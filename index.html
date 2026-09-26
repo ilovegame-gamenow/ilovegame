@@ -193,8 +193,6 @@ footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12
  次の工程で SUPABASE_ANON_KEY を設定すると、published の記事を自動取得します。
  anon key はブラウザ公開用のキーです。service_role key は絶対に入れないでください。
 */
-const SUPABASE_URL = "https://hsckhzwdtpvzylwakhdq.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzY2toendkdHB2enlsd2FraGRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0MDM4NTMsImV4cCI6MjEwNTk3OTg1M30.vZQfhpHBks4hZRztjFAoLTUszrviiF_t7Yi9ZE3AeJU"; // 次の工程で設定
 
 function platformClass(name){
   const n=(name||"").toLowerCase();
@@ -209,13 +207,9 @@ function platformClass(name){
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
 
 async function loadLiveNews(){
-  if(!SUPABASE_ANON_KEY) return;
   try{
-    const fields="id,title,summary,ilovegame_point,platforms,category,source_name,source_url,source_published_at,importance,is_breaking,status,published_at";
-    const url=`${SUPABASE_URL}/rest/v1/articles?select=${encodeURIComponent(fields)}&status=eq.published&order=published_at.desc&limit=30`;
-    const r=await fetch(url,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});
-    if(!r.ok) throw new Error(`Supabase ${r.status}`);
-    const rows=await r.json();
+    const r = await fetch("/api/news");
+    const rows = await r.json();
     if(!rows.length) return;
 
     const latest=document.querySelector(".news-grid,.grid");
