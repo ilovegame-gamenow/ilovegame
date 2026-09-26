@@ -231,7 +231,7 @@ async function loadLiveNews(){
         <div class="platforms">${badges}</div>
       </article>`;
     }).join("");
-  }catch(e){console.warn("Live news load skipped:",e);}
+  }catch(e){console.error(e);alert("Supabase接続エラー: "+e.message);}
 }
 loadLiveNews();
 </script>
