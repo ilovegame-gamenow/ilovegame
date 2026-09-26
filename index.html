@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I LOVE GAME♪ — ゲームの「今」をお届け♪</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --orange:#ff7a2f;
+  --orange2:#ff9a55;
+  --cream:#fff8f0;
+  --ink:#24201d;
+  --muted:#77706a;
+  --line:#eee2d7;
+  --white:#fff;
+}
+body{
+  margin:0;color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  background:var(--cream);
+}
+header{
+  background:var(--white);
+  border-bottom:3px solid var(--orange);
+  padding:18px 20px 14px;
+}
+.header-inner{
+  max-width:1100px;margin:auto;display:flex;align-items:center;
+  justify-content:space-between;gap:20px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo-mark{
+  width:48px;height:48px;background:var(--orange);border-radius:15px;
+  display:grid;place-items:center;font-size:27px;transform:rotate(-5deg);
+  box-shadow:4px 4px 0 #ffd0b5;
+}
+.logo{
+  font-weight:1000;font-size:29px;letter-spacing:.02em;line-height:1;
+}
+.logo .love{color:var(--orange)}
+.music{color:var(--orange);font-size:1.12em;display:inline-block;transform:translate(2px,-6px) rotate(8deg);font-weight:1000}
+.tagline{font-size:11px;color:var(--muted);margin-top:5px;font-weight:700}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+nav a{
+  color:var(--ink);text-decoration:none;font-size:12px;font-weight:800;
+  padding:8px 11px;border-radius:999px;background:#fff3e9;
+}
+nav a:hover{background:#ffe1cb}
+main{max-width:1100px;margin:0 auto;padding:28px 20px 65px}
+.breaking{
+  background:var(--white);border:2px solid var(--orange);border-radius:22px;
+  padding:23px 25px;margin-bottom:30px;position:relative;
+  box-shadow:7px 7px 0 #ffd9c2;
+}
+.breaking:after{
+  content:"";position:absolute;right:20px;top:-12px;width:25px;height:25px;
+  background:var(--orange);border-radius:8px;transform:rotate(14deg);
+}
+.breaking-label{font-weight:1000;color:var(--orange);font-size:13px;margin-bottom:8px}
+.breaking h1{font-size:28px;margin:0 0 8px;line-height:1.35}
+.meta{font-size:12px;color:var(--muted)}
+.section-title{
+  display:flex;align-items:end;justify-content:space-between;
+  margin:30px 0 12px;border-bottom:2px solid var(--line);padding-bottom:9px;
+}
+.section-title h2{margin:0;font-size:21px;font-weight:1000}
+.section-title span{font-size:11px;color:var(--muted);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{
+  background:var(--white);border:1px solid var(--line);border-radius:18px;
+  padding:17px;min-height:150px;box-shadow:0 4px 14px #d78f6317;
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 20px #d78f6326}
+.card:nth-child(3n)::after{content:"♪";float:right;color:#ff9a55;font-size:16px;font-weight:900;margin-top:-5px}
+.time{font-size:11px;color:var(--orange);font-weight:900;margin-bottom:9px}
+.card h3{font-size:16px;line-height:1.5;margin:0 0 12px}
+.tag{
+  display:inline-block;font-size:10px;font-weight:800;color:#8a4b28;
+  background:#fff0e5;border:1px solid #ffd5bd;border-radius:999px;padding:4px 8px;
+}
+.pickup{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:14px}
+.pickup .card:first-child{min-height:210px;background:#fff3e8;border-color:#ffc8a5}
+footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12px}
+.footer-logo{font-size:20px;font-weight:1000;margin-bottom:5px}
+.footer-logo span{color:var(--orange2)}
+@media(max-width:800px){
+  .grid{grid-template-columns:1fr 1fr}.pickup{grid-template-columns:1fr 1fr}
+  .pickup .card:first-child{grid-column:1/-1}
+}
+@media(max-width:600px){
+  .header-inner{align-items:flex-start}.logo{font-size:24px}
+  .logo-mark{width:42px;height:42px;font-size:23px}
+  nav{display:none}.grid,.pickup{grid-template-columns:1fr}
+  .breaking h1{font-size:22px}
+}
+.archive{min-height:120px}\n
+/* --- I LOVE GAME♪ live-news additions --- */
+.platforms{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.platform{font-size:11px;font-weight:900;padding:5px 8px;border-radius:999px;color:#fff;letter-spacing:.02em}
+.platform.switch,.platform.switch2{background:#e60012}
+.platform.ps5{background:#1674d1}
+.platform.xbox{background:#107c10}
+.platform.pc{background:#5d6470}
+.platform.mobile{background:#8e44ad}
+.platform.other{background:#ff7a2f}
+.thumb{width:100%;aspect-ratio:16/9;border-radius:14px;object-fit:cover;background:linear-gradient(135deg,#ffe2cc,#fff3e8);display:block;margin-bottom:12px}
+.thumb-placeholder{width:100%;aspect-ratio:16/9;border-radius:14px;background:linear-gradient(135deg,#ff7a2f,#ffb36f);display:grid;place-items:center;color:#fff;font-weight:1000;font-size:22px;margin-bottom:12px}
+.live-note{max-width:1120px;margin:10px auto 0;padding:0 20px;color:#8a817a;font-size:12px}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo-mark">♥</div>
+      <div>
+        <div class="logo">I <span class="love">LOVE</span> GAME<span class="music">♪</span></div>
+        <div class="tagline">ゲームの「今」をお届け♪</div>
+      </div>
+    </div>
+    <nav>
+      <a href="#breaking">速報</a><a href="#latest">最新</a><a href="#latest">ニュース</a><a href="#breaking">PICK UP</a>
+    </nav>
+  </div>
+</header>
+
+
+<main>
+<section id="breaking" class="breaking">
+  <div class="breaking-label">● BREAKING / 速報</div>
+  <h1>ここに最新のゲーム速報が入ります</h1>
+  <div class="meta">2026.09.26 14:32　｜　速報</div>
+</section>
+
+<div class="section-title" id="latest">
+  <h2>🔥 LATEST</h2>
+  <span>最新ゲームニュース</span>
+</div>
+
+<section class="grid">
+<article class="card"><div class="time">14:32</div><h3>注目タイトルの最新情報が発表</h3><span class="tag">NEWS</span></article>
+<article class="card"><div class="time">14:08</div><h3>新作ゲームの発売日が決定</h3><span class="tag">発売情報</span></article>
+<article class="card"><div class="time">13:51</div><h3>大型アップデートの詳細が公開</h3><span class="tag">UPDATE</span></article>
+<article class="card"><div class="time">13:20</div><h3>最新トレーラーが公開</h3><span class="tag">PV</span></article>
+<article class="card"><div class="time">12:45</div><h3>ゲームイベントの開催が決定</h3><span class="tag">EVENT</span></article>
+<article class="card"><div class="time">12:18</div><h3>話題のインディーゲーム最新情報</h3><span class="tag">INDIE</span></article>
+<article class="card"><div class="time">11:42</div><h3>人気タイトルに新コンテンツ追加</h3><span class="tag">UPDATE</span></article>
+<article class="card"><div class="time">11:05</div><h3>海外で新たなゲーム情報が公開</h3><span class="tag">WORLD</span></article>
+</section>
+
+<div class="section-title">
+  <h2>🎮 PICK UP</h2>
+  <span>注目ニュース</span>
+</div>
+
+<section class="pickup">
+<article class="card">
+  <div class="time">FEATURE</div>
+  <h3>今日もっとも注目したいゲームニュース</h3>
+  <p class="meta">その日のニュースの中から、特に気になる情報をピックアップ。</p>
+</article>
+<article class="card">
+  <div class="time">REVIEW</div>
+  <h3>話題の新作をチェック</h3>
+  <span class="tag">REVIEW</span>
+</article>
+<article class="card">
+  <div class="time">COLUMN</div>
+  <h3>ゲームの「なぜ面白い？」を考える</h3>
+  <span class="tag">COLUMN</span>
+</article>
+</section>
+
+<div class="section-title">
+  <h2>📅 NEWS ARCHIVE</h2>
+  <span>過去のニュース</span>
+</div>
+
+<section class="card archive">
+  <h3>ゲームニュースを日付・タイトル・ジャンルから探す</h3>
+  <p class="meta">検索・カテゴリ・ゲームタイトル別のアーカイブをここに追加予定。</p>
+</section>
+</main>
+
+<footer><div class="footer-logo">I <span>LOVE</span> GAME<span class="music">♪</span></div>ゲームの「今」をお届け♪</footer>
+
+<script>
+/*
+ I LOVE GAME♪ live data hook
+ 次の工程で SUPABASE_ANON_KEY を設定すると、published の記事を自動取得します。
+ anon key はブラウザ公開用のキーです。service_role key は絶対に入れないでください。
+*/
+const SUPABASE_URL = "https://hsckhzwdtpvzylwakhdq.supabase.co";
+const SUPABASE_ANON_KEY = ""; // 次の工程で設定
+
+function platformClass(name){
+  const n=(name||"").toLowerCase();
+  if(n.includes("switch 2")) return "switch2";
+  if(n.includes("switch")) return "switch";
+  if(n.includes("ps5") || n.includes("playstation")) return "ps5";
+  if(n.includes("xbox")) return "xbox";
+  if(n.includes("pc") || n.includes("steam")) return "pc";
+  if(n.includes("ios") || n.includes("android") || n.includes("スマホ") || n.includes("mobile")) return "mobile";
+  return "other";
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+
+async function loadLiveNews(){
+  if(!SUPABASE_ANON_KEY) return;
+  try{
+    const fields="id,title,summary,ilovegame_point,platforms,category,source_name,source_url,source_published_at,importance,is_breaking,status,published_at";
+    const url=`${SUPABASE_URL}/rest/v1/articles?select=${encodeURIComponent(fields)}&status=eq.published&order=published_at.desc&limit=30`;
+    const r=await fetch(url,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});
+    if(!r.ok) throw new Error(`Supabase ${r.status}`);
+    const rows=await r.json();
+    if(!rows.length) return;
+
+    const latest=document.querySelector(".news-grid,.grid");
+    if(!latest) return;
+    latest.innerHTML=rows.map(a=>{
+      const ps=Array.isArray(a.platforms)?a.platforms:[];
+      const badges=ps.map(p=>`<span class="platform ${platformClass(p)}">${esc(p)}</span>`).join("");
+      return `<article class="card">
+        <div class="thumb-placeholder">I LOVE GAME♪</div>
+        <div class="meta">${esc(a.category||"NEWS")} ・ ${esc(a.source_name||"")}</div>
+        <h3>${esc(a.title)}</h3>
+        <p>${esc(a.summary||"")}</p>
+        <div class="platforms">${badges}</div>
+      </article>`;
+    }).join("");
+  }catch(e){console.warn("Live news load skipped:",e);}
+}
+loadLiveNews();
+</script>
+
+</body>
+</html>
