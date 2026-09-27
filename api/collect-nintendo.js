@@ -1,46 +1,39 @@
 export default async function handler(req, res) {
   try {
-    const url = "https://www.nintendo.com/jp/topics/list";
+    const pageUrl = "https://www.nintendo.com/jp/topics/list";
 
-    const response = await fetch(url, {
+    const response = await fetch(pageUrl, {
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1",
+        "User-Agent": "Mozilla/5.0",
         "Accept": "text/html,application/xhtml+xml"
       }
     });
 
     const html = await response.text();
 
-    const words = [
-      "/jp/topics/article/",
-      "topics/article",
-      "__NEXT_DATA__",
-      "__NUXT__",
-      "application/json",
-      "topics"
+    const matches = [
+      ...html.matchAll(
+        /<script[^>]+src=["']([^"']+)["'][^>]*>/gi
+      )
     ];
 
-    const diagnostics = {};
+    const scripts = [];
+    const seen = new Set();
 
-    for (const word of words) {
-      diagnostics[word] = html.includes(word);
+    for (const match of matches) {
+      const scriptUrl = new URL(match[1], pageUrl).href;
+
+      if (seen.has(scriptUrl)) continue;
+      seen.add(scriptUrl);
+
+      scripts.push(scriptUrl);
     }
-
-    const topicsIndex = html.indexOf("topics");
 
     return res.status(200).json({
       success: response.ok,
       status: response.status,
-      length: html.length,
-      diagnostics,
-      sample:
-        topicsIndex >= 0
-          ? html.slice(
-              Math.max(0, topicsIndex - 300),
-              topicsIndex + 700
-            )
-          : html.slice(0, 1000)
+      count: scripts.length,
+      scripts
     });
 
   } catch (error) {
