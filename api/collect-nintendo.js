@@ -39,9 +39,6 @@ export default async function handler(req, res) {
 
       const article = {
         title: item.title,
-        summary: null,
-        ilovegame_point: null,
-        platforms: [],
         category: "NEWS",
         thumbnail_url: item.thumbnail?.url_key || null,
         source_name: "Nintendo",
