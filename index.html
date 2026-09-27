@@ -218,7 +218,7 @@ async function loadLiveNews(){
       const ps=Array.isArray(a.platforms)?a.platforms:[];
       const badges=ps.map(p=>`<span class="platform ${platformClass(p)}">${esc(p)}</span>`).join("");
       return `<article class="card">
-        <div class="thumb-placeholder">I LOVE GAME♪</div>
+        ${a.thumbnail_url ? `<img class="thumb" src="https://assets.topics.apps-jp.nintendo.com/image/${esc(a.thumbnail_url)}" alt="${esc(a.title)}">` : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
         <div class="meta">${esc(a.category||"NEWS")} ・ ${esc(a.source_name||"")}</div>
         <h3>${esc(a.title)}</h3>
         <p>${esc(a.summary||"")}</p>
