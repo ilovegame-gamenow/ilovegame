@@ -43,7 +43,7 @@ export default async function handler(req, res) {
         ilovegame_point: null,
         platforms: [],
         category: "NEWS",
-        thumbnail_url: null,
+        thumbnail_url: item.thumbnail?.url_key || null,
         source_name: "Nintendo",
         source_url: sourceUrl,
         source_published_at: item.display_date,
