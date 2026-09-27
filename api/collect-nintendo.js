@@ -61,7 +61,7 @@ export default async function handler(req, res) {
             "apikey": supabaseKey,
             "Authorization": `Bearer ${supabaseKey}`,
             "Content-Type": "application/json",
-            "Prefer": "resolution=ignore-duplicates,return=minimal"
+            "Prefer": "resolution=merge-duplicates,return=minimal"
           },
           body: JSON.stringify(article)
         }
