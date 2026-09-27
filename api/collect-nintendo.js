@@ -1,55 +1,32 @@
 export default async function handler(req, res) {
   try {
-    const jsUrl =
-      "https://www.nintendo.com/jp/topics/main.61a655bbb473ca0b.js";
+    const apiUrl =
+      "https://www.nintendo.com/jp/topics/c/_/v0/posts/search";
 
-    const response = await fetch(jsUrl, {
+    const response = await fetch(apiUrl, {
       headers: {
-        "User-Agent": "Mozilla/5.0"
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/json"
       }
     });
 
-    const js = await response.text();
+    const text = await response.text();
 
-    const keywords = [
-      "esVersion=",
-      "esVersion:",
-      "this.esVersion",
-      '"/posts/search"',
-      '"_/v"',
-      "API_PATH",
-      "apiCache.get"
-    ];
+    let data;
 
-    const results = {};
-
-    for (const keyword of keywords) {
-      const matches = [];
-      let start = 0;
-
-      while (matches.length < 8) {
-        const index = js.indexOf(keyword, start);
-
-        if (index === -1) break;
-
-        matches.push(
-          js.slice(
-            Math.max(0, index - 700),
-            index + 1200
-          )
-        );
-
-        start = index + keyword.length;
-      }
-
-      results[keyword] = matches;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = null;
     }
 
     return res.status(200).json({
       success: response.ok,
       status: response.status,
-      length: js.length,
-      results
+      contentType: response.headers.get("content-type"),
+      length: text.length,
+      isJson: data !== null,
+      sample: data !== null ? data : text.slice(0, 1000)
     });
 
   } catch (error) {
