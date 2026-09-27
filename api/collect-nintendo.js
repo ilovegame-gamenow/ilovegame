@@ -10,23 +10,30 @@ export default async function handler(req, res) {
       }
     });
 
-    const text = await response.text();
-
-    let data;
-
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = null;
+    if (!response.ok) {
+      return res.status(response.status).json({
+        success: false,
+        error: "Nintendo API request failed"
+      });
     }
 
+    const data = await response.json();
+
+    const articles = data.slice(0, 10).map((item) => ({
+      id: item.id,
+      title: item.title,
+      publishedAt: item.display_date,
+      slug: item.slug,
+      articleUrl:
+        `https://www.nintendo.com/jp/topics/article/${item.slug}`,
+      thumbnailKey:
+        item.thumbnail?.url_key || null
+    }));
+
     return res.status(200).json({
-      success: response.ok,
-      status: response.status,
-      contentType: response.headers.get("content-type"),
-      length: text.length,
-      isJson: data !== null,
-      sample: data !== null ? data : text.slice(0, 1000)
+      success: true,
+      count: articles.length,
+      articles
     });
 
   } catch (error) {
