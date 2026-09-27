@@ -53,13 +53,25 @@ const text = articleHtml
   .replace(/&amp;/g, "&")
   .replace(/\s+/g, " ")
   .trim();
+const cutoffMarkers = [
+  "関連リンク",
+  "この記事のほかにも、こんな記事があります。"
+];
 
+let cleanText = text;
+
+for (const marker of cutoffMarkers) {
+  const index = cleanText.indexOf(marker);
+  if (index !== -1) {
+    cleanText = cleanText.slice(0, index).trim();
+  }
+}
     return res.status(200).json({
       success: true,
       title: item.title,
       source_url: sourceUrl,
       html_length: html.length,
-      text_preview: text.slice(0, 3000)
+      text_preview: cleanText.slice(0, 3000)
     });
 
   } catch (error) {
