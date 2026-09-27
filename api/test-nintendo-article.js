@@ -37,15 +37,22 @@ export default async function handler(req, res) {
     }
 
     const html = await articleResponse.text();
+    const mainMatch =
+  html.match(/<main[\s\S]*?<\/main>/i) ||
+  html.match(/<article[\s\S]*?<\/article>/i);
 
-    const text = html
-      .replace(/<script[\s\S]*?<\/script>/gi, " ")
-      .replace(/<style[\s\S]*?<\/style>/gi, " ")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/&nbsp;/g, " ")
-      .replace(/&amp;/g, "&")
-      .replace(/\s+/g, " ")
-      .trim();
+const articleHtml = mainMatch ? mainMatch[0] : html;
+
+const text = articleHtml
+  .replace(/<script[\s\S]*?<\/script>/gi, " ")
+  .replace(/<style[\s\S]*?<\/style>/gi, " ")
+  .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+  .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+  .replace(/<[^>]+>/g, " ")
+  .replace(/&nbsp;/g, " ")
+  .replace(/&amp;/g, "&")
+  .replace(/\s+/g, " ")
+  .trim();
 
     return res.status(200).json({
       success: true,
