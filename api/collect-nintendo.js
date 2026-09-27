@@ -12,26 +12,38 @@ export default async function handler(req, res) {
     const js = await response.text();
 
     const keywords = [
-      "api",
-      ".json",
-      "fetch(",
-      "HttpClient",
-      "article",
-      "topics"
+      "ADMIN_API_PATH",
+      "article-post",
+      "/posts",
+      "posts?",
+      "/post",
+      "post?",
+      "page=",
+      "category="
     ];
 
     const results = {};
 
     for (const keyword of keywords) {
-      const index = js.toLowerCase().indexOf(keyword.toLowerCase());
+      const matches = [];
+      let start = 0;
 
-      results[keyword] =
-        index >= 0
-          ? js.slice(
-              Math.max(0, index - 300),
-              index + 700
-            )
-          : null;
+      while (matches.length < 5) {
+        const index = js.indexOf(keyword, start);
+
+        if (index === -1) break;
+
+        matches.push(
+          js.slice(
+            Math.max(0, index - 500),
+            index + 1000
+          )
+        );
+
+        start = index + keyword.length;
+      }
+
+      results[keyword] = matches;
     }
 
     return res.status(200).json({
