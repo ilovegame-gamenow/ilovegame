@@ -1,39 +1,44 @@
 export default async function handler(req, res) {
   try {
-    const pageUrl = "https://www.nintendo.com/jp/topics/list";
+    const jsUrl =
+      "https://www.nintendo.com/jp/topics/main.61a655bbb473ca0b.js";
 
-    const response = await fetch(pageUrl, {
+    const response = await fetch(jsUrl, {
       headers: {
-        "User-Agent": "Mozilla/5.0",
-        "Accept": "text/html,application/xhtml+xml"
+        "User-Agent": "Mozilla/5.0"
       }
     });
 
-    const html = await response.text();
+    const js = await response.text();
 
-    const matches = [
-      ...html.matchAll(
-        /<script[^>]+src=["']([^"']+)["'][^>]*>/gi
-      )
+    const keywords = [
+      "api",
+      ".json",
+      "fetch(",
+      "HttpClient",
+      "article",
+      "topics"
     ];
 
-    const scripts = [];
-    const seen = new Set();
+    const results = {};
 
-    for (const match of matches) {
-      const scriptUrl = new URL(match[1], pageUrl).href;
+    for (const keyword of keywords) {
+      const index = js.toLowerCase().indexOf(keyword.toLowerCase());
 
-      if (seen.has(scriptUrl)) continue;
-      seen.add(scriptUrl);
-
-      scripts.push(scriptUrl);
+      results[keyword] =
+        index >= 0
+          ? js.slice(
+              Math.max(0, index - 300),
+              index + 700
+            )
+          : null;
     }
 
     return res.status(200).json({
       success: response.ok,
       status: response.status,
-      count: scripts.length,
-      scripts
+      length: js.length,
+      results
     });
 
   } catch (error) {
