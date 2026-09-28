@@ -66,12 +66,52 @@ for (const marker of cutoffMarkers) {
     cleanText = cleanText.slice(0, index).trim();
   }
 }
+    const openaiResponse = await fetch("https://api.openai.com/v1/responses", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: "gpt-5-mini",
+    input: `あなたはゲームニュースサイト「I LOVE GAME♪」の編集者です。
+
+以下のNintendo公式記事だけを情報源として、日本語のゲームニュースを作成してください。
+公式記事に書かれていない情報は追加しないでください。
+
+次の3項目をJSONだけで出力してください。
+{
+  "title": "分かりやすいニュースタイトル",
+  "summary": "ニュースの重要点を2〜3文で簡潔にまとめた文章",
+  "ilovegame_point": "読者が注目すべきポイントを1〜2文で紹介。過度な煽り表現は使わない"
+}
+
+公式タイトル:
+${item.title}
+
+公式記事本文:
+${cleanText.slice(0, 6000)}`
+  })
+});
+
+const openaiData = await openaiResponse.json();
+
+if (!openaiResponse.ok) {
+  return res.status(openaiResponse.status).json({
+    success: false,
+    error: "OpenAI request failed",
+    details: openaiData
+  });
+}
+
+const aiText = openaiData.output_text;
     return res.status(200).json({
       success: true,
       title: item.title,
       source_url: sourceUrl,
       html_length: html.length,
-      text_preview: cleanText.slice(0, 3000)
+      text_preview: cleanText.slice(0, 3000),
+      ai_result: aiText
     });
 
   } catch (error) {
