@@ -62,24 +62,41 @@ export default async function handler(req, res) {
 
 const existingArticles = await existingResponse.json();
 const alreadyExists = Array.isArray(existingArticles) && existingArticles.length > 0;
-if (alreadyExists) {
-  delete article.title;
-}
-      const insertResponse = await fetch(
-        `${supabaseUrl}/rest/v1/articles?on_conflict=source_url`,
-        {
-          method: "POST",
-          headers: {
-            "apikey": supabaseKey,
-            "Authorization": `Bearer ${supabaseKey}`,
-            "Content-Type": "application/json",
-            "Prefer": "resolution=merge-duplicates,return=minimal"
-          },
-          body: JSON.stringify(article)
-        }
-      );
+let saveResponse;
 
-      if (insertResponse.ok) {
+if (alreadyExists) {
+  const updateArticle = { ...article };
+  delete updateArticle.title;
+
+  saveResponse = await fetch(
+    `${supabaseUrl}/rest/v1/articles?source_url=eq.${encodeURIComponent(sourceUrl)}`,
+    {
+      method: "PATCH",
+      headers: {
+        "apikey": supabaseKey,
+        "Authorization": `Bearer ${supabaseKey}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify(updateArticle)
+    }
+  );
+} else {
+  saveResponse = await fetch(
+    `${supabaseUrl}/rest/v1/articles`,
+    {
+      method: "POST",
+      headers: {
+        "apikey": supabaseKey,
+        "Authorization": `Bearer ${supabaseKey}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify(article)
+    }
+  );
+}
+      if (saveResponse.ok) {
         results.push({
           title: item.title,
           success: true
@@ -88,7 +105,7 @@ if (alreadyExists) {
         results.push({
           title: item.title,
           success: false,
-          error: await insertResponse.text()
+          error: await saveResponse.text()
         });
       }
     }
