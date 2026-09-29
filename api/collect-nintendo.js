@@ -50,7 +50,21 @@ export default async function handler(req, res) {
         status: "published",
         published_at: item.display_date
       };
+      const existingResponse = await fetch(
+  `${supabaseUrl}/rest/v1/articles?source_url=eq.${encodeURIComponent(sourceUrl)}&select=id`,
+  {
+    headers: {
+      "apikey": supabaseKey,
+      "Authorization": `Bearer ${supabaseKey}`
+    }
+  }
+);
 
+const existingArticles = await existingResponse.json();
+const alreadyExists = Array.isArray(existingArticles) && existingArticles.length > 0;
+if (alreadyExists) {
+  delete article.title;
+}
       const insertResponse = await fetch(
         `${supabaseUrl}/rest/v1/articles?on_conflict=source_url`,
         {
