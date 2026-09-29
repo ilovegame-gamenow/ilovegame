@@ -111,13 +111,17 @@ const aiText =
     ?.find(part => part.type === "output_text")
     ?.text ||
   "";
+    const aiArticle = JSON.parse(aiText);
     return res.status(200).json({
       success: true,
       title: item.title,
       source_url: sourceUrl,
       html_length: html.length,
       text_preview: cleanText.slice(0, 3000),
-      ai_result: aiText
+      ai_result: aiText,
+      ai_title: aiArticle.title,
+      ai_summary: aiArticle.summary,
+      ai_point: aiArticle.ilovegame_point
     });
 
   } catch (error) {
