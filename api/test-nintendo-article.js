@@ -104,7 +104,13 @@ if (!openaiResponse.ok) {
   });
 }
 
-const aiText = openaiData.output_text;
+const aiText =
+  openaiData.output_text ||
+  openaiData.output
+    ?.flatMap(item => item.content || [])
+    ?.find(part => part.type === "output_text")
+    ?.text ||
+  "";
     return res.status(200).json({
       success: true,
       title: item.title,
