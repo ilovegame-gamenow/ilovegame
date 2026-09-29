@@ -112,6 +112,34 @@ const aiText =
     ?.text ||
   "";
     const aiArticle = JSON.parse(aiText);
+    const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+const saveResponse = await fetch(
+  `${supabaseUrl}/rest/v1/articles?source_url=eq.${encodeURIComponent(sourceUrl)}`,
+  {
+    method: "PATCH",
+    headers: {
+      "apikey": supabaseKey,
+      "Authorization": `Bearer ${supabaseKey}`,
+      "Content-Type": "application/json",
+      "Prefer": "return=minimal"
+    },
+    body: JSON.stringify({
+      title: aiArticle.title,
+      summary: aiArticle.summary,
+      ilovegame_point: aiArticle.ilovegame_point
+    })
+  }
+);
+
+if (!saveResponse.ok) {
+  return res.status(saveResponse.status).json({
+    success: false,
+    error: "Supabase save failed",
+    details: await saveResponse.text()
+  });
+}
     return res.status(200).json({
       success: true,
       title: item.title,
