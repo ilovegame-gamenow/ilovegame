@@ -38,7 +38,7 @@ export default async function handler(req, res) {
         `https://www.nintendo.com/jp/topics/article/${item.slug}`;
 
       const article = {
-        title: item.title,
+        source_title: item.title,
         category: "NEWS",
         thumbnail_url: item.thumbnail?.url_key || null,
         source_name: "Nintendo",
