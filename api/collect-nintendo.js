@@ -39,6 +39,7 @@ export default async function handler(req, res) {
 
       const article = {
         source_title: item.title,
+        title: item.title,
         category: "NEWS",
         thumbnail_url: item.thumbnail?.url_key || null,
         source_name: "Nintendo",
