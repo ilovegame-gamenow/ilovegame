@@ -50,18 +50,22 @@ export default async function handler(req, res) {
         status: "published",
         published_at: item.display_date
       };
-      const existingResponse = await fetch(
-  `${supabaseUrl}/rest/v1/articles?source_url=eq.${encodeURIComponent(`"${sourceUrl}"`)}&select=id`,
-  {
-    headers: {
-      "apikey": supabaseKey,
-      "Authorization": `Bearer ${supabaseKey}`
-    }
+const checkUrl = new URL(`${supabaseUrl}/rest/v1/articles`);
+checkUrl.searchParams.set("select", "id");
+checkUrl.searchParams.set("source_url", `eq.${sourceUrl}`);
+
+const existingResponse = await fetch(checkUrl.toString(), {
+  headers: {
+    "apikey": supabaseKey,
+    "Authorization": `Bearer ${supabaseKey}`
   }
-);
+});
 
 const existingArticles = await existingResponse.json();
-const alreadyExists = Array.isArray(existingArticles) && existingArticles.length > 0;
+const alreadyExists =
+  existingResponse.ok &&
+  Array.isArray(existingArticles) &&
+  existingArticles.length > 0;
 if (!alreadyExists) {
   // 新規記事だけAI記事生成を行う
   const articleResponse = await fetch(sourceUrl, {
