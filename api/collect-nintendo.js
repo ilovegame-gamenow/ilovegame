@@ -51,7 +51,7 @@ export default async function handler(req, res) {
         published_at: item.display_date
       };
       const existingResponse = await fetch(
-  `${supabaseUrl}/rest/v1/articles?source_url=eq.${encodeURIComponent(sourceUrl)}&select=id`,
+  `${supabaseUrl}/rest/v1/articles?source_url=eq.${encodeURIComponent(`"${sourceUrl}"`)}&select=id`,
   {
     headers: {
       "apikey": supabaseKey,
