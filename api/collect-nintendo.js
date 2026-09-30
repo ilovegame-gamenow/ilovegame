@@ -83,7 +83,7 @@ export default async function handler(req, res) {
         existingArticles.length > 0;
 
       // 新規記事だけAI記事生成を行う
-      if (!alreadyExists) {
+      if (!alreadyExists || item === latest[0]) {
         const articleResponse = await fetch(
           sourceUrl,
           {
