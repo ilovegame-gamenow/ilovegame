@@ -2,8 +2,8 @@ export default async function handler(req, res) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
+    const openaiKey = process.env.OPENAI_API_KEY;
+    if (!supabaseUrl || !supabaseKey || !openaiKey) {
       return res.status(500).json({
         success: false,
         error: "Supabase environment variables are missing"
@@ -62,6 +62,92 @@ export default async function handler(req, res) {
 
 const existingArticles = await existingResponse.json();
 const alreadyExists = Array.isArray(existingArticles) && existingArticles.length > 0;
+if (!alreadyExists) {
+  // 新規記事だけAI記事生成を行う
+  const articleResponse = await fetch(sourceUrl, {
+  headers: {
+    "User-Agent": "Mozilla/5.0"
+  }
+});
+
+if (!articleResponse.ok) {
+  throw new Error("Nintendo article fetch failed");
+}
+
+const html = await articleResponse.text();
+const mainMatch =
+  html.match(/<main[\s\S]*?<\/main>/i) ||
+  html.match(/<article[\s\S]*?<\/article>/i);
+
+const articleHtml = mainMatch ? mainMatch[0] : html;
+
+const cleanText = articleHtml
+  .replace(/<script[\s\S]*?<\/script>/gi, " ")
+  .replace(/<style[\s\S]*?<\/style>/gi, " ")
+  .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+  .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+  .replace(/<[^>]+>/g, " ")
+  .replace(/&nbsp;/g, " ")
+  .replace(/&amp;/g, "&")
+  .replace(/\s+/g, " ")
+  .trim();
+  const openaiResponse = await fetch("https://api.openai.com/v1/responses", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${openaiKey}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: "gpt-5-mini",
+    input: `あなたはゲームニュースサイト「I LOVE GAME♪」の編集者です。
+
+以下のNintendo公式記事だけを情報源として、日本語のゲームニュースを作成してください。
+公式記事に書かれていない情報は追加しないでください。
+
+JSONだけで次の形式で出力してください。
+{
+  "title": "分かりやすいニュースタイトル",
+  "summary": "一覧カード用の短い要約。1〜2文で簡潔に",
+  "ilovegame_point": "読者が注目すべきポイントを1〜2文で紹介"
+}
+
+公式タイトル:
+${item.title}
+
+公式記事本文:
+${cleanText.slice(0, 6000)}`
+  })
+});
+const openaiData = await openaiResponse.json();
+
+if (!openaiResponse.ok) {
+  throw new Error(`OpenAI request failed: ${JSON.stringify(openaiData)}`);
+}
+
+const aiText =
+  openaiData.output_text ||
+  openaiData.output
+    ?.flatMap(item => item.content || [])
+    ?.find(part => part.type === "output_text")
+    ?.text ||
+  "";
+let aiArticle;
+
+try {
+  const jsonText = aiText
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  aiArticle = JSON.parse(jsonText);
+} catch (error) {
+  throw new Error(`AI JSON parse failed: ${aiText}`);
+}
+article.title = aiArticle.title;
+article.summary = aiArticle.summary;
+article.ilovegame_point = aiArticle.ilovegame_point;
+}
 let saveResponse;
 
 if (alreadyExists) {
