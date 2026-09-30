@@ -158,7 +158,8 @@ JSONだけで次の形式で出力してください。
 {
   "title": "分かりやすいニュースタイトル",
   "summary": "一覧カード用の要約。必ず1文、50～70文字程度で、最も重要な情報だけを簡潔にまとめる",
-  "ilovegame_point": "読者が注目すべきポイントを1～2文で紹介"
+  "ilovegame_point": "読者が注目すべきポイントを1～2文で紹介",
+  "article_body": "詳細記事ページ用の本文。公式記事の事実だけを使い、読みやすい日本語で3～5段落程度にまとめる"
 }
 
 公式タイトル:
@@ -219,6 +220,9 @@ ${cleanText.slice(0, 6000)}`
 
         article.ilovegame_point =
           aiArticle.ilovegame_point;
+
+        article.article_body =
+          aiArticle.article_body;
       }
 
       let saveResponse;
