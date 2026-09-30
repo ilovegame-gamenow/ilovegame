@@ -66,7 +66,7 @@ const alreadyExists =
   existingResponse.ok &&
   Array.isArray(existingArticles) &&
   existingArticles.length > 0;
-if (!alreadyExists) {
+if (!alreadyExists || item === latest[0]) {
   // 新規記事だけAI記事生成を行う
   const articleResponse = await fetch(sourceUrl, {
   headers: {
