@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>I LOVE GAME♪</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #fffaf3;
+      color: #2b2b2b;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Helvetica Neue",
+        "Hiragino Kaku Gothic ProN",
+        "Yu Gothic",
+        sans-serif;
+      line-height: 1.8;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 4px solid #ff8a3d;
+      padding: 18px 20px;
+    }
+
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      display: inline-block;
+      color: #222;
+      font-size: 25px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: #ff7a22;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 35px auto 80px;
+      padding: 0 20px;
+    }
+
+    .back {
+      display: inline-block;
+      margin-bottom: 24px;
+      color: #e86512;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .article-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+    }
+
+    .category {
+      display: inline-block;
+      background: #fff0e4;
+      color: #e86512;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(25px, 5vw, 38px);
+      line-height: 1.4;
+    }
+
+    .meta {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .hero {
+      width: 100%;
+      display: block;
+      border-radius: 18px;
+      margin: 0 0 30px;
+    }
+
+    .summary {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 28px;
+    }
+
+    .body {
+      font-size: 17px;
+      white-space: pre-line;
+    }
+
+    .point {
+      margin-top: 35px;
+      padding: 22px;
+      background: #fff4e8;
+      border-left: 6px solid #ff8a3d;
+      border-radius: 14px;
+    }
+
+    .point-title {
+      color: #e86512;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .source {
+      margin-top: 30px;
+      padding-top: 22px;
+      border-top: 1px solid #eee;
+    }
+
+    .source a {
+      color: #e86512;
+      font-weight: 700;
+    }
+
+    .error {
+      text-align: center;
+      padding: 70px 20px;
+    }
+
+    @media (max-width: 600px) {
+      main {
+        margin-top: 20px;
+        padding: 0 12px;
+      }
+
+      .article-card {
+        padding: 22px 18px;
+        border-radius: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a class="logo" href="/">
+        I <span>LOVE</span> GAME<span>♪</span>
+      </a>
+    </div>
+  </header>
+
+  <main id="app">
+    <div class="error">
+      記事を読み込んでいます…
+    </div>
+  </main>
+
+  <script>
+    const esc = (value = "") =>
+      String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+    async function loadArticle() {
+      const app = document.getElementById("app");
+
+      try {
+        const params =
+          new URLSearchParams(window.location.search);
+
+        const id = params.get("id");
+
+        if (!id) {
+          throw new Error("記事IDがありません");
+        }
+
+        const response = await fetch("/api/news");
+
+        if (!response.ok) {
+          throw new Error("記事を取得できませんでした");
+        }
+
+        const articles = await response.json();
+
+        const article = articles.find(
+          item => String(item.id) === String(id)
+        );
+
+        if (!article) {
+          throw new Error("記事が見つかりません");
+        }
+
+        const thumbnail = article.thumbnail_url
+          ? `https://assets.topics.apps-jp.nintendo.com/image/${article.thumbnail_url}`
+          : "";
+
+        const date = article.published_at
+          ? new Date(article.published_at).toLocaleDateString(
+              "ja-JP",
+              {
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+              }
+            )
+          : "";
+
+        document.title =
+          `${article.title} | I LOVE GAME♪`;
+
+        app.innerHTML = `
+          <a class="back" href="/">← LATESTへ戻る</a>
+
+          <article class="article-card">
+
+            <div class="category">
+              ${esc(article.category || "NEWS")}
+            </div>
+
+            <h1>${esc(article.title)}</h1>
+
+            <div class="meta">
+              ${esc(date)}
+              ${article.source_name
+                ? ` ・ ${esc(article.source_name)}`
+                : ""}
+            </div>
+
+            ${thumbnail
+              ? `<img
+                   class="hero"
+                   src="${esc(thumbnail)}"
+                   alt="${esc(article.title)}"
+                 >`
+              : ""}
+
+            ${article.summary
+              ? `<div class="summary">
+                   ${esc(article.summary)}
+                 </div>`
+              : ""}
+
+            <div class="body">
+              ${esc(
+                article.article_body ||
+                article.summary ||
+                ""
+              )}
+            </div>
+
+            ${article.ilovegame_point
+              ? `
+                <div class="point">
+                  <div class="point-title">
+                    I LOVE GAME♪ POINT
+                  </div>
+                  <div>
+                    ${esc(article.ilovegame_point)}
+                  </div>
+                </div>
+              `
+              : ""}
+
+            ${article.source_url
+              ? `
+                <div class="source">
+                  情報元：
+                  <a
+                    href="${esc(article.source_url)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    ${esc(
+                      article.source_name ||
+                      "公式サイト"
+                    )}
+                  </a>
+                </div>
+              `
+              : ""}
+
+          </article>
+        `;
+
+      } catch (error) {
+        app.innerHTML = `
+          <div class="error">
+            <h2>記事を表示できませんでした</h2>
+            <p>${esc(error.message)}</p>
+            <p><a href="/">トップページへ戻る</a></p>
+          </div>
+        `;
+      }
+    }
+
+    loadArticle();
+  </script>
+
+</body>
+</html>
