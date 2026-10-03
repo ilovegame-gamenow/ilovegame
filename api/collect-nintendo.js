@@ -206,6 +206,12 @@ ${cleanText.slice(0, 6000)}`
           aiArticle =
             JSON.parse(jsonText);
 
+          console.log("AI DEBUG", {
+            title: aiArticle.title,
+            summaryLength: aiArticle.summary?.length,
+            articleBodyLength: aiArticle.article_body?.length,
+            articleBody: aiArticle.article_body
+          });
         } catch (error) {
           throw new Error(
             `AI JSON parse failed: ${aiText}`
