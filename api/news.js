@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     }
 
     const fields =
-      "id,title,summary,ilovegame_point,platforms,category,thumbnail_url,source_name,source_url,source_published_at,importance,is_breaking,status,published_at";
+      "id,title,summary,article_body,ilovegame_point,platforms,category,thumbnail_url,source_name,source_url,source_published_at,importance,is_breaking,status,published_at";
 
     const url =
       `${supabaseUrl}/rest/v1/articles` +
