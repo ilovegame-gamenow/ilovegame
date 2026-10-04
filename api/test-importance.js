@@ -25,7 +25,8 @@ export default async function handler(req, res) {
     }
 
     const data = await nintendoResponse.json();
-    const latest = data.slice(0, 10);
+    const start = Math.max(0, Number(req.query.start) || 0);
+    const latest = data.slice(start, start + 10);
     const results = [];
 
     // 最新10件を本文まで取得してAI採点
