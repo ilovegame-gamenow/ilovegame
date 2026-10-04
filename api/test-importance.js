@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
     // Nintendo Topics の最新記事を取得
     const nintendoResponse = await fetch(
-      "https://www.nintendo.com/jp/topics/c/_/v0/posts/search?page=2",
+      "https://www.nintendo.com/jp/topics/c/_/v0/posts/search?page=3",
       {
         headers: {
           "User-Agent": "Mozilla/5.0",
