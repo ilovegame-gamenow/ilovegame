@@ -104,13 +104,24 @@ export default async function handler(req, res) {
       );
 
       if (!saveResponse.ok) {
-        results.push({
-          title: item.title,
-          status: "error",
-          error: await saveResponse.text()
-        });
-        continue;
-      }
+  const errorText = await saveResponse.text();
+
+  // 同じsource_urlがすでに存在する場合は正常扱い
+  if (saveResponse.status === 409 || errorText.includes("23505")) {
+    results.push({
+      title: item.title,
+      status: "existing"
+    });
+    continue;
+  }
+
+  results.push({
+    title: item.title,
+    status: "error",
+    error: errorText
+  });
+  continue;
+}
 
       results.push({
         title: item.title,
