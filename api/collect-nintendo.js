@@ -162,6 +162,7 @@ export default async function handler(req, res) {
 JSONだけで次の形式で出力してください。
 
 {
+  "importance": "I LOVE GAME♪での掲載価値を0～100の整数で評価する。ゲームそのものに直接関係する新作発表・発売日・大型アップデート・DLC・体験版などを高く評価する。ニュースの大きさ、タイトルやIPの注目度、プレイヤーにとっての有用性も考慮する。グッズや映画などゲーム外の情報は基本的に低めにするが、人気IPや大きな話題なら加点してよい。決算・人事など企業情報はゲームへの直接的な影響が大きい場合を除き低く評価する",
   "title": "分かりやすいニュースタイトル",
   "summary": "一覧カード用の要約。必ず1文、50～70文字程度で、最も重要な情報だけを簡潔にまとめる",
   "ilovegame_point": "「ここに注目♪」に表示する文章。記事の中で特に読者に伝えたいポイントを1～2文で紹介する。ニュース本文の要約を繰り返さず、ゲーム好きの友だちに話しかけるような、親しみのある柔らかい口調にする。「～だね♪」「～も楽しみ♪」「～なのもうれしいところ♪」など自然な表現を使ってよい。ただし毎回同じ語尾にしない。文章が長くなる場合は「。」「♪」「！」「？」で文が一区切りするごとに改行する。必要な場合のみ「、」の自然な位置でも改行する",
@@ -212,19 +213,15 @@ ${cleanText.slice(0, 6000)}`
           aiArticle =
             JSON.parse(jsonText);
 
-          console.log("AI DEBUG", {
-            title: aiArticle.title,
-            summaryLength: aiArticle.summary?.length,
-            articleBodyLength: aiArticle.article_body?.length,
-            articleBody: aiArticle.article_body
-          });
         } catch (error) {
           throw new Error(
             `AI JSON parse failed: ${aiText}`
           );
         }
-
-        article.title =
+        article.importance =
+          Math.max(0, Math.min(100, Math.round(Number(aiArticle.importance) || 0)));
+      
+         article.title =
           aiArticle.title;
 
         article.summary =
