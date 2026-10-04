@@ -3,7 +3,19 @@ export default async function handler(req, res) {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
     const openaiKey = process.env.OPENAI_API_KEY;
+    const cronSecret = process.env.CRON_SECRET;
 
+    const authHeader = req.headers.authorization;
+
+    if (
+      !cronSecret ||
+      authHeader !== `Bearer ${cronSecret}`
+    ) {
+      return res.status(401).json({
+        success: false,
+        error: "Unauthorized"
+      });
+    }
     if (!supabaseUrl || !supabaseKey || !openaiKey) {
       return res.status(500).json({
         success: false,
