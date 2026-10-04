@@ -147,6 +147,7 @@ ${cleanText.slice(0, 6000)}
 
     return res.status(200).json({
       success: true,
+      totalReceived: data.length,
       checked: latest.length,
       results
     });
