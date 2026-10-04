@@ -11,30 +11,39 @@ export default async function handler(req, res) {
       });
     }
 
-    // Nintendo Topics の最新記事を取得
-    const nintendoResponse = await fetch(
-      "https://www.nintendo.com/jp/topics/c/_/v0/posts/search",
-      {
-        headers: {
-          "User-Agent": "Mozilla/5.0",
-          "Accept": "application/json"
-        }
+    // Nintendo Topics を複数ページ取得
+const latest = [];
+
+for (let page = 1; page <= 4; page++) {
+  const nintendoResponse = await fetch(
+    `https://www.nintendo.com/jp/topics/c/_/v0/posts/search?page=${page}`,
+    {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/json"
       }
-    );
-
-    if (!nintendoResponse.ok) {
-      return res.status(nintendoResponse.status).json({
-        success: false,
-        error: "Nintendo API request failed"
-      });
     }
+  );
 
-    const data = await nintendoResponse.json();
-    const latest = data.slice(0, 10);
+  if (!nintendoResponse.ok) {
+    return res.status(nintendoResponse.status).json({
+      success: false,
+      error: `Nintendo API request failed on page ${page}`
+    });
+  }
+
+  const pageData = await nintendoResponse.json();
+
+  if (!Array.isArray(pageData) || pageData.length === 0) {
+    break;
+  }
+
+  latest.push(...pageData);
+}
 
     const results = [];
 
-    // 最新10件を順番に処理
+    // 取得した記事を順番に処理
     for (const item of latest) {
       const sourceUrl =
         `https://www.nintendo.com/jp/topics/article/${item.slug}`;
