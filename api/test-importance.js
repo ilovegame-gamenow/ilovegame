@@ -4,46 +4,70 @@ export default async function handler(req, res) {
 
     if (!openaiKey) {
       return res.status(500).json({
+        success: false,
         error: "OPENAI_API_KEY is missing"
       });
     }
 
-    const testArticles = [
-  {
-    title: "完全新作ゲームを発表。発売日は来年春を予定。"
-  },
-  {
-    title: "人気ゲームの大型無料アップデートを配信。新ステージと新モードを追加。"
-  },
-  {
-    title: "人気ゲームの追加DLCを発表。新エリアや新ストーリーを収録。"
-  },
-  {
-    title: "発売予定の新作ゲームの無料体験版を配信開始。"
-  },
-  {
-    title: "ニンテンドーeショップ新作ソフト情報。今週発売のタイトルを紹介。"
-  },
-  {
-    title: "「ゼルダの伝説40周年コンサート」を全国5都市で開催。"
-  },
-  {
-    title: "人気ゲームシリーズの映画化を正式発表。"
-  },
-  {
-    title: "全国のアニメイトで「ゼルダの伝説」オリジナルグッズを発売。"
-  },
-  {
-    title: "ゲーム会社が最新の決算情報を発表。"
-  },
-  {
-    title: "人気ゲームの期間限定セールを開始。ダウンロード版が30％OFF。"
-  }
-];
+    // Nintendo Topics の最新記事を取得
+    const nintendoResponse = await fetch(
+      "https://www.nintendo.com/jp/topics/c/_/v0/posts/search",
+      {
+        headers: {
+          "User-Agent": "Mozilla/5.0",
+          "Accept": "application/json"
+        }
+      }
+    );
 
+    if (!nintendoResponse.ok) {
+      throw new Error("Nintendo API request failed");
+    }
+
+    const data = await nintendoResponse.json();
+    const latest = data.slice(0, 10);
     const results = [];
 
-    for (const article of testArticles) {
+    // 最新10件を本文まで取得してAI採点
+    for (const item of latest) {
+      const sourceUrl =
+        `https://www.nintendo.com/jp/topics/article/${item.slug}`;
+
+      const articleResponse = await fetch(sourceUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0"
+        }
+      });
+
+      if (!articleResponse.ok) {
+        results.push({
+          title: item.title,
+          success: false,
+          error: "Nintendo article fetch failed"
+        });
+        continue;
+      }
+
+      const html = await articleResponse.text();
+
+      const mainMatch =
+        html.match(/<main[\s\S]*?<\/main>/i) ||
+        html.match(/<article[\s\S]*?<\/article>/i);
+
+      const articleHtml =
+        mainMatch ? mainMatch[0] : html;
+
+      const cleanText = articleHtml
+        .replace(/<script[\s\S]*?<\/script>/gi, " ")
+        .replace(/<style[\s\S]*?<\/style>/gi, " ")
+        .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+        .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&")
+        .replace(/\s+/g, " ")
+        .trim();
+
       const openaiResponse = await fetch(
         "https://api.openai.com/v1/responses",
         {
@@ -57,52 +81,75 @@ export default async function handler(req, res) {
             input: `
 あなたはゲームニュースサイト「I LOVE GAME♪」の編集者です。
 
-次のニュースのI LOVE GAME♪での掲載価値を0～100の整数で評価してください。
+以下のNintendo公式記事のタイトルと本文を読んで、
+I LOVE GAME♪での掲載価値を0～100の整数で評価してください。
 
-評価基準：
-・ゲームそのものに直接関係する新作発表、発売日、アップデート、DLC、体験版などを高く評価する
+評価では特に次の点を重視してください。
+
+・ゲームそのものに直接関係する情報か
+・新作発表、発売日、新情報、大型アップデート、DLC、体験版などは高く評価する
+・ゲームを実際に遊ぶ人にとって知りたい情報か
 ・ニュースとしての大きさを考慮する
-・タイトルやIPの注目度を考慮する
-・ゲームを遊ぶ人にとって知りたい情報かを重視する
-・グッズや映画などゲーム外の情報は基本的に低め。ただし人気IPや大きな話題なら加点してよい
-・決算、人事など企業情報はゲームへの直接的な影響が大きい場合を除き低く評価する
+・ゲームタイトルやIPの注目度を考慮する
+・同じアップデートでも、小さな修正と大型コンテンツ追加を区別する
+・映画、イベント、グッズなどゲーム外の情報は基本的に低めにする
+・ただし非常に人気の高いIPや大きな話題なら加点してよい
+・決算、人事など企業情報は、ゲームへの直接的な影響が大きい場合を除き低く評価する
+
+記事の種類だけで機械的に点数を決めず、
+記事本文の具体的な内容を読んで総合的に判断してください。
 
 数字だけを出力してください。
 
-ニュース：
-${article.title}
+公式タイトル:
+${item.title}
+
+公式記事本文:
+${cleanText.slice(0, 6000)}
 `
           })
         }
       );
 
-      const data = await openaiResponse.json();
+      const openaiData = await openaiResponse.json();
 
       if (!openaiResponse.ok) {
-        throw new Error(JSON.stringify(data));
+        results.push({
+          title: item.title,
+          success: false,
+          error: "OpenAI request failed"
+        });
+        continue;
       }
 
       const text =
-        data.output_text ??
-        data.output?.flatMap(item => item.content ?? [])
+        openaiData.output_text ??
+        openaiData.output
+          ?.flatMap(item => item.content ?? [])
           .find(item => item.type === "output_text")?.text ??
         "";
 
       const importance = Math.max(
         0,
-        Math.min(100, Math.round(Number(text.trim()) || 0))
+        Math.min(
+          100,
+          Math.round(Number(text.trim()) || 0)
+        )
       );
 
       results.push({
-        title: article.title,
-        importance
+        title: item.title,
+        importance,
+        source_url: sourceUrl
       });
     }
 
     return res.status(200).json({
       success: true,
+      checked: latest.length,
       results
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,
