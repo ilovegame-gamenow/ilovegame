@@ -220,7 +220,15 @@ ${cleanText.slice(0, 6000)}`
         }
         article.importance =
           Math.max(0, Math.min(100, Math.round(Number(aiArticle.importance) || 0)));
-      
+        if (article.importance < 70) {
+          results.push({
+            title: item.title,
+            success: true,
+            skipped: true,
+            importance: article.importance
+          });
+          continue;
+        }
          article.title =
           aiArticle.title;
 
