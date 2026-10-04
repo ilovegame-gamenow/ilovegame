@@ -62,7 +62,10 @@ ${article.title}
       }
 
       const text =
-        data.output?.[0]?.content?.[0]?.text ?? "";
+        data.output_text ??
+        data.output?.flatMap(item => item.content ?? [])
+          .find(item => item.type === "output_text")?.text ??
+        "";
 
       const importance = Math.max(
         0,
