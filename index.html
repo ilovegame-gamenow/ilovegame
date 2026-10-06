@@ -214,7 +214,7 @@ async function loadLiveNews(){
 
     const latest=document.querySelector(".news-grid,.grid");
     if(!latest) return;
-    latest.innerHTML=rows.map(a=>{
+    latest.innerHTML=rows.slice(0,20).map(a=>{
       const ps=Array.isArray(a.platforms)?a.platforms:[];
       const badges=ps.map(p=>`<span class="platform ${platformClass(p)}">${esc(p)}</span>`).join("");
       const updateTime=a.updated_at||a.created_at||a.published_at;
