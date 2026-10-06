@@ -226,7 +226,21 @@ async function loadLiveNews(){
     const r = await fetch("/api/news");
     const rows = await r.json();
     if(!rows.length) return;
+    const breaking = [...rows]
+  .sort((a,b) => (b.importance || 0) - (a.importance || 0))[0];
 
+if(breaking){
+  document.getElementById("breaking-title").textContent = breaking.title || "";
+  document.getElementById("breaking-meta").textContent =
+    `${breaking.source_name || "I LOVE GAME♪"} ｜ 注目度 ${breaking.importance || 0}`;
+}
+    if(breaking){
+  const breakingBox = document.getElementById("breaking");
+  breakingBox.style.cursor = "pointer";
+  breakingBox.onclick = () => {
+    location.href = `article.html?id=${encodeURIComponent(breaking.id)}`;
+  };
+}
     const latest = document.querySelector(".news-grid,.grid");
     const pagination = document.getElementById("pagination");
     if(!latest || !pagination) return;
