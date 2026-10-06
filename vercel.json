@@ -4,15 +4,5 @@
       "source": "/api/(.*)",
       "destination": "/api/$1"
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/collect-nintendo-queue",
-      "schedule": "0 * * * *"
-    },
-    {
-      "path": "/api/process-news-queue",
-      "schedule": "10 * * * *"
-    }
   ]
 }
