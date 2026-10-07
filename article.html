@@ -27,8 +27,8 @@
 
     header {
       background: #ffffff;
-      border-bottom: 4px solid #ff8a3d;
-      padding: 18px 20px;
+      border-bottom: 3px solid #ff7a2f;
+      padding: 18px 20px 14px;
     }
 
     .header-inner {
@@ -48,40 +48,32 @@
   text-decoration:none;
 }
 .logo-mark{
-  width:54px;
-  height:54px;
-  border-radius:16px;
-  background:#f47a24;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:22px;
+  width:48px;height:48px;background:#ff7a2f;border-radius:15px;
+  display:grid;place-items:center;font-size:27px;transform:rotate(-5deg);
+  box-shadow:4px 4px 0 #ffd0b5;
 }
-    .brand-title{
-  font-size:28px;
-  font-weight:900;
-  line-height:1;
+    .logo{
+  font-weight:1000;font-size:29px;letter-spacing:.02em;line-height:1;
 }
-
-.brand-title span{
-  color:#f47a24;
+.logo .love{color:#ff7a2f}
+.music{
+  color:#ff7a2f;font-size:1.12em;display:inline-block;
+  transform:translate(2px,-6px) rotate(8deg);font-weight:1000;
 }
-    .brand-sub{
-  margin-top:6px;
-  font-size:12px;
-  font-weight:700;
-  color:#777;
+.tagline{
+  font-size:11px;color:#77706a;margin-top:5px;font-weight:700;
 }
     .nav{
   display:flex;
-  gap:10px;
+  gap:8px;
 }
     .nav a{
   color:#222;
   text-decoration:none;
   font-weight:800;
+  font-size:12px;
   background:#fff4ea;
-  padding:10px 14px;
+  padding:8px 11px;
   border-radius:999px;
 }
     main {
@@ -208,8 +200,8 @@
       <a class="brand" href="/">
   <div class="logo-mark">♥</div>
   <div>
-    <div class="brand-title">I <span>LOVE</span> GAME <span>♪</span></div>
-    <div class="brand-sub">ゲームの「今」をお届け♪</div>
+    <div class="logo">I <span class="love">LOVE</span> GAME<span class="music">♪</span></div>
+    <div class="tagline">ゲームの「今」をお届け♪</div>
   </div>
 </a>
 <nav class="nav">
