@@ -306,10 +306,12 @@ const updateLabel = updateTime
 
             <div class="body">
               ${esc(
-                article.article_body ||
-                article.summary ||
-                ""
-              )}
+  (
+    article.article_body ||
+    article.summary ||
+    ""
+  ).trim()
+)}
             </div>
 
             ${article.ilovegame_point
