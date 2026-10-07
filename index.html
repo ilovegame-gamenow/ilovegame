@@ -180,23 +180,7 @@ footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12
   <span>注目ニュース</span>
 </div>
 
-<section class="pickup">
-<article class="card">
-  <div class="time">FEATURE</div>
-  <h3>今日もっとも注目したいゲームニュース</h3>
-  <p class="meta">その日のニュースの中から、特に気になる情報をピックアップ。</p>
-</article>
-<article class="card">
-  <div class="time">REVIEW</div>
-  <h3>話題の新作をチェック</h3>
-  <span class="tag">REVIEW</span>
-</article>
-<article class="card">
-  <div class="time">COLUMN</div>
-  <h3>ゲームの「なぜ面白い？」を考える</h3>
-  <span class="tag">COLUMN</span>
-</article>
-</section>
+<section id="pickup" class="pickup"></section>
 
 <div id="pagination" class="pagination"></div>
 </main>
@@ -247,6 +231,21 @@ if(breaking){
   breakingBox.onclick = () => {
     location.href = `article.html?id=${encodeURIComponent(breaking.id)}`;
   };
+}
+    const pickup = document.getElementById("pickup");
+const pickupRows = [...rows]
+  .filter(a => !breaking || a.id !== breaking.id)
+  .sort((a,b) => (b.importance || 0) - (a.importance || 0))
+  .slice(0, 3);
+    if(pickup){
+  pickup.innerHTML = pickupRows.map(a => `
+    <article class="card" onclick="location.href='article.html?id=${encodeURIComponent(a.id)}'" style="cursor:pointer">
+      <div class="time">PICK UP</div>
+      <h3>${esc(a.title || "")}</h3>
+      <p class="meta">${esc(a.summary || "")}</p>
+      <span class="tag">注目度 ${a.importance || 0}</span>
+    </article>
+  `).join("");
 }
     const latest = document.querySelector(".news-grid,.grid");
     const pagination = document.getElementById("pagination");
