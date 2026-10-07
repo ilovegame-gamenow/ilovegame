@@ -226,9 +226,16 @@ async function loadLiveNews(){
     const r = await fetch("/api/news");
     const rows = await r.json();
     if(!rows.length) return;
-    const breaking = [...rows]
-  .sort((a,b) => (b.importance || 0) - (a.importance || 0))[0];
+    const now = Date.now();
+const fortyEightHoursAgo = now - (48 * 60 * 60 * 1000);
 
+const recentRows = rows.filter(a => {
+  const date = a.published_at || a.created_at || a.updated_at;
+  return date && new Date(date).getTime() >= fortyEightHoursAgo;
+});
+
+const breaking = [...recentRows]
+  .sort((a,b) => (b.importance || 0) - (a.importance || 0))[0];
 if(breaking){
   document.getElementById("breaking-title").textContent = breaking.title || "";
   document.getElementById("breaking-meta").textContent =
