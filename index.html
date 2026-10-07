@@ -212,8 +212,8 @@ async function loadLiveNews(){
     if(!rows.length) return;
     const now = Date.now();
 const fortyEightHoursAgo = now - (48 * 60 * 60 * 1000);
-
-const recentRows = rows.filter(a => {
+const newsRows = rows.filter(a => !String(a.title || "").includes("テスト") && !String(a.source_name || "").includes("I LOVE GAME"));
+const recentRows = newsRows.filter(a => {
   const date = a.published_at || a.created_at || a.updated_at;
   return date && new Date(date).getTime() >= fortyEightHoursAgo;
 });
@@ -233,7 +233,7 @@ if(breaking){
   };
 }
     const pickup = document.getElementById("pickup");
-const pickupRows = [...rows]
+const pickupRows = [...newsRows]
   .filter(a => !breaking || a.id !== breaking.id)
   .sort((a,b) => (b.importance || 0) - (a.importance || 0))
   .slice(0, 3);
