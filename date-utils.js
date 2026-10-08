@@ -29,3 +29,12 @@ const GameDate = {
       : "#8a817a";
   }
 };
+// 更新日時の共通デザイン
+const dateStyle = document.createElement("style");
+dateStyle.textContent = `
+  .game-date {
+    font-size: 11px;
+    font-weight: 900;
+  }
+`;
+document.head.appendChild(dateStyle);
