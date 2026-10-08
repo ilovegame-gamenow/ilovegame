@@ -233,10 +233,12 @@ if(breaking){
 }
     const pickup = document.getElementById("pickup");
 const pickupRows = [...newsRows]
-  .filter(a => !breaking || a.id !== breaking.id)
+  .filter(a => (!breaking || a.id !== breaking.id) && Number(a.importance || 0) >= 80)
   .sort((a,b) => (b.importance || 0) - (a.importance || 0))
   .slice(0, 3);
     if(pickup){
+      const pickupTitle = pickup.previousElementSibling;
+if(pickupTitle) pickupTitle.style.display = pickupRows.length ? "" : "none";
   pickup.innerHTML = pickupRows.map(a => `
     <article class="card" onclick="location.href='article.html?id=${encodeURIComponent(a.id)}'" style="cursor:pointer">
       <div class="time">PICK UP</div>
