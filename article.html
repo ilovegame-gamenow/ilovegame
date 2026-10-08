@@ -222,7 +222,7 @@
       記事を読み込んでいます…
     </div>
   </main>
-
+  <script src="/date-utils.js"></script>
   <script>
     const esc = (value = "") =>
       String(value)
@@ -266,19 +266,8 @@
           : "";
 
         const updateTime = article.updated_at || article.created_at || article.published_at;
-const updateLabel = updateTime
-    ? new Date(updateTime).toLocaleString("sv-SE", {
-        timeZone: "Asia/Tokyo",
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-    }).replace(/-/g, "/")
-    : "";
-    const isRecent = updateTime &&
-    (Date.now() - new Date(updateTime).getTime()) <= 24 * 60 * 60 * 1000;
-const timeColor = isRecent ? "#ff7a2f" : "#8a817a";
+const updateLabel = GameDate.format(updateTime);
+const timeColor = GameDate.color(updateTime);
         document.title =
           `${article.title} | I LOVE GAME♪`;
 
