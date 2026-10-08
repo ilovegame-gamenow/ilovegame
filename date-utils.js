@@ -33,8 +33,8 @@ const GameDate = {
 const dateStyle = document.createElement("style");
 dateStyle.textContent = `
   .game-date {
-    font-size: 11px;
-    font-weight: 900;
+    font-size: 10px;
+    font-weight: 400;
   }
 `;
 document.head.appendChild(dateStyle);
