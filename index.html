@@ -188,7 +188,7 @@ footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12
 </main>
 
 <footer><div class="footer-logo">I <span>LOVE</span> GAME<span class="music">♪</span></div>ゲームの「今」をお届け♪</footer>
-
+<script src="/date-utils.js"></script>
 <script>
 /*
  I LOVE GAME♪ live data hook
@@ -270,19 +270,8 @@ const pickupRows = [...newsRows]
       const ps = Array.isArray(a.platforms) ? a.platforms : [];
       const badges = ps.map(p=>`<span class="platform ${platformClass(p)}">${esc(p)}</span>`).join("");
       const updateTime = a.updated_at || a.created_at || a.published_at;
-      const updateLabel = updateTime
-        ? new Date(updateTime).toLocaleString("sv-SE",{
-            timeZone:"Asia/Tokyo",
-            year:"numeric",
-            month:"numeric",
-            day:"numeric",
-            hour:"2-digit",
-            minute:"2-digit"
-          }).replace(/-/g, "/")
-        : "";
-      const isRecent = updateTime &&
-    (Date.now() - new Date(updateTime).getTime()) <= 24 * 60 * 60 * 1000;
-const timeColor = isRecent ? "#ff7a2f" : "#8a817a";
+      const updateLabel = GameDate.format(updateTime);
+      const timeColor = GameDate.color(updateTime);
       return `<article class="card" onclick="location.href='article.html?id=${encodeURIComponent(a.id)}'" style="cursor:pointer">
         ${a.thumbnail_url ? `<img class="thumb" src="https://assets.topics.apps-jp.nintendo.com/image/${esc(a.thumbnail_url)}" alt="${esc(a.title)}">` : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
         <div class="meta">${esc(a.category||"NEWS")} ・ ${esc(a.source_name||"")}</div>
@@ -312,6 +301,6 @@ const timeColor = isRecent ? "#ff7a2f" : "#8a817a";
 }
 loadLiveNews();
 </script>
-
+  
 </body>
 </html>
