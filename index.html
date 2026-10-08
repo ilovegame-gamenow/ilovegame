@@ -162,7 +162,7 @@ footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12
 </section>
 
 <div class="section-title" id="latest">
-  <h2>🔥 LATEST</h2>
+  <h2>🔥 NEWS</h2>
   <span>最新ゲームニュース</span>
 </div>
 
@@ -274,7 +274,7 @@ const pickupRows = [...newsRows]
       const timeColor = GameDate.color(updateTime);
       return `<article class="card" onclick="location.href='article.html?id=${encodeURIComponent(a.id)}'" style="cursor:pointer">
         ${a.thumbnail_url ? `<img class="thumb" src="https://assets.topics.apps-jp.nintendo.com/image/${esc(a.thumbnail_url)}" alt="${esc(a.title)}">` : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
-        <div class="meta">${esc(a.category||"NEWS")} ・ ${esc(a.source_name||"")}</div>
+        <div class="meta">${esc(a.source_name||"")}</div>
         <div class="time game-date" style="color:${timeColor}">${esc(updateLabel)} 更新</div>
         <h3>${esc(a.title)}</h3>
         <p>${esc(a.summary||"")}</p>
