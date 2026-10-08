@@ -267,15 +267,18 @@
 
         const updateTime = article.updated_at || article.created_at || article.published_at;
 const updateLabel = updateTime
-  ? new Date(updateTime).toLocaleString("ja-JP", {
-      timeZone: "Asia/Tokyo",
-      month: "numeric",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    })
-  : "";
-
+    ? new Date(updateTime).toLocaleString("sv-SE", {
+        timeZone: "Asia/Tokyo",
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    }).replace(/-/g, "/")
+    : "";
+    const isRecent = updateTime &&
+    (Date.now() - new Date(updateTime).getTime()) <= 24 * 60 * 60 * 1000;
+const timeColor = isRecent ? "#ff7a2f" : "#8a817a";
         document.title =
           `${article.title} | I LOVE GAME♪`;
 
@@ -290,7 +293,7 @@ const updateLabel = updateTime
 
             <div class="meta">
   ${article.source_name ? esc(article.source_name) : ""}
-  ${updateLabel ? ` ｜ ${esc(updateLabel)} 更新` : ""}
+  ${updateLabel ? ` ｜ <span style="color:${timeColor}">${esc(updateLabel)} 更新</span>` : ""}
 </div>
 
             ${thumbnail
