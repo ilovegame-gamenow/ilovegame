@@ -271,13 +271,14 @@ const pickupRows = [...newsRows]
       const badges = ps.map(p=>`<span class="platform ${platformClass(p)}">${esc(p)}</span>`).join("");
       const updateTime = a.updated_at || a.created_at || a.published_at;
       const updateLabel = updateTime
-        ? new Date(updateTime).toLocaleString("ja-JP",{
+        ? new Date(updateTime).toLocaleString("sv-SE",{
             timeZone:"Asia/Tokyo",
+            year:"numeric",
             month:"numeric",
             day:"numeric",
             hour:"2-digit",
             minute:"2-digit"
-          })
+          }).replace(/-/g, "/")
         : "";
       const isRecent = updateTime &&
     (Date.now() - new Date(updateTime).getTime()) <= 24 * 60 * 60 * 1000;
