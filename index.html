@@ -275,7 +275,7 @@ const pickupRows = [...newsRows]
       return `<article class="card" onclick="location.href='article.html?id=${encodeURIComponent(a.id)}'" style="cursor:pointer">
         ${a.thumbnail_url ? `<img class="thumb" src="https://assets.topics.apps-jp.nintendo.com/image/${esc(a.thumbnail_url)}" alt="${esc(a.title)}">` : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
         <div class="meta">${esc(a.category||"NEWS")} ・ ${esc(a.source_name||"")}</div>
-        <div class="time" style="color:${timeColor}">${esc(updateLabel)} 更新</div>
+        <div class="time game-date" style="color:${timeColor}">${esc(updateLabel)} 更新</div>
         <h3>${esc(a.title)}</h3>
         <p>${esc(a.summary||"")}</p>
         <div class="platforms">${badges}</div>
