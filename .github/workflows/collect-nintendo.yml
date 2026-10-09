@@ -1,0 +1,27 @@
+
+name: Collect Nintendo News
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect new Nintendo articles
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "CRON_SECRET is not configured"
+            exit 1
+          fi
+
+          curl --fail-with-body --silent --show-error \
+            --max-time 240 \
+            --retry 2 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "https://ilovegame.vercel.app/api/collect-nintendo-queue"
