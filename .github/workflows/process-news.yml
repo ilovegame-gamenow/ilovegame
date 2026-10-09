@@ -1,0 +1,26 @@
+
+name: Process News with AI
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Process pending articles
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "CRON_SECRET is not configured"
+            exit 1
+          fi
+
+          curl --fail-with-body --silent --show-error \
+            --max-time 240 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "https://ilovegame.vercel.app/api/process-news-queue"
