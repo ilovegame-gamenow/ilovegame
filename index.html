@@ -20,33 +20,7 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
   background:var(--cream);
 }
-header{
-  background:var(--white);
-  border-bottom:3px solid var(--orange);
-  padding:18px 20px 14px;
-}
-.header-inner{
-  max-width:1100px;margin:auto;display:flex;align-items:center;
-  justify-content:space-between;gap:20px;
-}
-.brand{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none}
-.logo-mark{
-  width:48px;height:48px;background:var(--orange);border-radius:15px;
-  display:grid;place-items:center;font-size:27px;transform:rotate(-5deg);
-  box-shadow:4px 4px 0 #ffd0b5;
-}
-.logo{
-  font-weight:1000;font-size:29px;letter-spacing:.02em;line-height:1;
-}
-.logo .love{color:var(--orange)}
-.music{color:var(--orange);font-size:1.12em;display:inline-block;transform:translate(2px,-6px) rotate(8deg);font-weight:1000}
-.tagline{font-size:11px;color:var(--muted);margin-top:5px;font-weight:700}
-nav{display:flex;gap:8px;flex-wrap:wrap}
-nav a{
-  color:var(--ink);text-decoration:none;font-size:12px;font-weight:800;
-  padding:8px 11px;border-radius:999px;background:#fff3e9;
-}
-nav a:hover{background:#ffe1cb}
+
 main{max-width:1100px;margin:0 auto;padding:28px 20px 65px}
 .breaking{
   background:var(--white);border:2px solid var(--orange);border-radius:22px;
@@ -91,12 +65,12 @@ footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12
   .grid{grid-template-columns:1fr 1fr}.pickup{grid-template-columns:1fr 1fr}
   .pickup .card:first-child{grid-column:1/-1}
 }
+
 @media(max-width:600px){
-  .header-inner{align-items:flex-start}.logo{font-size:24px}
-  .logo-mark{width:42px;height:42px;font-size:23px}
-  nav{display:none}.grid,.pickup{grid-template-columns:1fr}
+  .grid,.pickup{grid-template-columns:1fr}
   .breaking h1{font-size:22px}
 }
+  
 .archive{min-height:120px}\n
 /* --- I LOVE GAME♪ live-news additions --- */
 .platforms{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
