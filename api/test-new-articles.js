@@ -58,9 +58,14 @@ export default async function handler(req, res) {
         }
       });
 
-      if (!response.ok) {
-        throw new Error("Supabase check failed");
-      }
+      
+if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(
+        `Supabase check failed (${response.status}): ${detail}`
+    );
+}
+
 
       const existing = await response.json();
 
