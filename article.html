@@ -299,6 +299,26 @@ ${esc(formatArticleText(
 
           </article>
         `;
+      
+const bodyElement = app.querySelector(".body");
+const originalText = (
+    article.article_body ||
+    article.summary ||
+    ""
+).trim();
+
+let previousWidth = 0;
+
+const observer = new ResizeObserver(() => {
+    const currentWidth = Math.round(bodyElement.clientWidth);
+
+    if (currentWidth === previousWidth) return;
+    previousWidth = currentWidth;
+
+    bodyElement.textContent = formatArticleText(originalText);
+});
+
+observer.observe(bodyElement);
 
       } catch (error) {
         app.innerHTML = `
