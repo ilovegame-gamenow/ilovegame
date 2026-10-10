@@ -161,6 +161,29 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+    
+function formatArticleText(text) {
+    const width = Math.min(
+        document.querySelector(".article-card")?.clientWidth || window.innerWidth,
+        window.innerWidth
+    );
+    const charsPerLine = Math.max(12, Math.floor((width - 64) / 17));
+    const target = Math.round(charsPerLine * 1.7);
+
+    let count = 0;
+
+    return String(text).replace(/([。！？♪])(?=\S)/g, (match) => {
+        count += 1;
+        return match;
+    }).split(/(?<=[。！？♪])/).map(sentence => {
+        count += sentence.length;
+        if (count >= target) {
+            count = 0;
+            return sentence + "\n";
+        }
+        return sentence;
+    }).join("").trim();
+}
 
     async function loadArticle() {
       const app = document.getElementById("app");
@@ -231,13 +254,15 @@ const timeColor = GameDate.color(updateTime);
 
             <div class="body">
               
-${esc(
+
+${esc(formatArticleText(
     (
         article.article_body ||
         article.summary ||
         ""
     ).trim()
-).replace(/([。！？♪])(?=\S)/g, "$1\n")}
+))}
+
 
             </div>
 
