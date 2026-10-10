@@ -269,7 +269,23 @@ if (openaiData.status !== "completed") {
         }
 
         
-const aiArticle = JSON.parse(jsonText);
+        
+let aiArticle;
+
+try {
+    aiArticle = JSON.parse(jsonText);
+} catch (error) {
+    const firstChar = jsonText.charAt(0);
+    const lastChar = jsonText.slice(-1);
+
+    throw new Error(
+        `AI JSON parse failed: ${error.message}; ` +
+        `length=${jsonText.length}; ` +
+        `startsWithBrace=${firstChar === "{"}; ` +
+        `endsWithBrace=${lastChar === "}"}`
+    );
+}
+
 
 
         const importance = Math.max(
