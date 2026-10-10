@@ -119,7 +119,7 @@
       color: #e86512;
       font-weight: 700;
     }
-    .article-card .back {
+    main > .back {
     display: inline-block;
     margin-top: 16px;
     }
@@ -301,9 +301,8 @@ ${esc(formatArticleText(
               `
               : ""}
         
-<a class="back" href="#" onclick="if(history.length>1){history.back();}else{location.href='/';}return false;">← 一覧に戻る</a>
-
           </article>
+<a class="back" href="#" onclick="if(history.length>1){history.back();}else{location.href='/';}return false;">← 一覧に戻る</a>
         `;
       
 const bodyElement = app.querySelector(".body");
