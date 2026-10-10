@@ -13,14 +13,14 @@ export default async function handler(req, res) {
     const offset = (page - 1) * limit;
     const fields =
       "id,title,summary,article_body,ilovegame_point,platforms,category,thumbnail_url,source_name,source_url,source_published_at,importance,is_breaking,status,published_at,created_at,site_published_at";
-
+    const articleId = req.query.id;
     const url =
-      `${supabaseUrl}/rest/v1/articles` +
-      `?select=${encodeURIComponent(fields)}` +
-      `&status=eq.published` +
-      `&order=site_published_at.desc.nullslast` +
-      `&limit=${limit}` +
-      `&offset=${offset}`;
+    `${supabaseUrl}/rest/v1/articles` +
+    `?select=${encodeURIComponent(fields)}` +
+    `&status=eq.published` +
+    (articleId
+        ? `&id=eq.${encodeURIComponent(articleId)}&limit=1`
+        : `&order=site_published_at.desc.nullslast&limit=${limit}&offset=${offset}`);
 
     const response = await fetch(url, {
         headers: {
@@ -38,7 +38,12 @@ export default async function handler(req, res) {
         details: data
       });
     }
-
+    if (articleId) {
+      if (!data.length) {
+          return res.status(404).json({ error: "記事が見つかりません" });
+      }
+    return res.status(200).json(data[0]);
+    }
     const contentRange = response.headers.get("content-range");
     const total = Number(contentRange?.split("/")[1]) || 0;
 
