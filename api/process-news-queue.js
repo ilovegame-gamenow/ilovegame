@@ -1,3 +1,4 @@
+import { newsConfig } from "./news-config.js";
 export default async function handler(req, res) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -208,6 +209,8 @@ text: {
 次の5項目を作成してください。出力形式は指定されたJSONスキーマに従ってください。
 
 importance：I LOVE GAME♪での掲載価値を0〜100の整数で評価してください。最優先の基準は「ゲームを遊ぶ人にとって知りたい情報か？」です。
+評価の詳しい方針:
+${newsConfig.evaluationGuidelines.map(rule => `・${rule}`).join("\n")}
 title：分かりやすいニュースタイトルにしてください。
 summary：一覧カード用の要約です。必ず1文、50〜70文字程度にしてください。タイトルの内容をそのまま繰り返さないでください。
 ilovegame_point：「ここに注目♪」に表示する文章です。読者に伝えたいポイントを1〜2文で紹介してください。
@@ -298,8 +301,8 @@ try {
           )
         );
 
-        // 70点未満は非掲載
-        if (importance < 70) {
+        // 設定した掲載基準未満は非掲載
+        if (importance < newsConfig.publishThreshold) {
           await updateArticle(
             supabaseUrl,
             supabaseKey,
@@ -322,7 +325,7 @@ try {
           continue;
         }
 
-        // 70点以上は記事として公開
+        // 設定した掲載基準以上は記事として公開
         await updateArticle(
           supabaseUrl,
           supabaseKey,
