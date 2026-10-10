@@ -173,7 +173,7 @@ const siteConfig = configResponse.ok
 const fortyEightHoursAgo = now - (48 * 60 * 60 * 1000);
 const newsRows = rows.filter(a => !String(a.title || "").includes("テスト") && !String(a.source_name || "").includes("I LOVE GAME"));
 const recentRows = newsRows.filter(a => {
-  const date = a.published_at || a.created_at || a.updated_at;
+  const date = a.site_published_at || a.created_at || a.published_at;
   return date && new Date(date).getTime() >= fortyEightHoursAgo;
 });
 
@@ -228,7 +228,7 @@ if(pickupTitle) pickupTitle.style.display = pickupRows.length ? "" : "none";
     latest.innerHTML = pageRows.map(a=>{
       const ps = Array.isArray(a.platforms) ? a.platforms : [];
       const badges = ps.map(p=>`<span class="platform ${platformClass(p)}">${esc(p)}</span>`).join("");
-      const updateTime = a.updated_at || a.created_at || a.published_at;
+      const updateTime = a.site_published_at || a.created_at || a.published_at;
       const updateLabel = GameDate.format(updateTime);
       const timeColor = GameDate.color(updateTime);
       return `<article class="card" onclick="location.href='article.html?id=${encodeURIComponent(a.id)}'" style="cursor:pointer">
