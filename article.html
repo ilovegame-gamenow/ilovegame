@@ -225,7 +225,7 @@ const timeColor = GameDate.color(updateTime);
           `${article.title} | I LOVE GAME♪`;
 
         app.innerHTML = `
-          <a class="back" href="#" onclick="if(history.length>1){history.back();}else{location.href='/';}return false;">← 一覧に戻る</a>
+          
 
           <article class="article-card">
 
@@ -296,6 +296,8 @@ ${esc(formatArticleText(
                 </div>
               `
               : ""}
+        
+<a class="back" href="#" onclick="if(history.length>1){history.back();}else{location.href='/';}return false;">← 一覧に戻る</a>
 
           </article>
         `;
