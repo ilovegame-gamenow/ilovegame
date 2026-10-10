@@ -222,7 +222,7 @@ function formatArticleText(text) {
           ? `https://assets.topics.apps-jp.nintendo.com/image/${article.thumbnail_url}`
           : "";
 
-        const updateTime = article.updated_at || article.created_at || article.published_at;
+        const updateTime = article.site_published_at || article.created_at || article.published_at;
 const updateLabel = GameDate.format(updateTime);
 const timeColor = GameDate.color(updateTime);
         document.title =
