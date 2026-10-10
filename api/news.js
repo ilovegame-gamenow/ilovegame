@@ -10,13 +10,13 @@ export default async function handler(req, res) {
     }
 
     const fields =
-      "id,title,summary,article_body,ilovegame_point,platforms,category,thumbnail_url,source_name,source_url,source_published_at,importance,is_breaking,status,published_at,created_at";
+      "id,title,summary,article_body,ilovegame_point,platforms,category,thumbnail_url,source_name,source_url,source_published_at,importance,is_breaking,status,published_at,created_at,site_published_at";
 
     const url =
       `${supabaseUrl}/rest/v1/articles` +
       `?select=${encodeURIComponent(fields)}` +
       `&status=eq.published` +
-      `&order=published_at.desc` +
+      `&order=site_published_at.desc.nullslast` +
       `&limit=30`;
 
     const response = await fetch(url, {
