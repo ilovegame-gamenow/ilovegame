@@ -159,11 +159,15 @@ async function loadLiveNews(){
   try{
     const params = new URLSearchParams(location.search);
     const requestedPage = Math.max(1, parseInt(params.get("page") || "1", 10) || 1);
-    const r = await fetch(`/api/news?page=${requestedPage}`);
-    const result = await r.json();
-    const rows = result.articles || [];
-    const featuredResponse = await fetch("/api/featured-news");
-    const featuredResult = await featuredResponse.json();
+    const [r, featuredResponse] = await Promise.all([
+  fetch(`/api/news?page=${requestedPage}`),
+  fetch("/api/featured-news")
+]);
+const [result, featuredResult] = await Promise.all([
+  r.json(),
+  featuredResponse.json()
+]);
+const rows = result.articles || [];
     
 const breaking = featuredResult.breaking || null;
 if(breaking){
