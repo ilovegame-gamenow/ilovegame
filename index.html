@@ -165,6 +165,10 @@ async function loadLiveNews(){
   try{
     const r = await fetch("/api/news");
     const rows = await r.json();
+    const configResponse = await fetch("/api/site-config");
+const siteConfig = configResponse.ok
+  ? await configResponse.json()
+  : { pickupThreshold: 80, maxPickupArticles: 3 };
     if(!rows.length) return;
     const now = Date.now();
 const fortyEightHoursAgo = now - (48 * 60 * 60 * 1000);
@@ -194,9 +198,9 @@ if(breaking){
 }
     const pickup = document.getElementById("pickup");
 const pickupRows = [...newsRows]
-  .filter(a => (!breaking || a.id !== breaking.id) && Number(a.importance || 0) >= 80)
+  .filter(a => (!breaking || a.id !== breaking.id) && Number(a.importance || 0) >= siteConfig.pickupThreshold)
   .sort((a,b) => (b.importance || 0) - (a.importance || 0))
-  .slice(0, 3);
+  .slice(0, siteConfig.maxPickupArticles);
     if(pickup){
       const pickupTitle = pickup.previousElementSibling;
 if(pickupTitle) pickupTitle.style.display = pickupRows.length ? "" : "none";
