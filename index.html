@@ -143,11 +143,6 @@ footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12
 <script src="/header.js"></script>
 <script src="/date-utils.js"></script>
 <script>
-/*
- I LOVE GAME♪ live data hook
- 次の工程で SUPABASE_ANON_KEY を設定すると、published の記事を自動取得します。
- anon key はブラウザ公開用のキーです。service_role key は絶対に入れないでください。
-*/
 
 function platformClass(name){
   const n=(name||"").toLowerCase();
@@ -169,7 +164,6 @@ async function loadLiveNews(){
     const rows = result.articles || [];
     const featuredResponse = await fetch("/api/featured-news");
     const featuredResult = await featuredResponse.json();
-    if(!rows.length) return;
     
 const breaking = featuredResult.breaking || null;
 if(breaking){
