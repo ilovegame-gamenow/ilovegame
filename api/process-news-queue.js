@@ -231,6 +231,12 @@ ${cleanText.slice(0, 6000)}`
             `OpenAI request failed: ${JSON.stringify(openaiData)}`
           );
         }
+        
+if (openaiData.status !== "completed") {
+    throw new Error(
+        `OpenAI response incomplete: ${openaiData.status}, reason: ${JSON.stringify(openaiData.incomplete_details)}`
+    );
+}
 
         const aiText =
           openaiData.output_text ||
@@ -263,14 +269,7 @@ ${cleanText.slice(0, 6000)}`
         }
 
         
-const aiArticle = JSON.parse(
-    jsonText.replace(/[\u0000-\u001F]/g, (char) => {
-        if (char === "\n" || char === "\r" || char === "\t") {
-            return char === "\n" ? "\\n" : char === "\r" ? "\\r" : "\\t";
-        }
-        return "";
-    })
-);
+const aiArticle = JSON.parse(jsonText);
 
 
         const importance = Math.max(
