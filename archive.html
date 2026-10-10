@@ -210,7 +210,7 @@ async function loadArchive(){
 
     archive.innerHTML=oldNews.map(a=>{
 
-      const updateTime=a.updated_at||a.created_at||a.published_at;
+      const updateTime=a.site_published_at||a.created_at||a.published_at;
 
       const updateLabel=updateTime
         ?new Date(updateTime).toLocaleString("ja-JP",{
@@ -237,7 +237,7 @@ async function loadArchive(){
           ${esc(a.category||"NEWS")} ・ ${esc(a.source_name||"")}
         </div>
 
-        <div class="time">${esc(updateLabel)} 更新</div>
+        <div class="time">${esc(updateLabel)} UP</div>
 
         <h3>${esc(a.title)}</h3>
 
