@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     queueUrl.searchParams.set(
       "select",
-      "id,source_title,source_name,source_url,source_published_at"
+      "id,source_title,source_name,source_url,source_published_at,site_published_at"
     );
     queueUrl.searchParams.set(
       "processing_status",
@@ -343,6 +343,7 @@ try {
             importance,
             status: "published",
             processing_status: "completed",
+            site_published_at: item.site_published_at || new Date().toISOString(),
             published_at:
               item.source_published_at ||
               new Date().toISOString()
