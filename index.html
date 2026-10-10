@@ -167,15 +167,19 @@ async function loadLiveNews(){
     const r = await fetch(`/api/news?page=${requestedPage}`);
     const result = await r.json();
     const rows = result.articles || [];
+    const featuredResponse = await fetch("/api/news?page=1");
+    const featuredResult = await featuredResponse.json();
+    const featuredRows = featuredResult.articles || [];
     const configResponse = await fetch("/api/site-config");
-const siteConfig = configResponse.ok
+    const siteConfig = configResponse.ok
   ? await configResponse.json()
   : { pickupThreshold: 80, maxPickupArticles: 3 };
     if(!rows.length) return;
     const now = Date.now();
 const fortyEightHoursAgo = now - (48 * 60 * 60 * 1000);
 const newsRows = rows.filter(a => !String(a.title || "").includes("テスト") && !String(a.source_name || "").includes("I LOVE GAME"));
-const recentRows = newsRows.filter(a => {
+const featuredNewsRows = featuredRows.filter(a => !String(a.title || "").includes("テスト") && !String(a.source_name || "").includes("テスト"));
+const recentRows = featuredNewsRows.filter(a => {
   const date = a.site_published_at || a.created_at || a.published_at;
   return date && new Date(date).getTime() >= fortyEightHoursAgo;
 });
@@ -199,7 +203,7 @@ if(breaking){
   };
 }
     const pickup = document.getElementById("pickup");
-const pickupRows = [...newsRows]
+const pickupRows = [...featuredNewsRows]
   .filter(a => (!breaking || a.id !== breaking.id) && Number(a.importance || 0) >= siteConfig.pickupThreshold)
   .sort((a,b) => (b.importance || 0) - (a.importance || 0))
   .slice(0, siteConfig.maxPickupArticles);
