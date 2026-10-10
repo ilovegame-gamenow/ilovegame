@@ -230,13 +230,15 @@ const timeColor = GameDate.color(updateTime);
               : ""}
 
             <div class="body">
-              ${esc(
-  (
-    article.article_body ||
-    article.summary ||
-    ""
-  ).trim()
-)}
+              
+${esc(
+    (
+        article.article_body ||
+        article.summary ||
+        ""
+    ).trim()
+).replace(/([。！？♪])(?=\S)/g, "$1\n")}
+
             </div>
 
             ${article.ilovegame_point
