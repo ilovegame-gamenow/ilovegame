@@ -3,7 +3,8 @@
 
 export const newsConfig = {
   // 掲載判定
-  publishThreshold: 70,
+  publishThreshold: 80,
+  noArticleThreshold: 50,
 
   // PICK UP表示
   pickupThreshold: 80,
