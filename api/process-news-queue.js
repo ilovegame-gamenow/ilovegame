@@ -1,5 +1,5 @@
 import { newsConfig } from "./news-config.js";
-import { generateArticle } from "./article-generator.js";
+import { generateArticle } from "../lib/article-generator.js";
 export default async function handler(req, res) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
