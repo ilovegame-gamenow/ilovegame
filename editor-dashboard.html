@@ -160,6 +160,67 @@
       .panel { padding: 15px; }
       .article-top { flex-direction: column; }
     }
+
+    /* 記事プレビュー */
+    #previewDialog {
+      width: min(720px, calc(100% - 24px));
+      max-height: 88vh;
+      padding: 0;
+      border: none;
+      border-radius: 18px;
+      box-shadow: 0 15px 60px #0003;
+    }
+
+    #previewDialog::backdrop {
+      background: #0009;
+    }
+
+    .preview-content {
+      padding: 24px;
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+
+    #closePreview {
+      display: block;
+      margin-left: auto;
+      margin-bottom: 16px;
+      background: #f3f3f3;
+      color: #333;
+    }
+
+    #previewTitle {
+      font-size: 22px;
+      line-height: 1.5;
+      margin: 0 0 18px;
+    }
+
+    #previewBody {
+      font-size: 15px;
+      line-height: 1.8;
+      overflow-wrap: anywhere;
+    }
+
+    #previewBody img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      margin: 16px 0;
+    }
+
+    #previewBody a {
+      color: #d66b20;
+    }
+
+    #previewBody .preview-point {
+      background: #fff4e8;
+      padding: 16px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+
   </style>
 </head>
 <body>
@@ -200,6 +261,19 @@
       <div id="articlesList"></div>
     </section>
   </main>
+  <!-- 記事プレビュー -->
+  <dialog id="previewDialog" aria-labelledby="previewTitle">
+    <div class="preview-content">
+      <button type="button" id="closePreview">× 閉じる</button>
+
+      <h2 id="previewTitle">記事プレビュー</h2>
+
+      <div id="previewBody">
+        記事を読み込み中...
+      </div>
+    </div>
+  </dialog>
+
 
   <script>
     const list = document.getElementById("articlesList");
@@ -265,6 +339,20 @@
         const title = document.createElement("div");
         title.className = "article-title";
         title.textContent = article.title || "タイトルなし";
+
+      title.style.cursor = "pointer";
+      title.style.color = "#d66b20";
+      title.style.textDecoration = "underline";
+      title.setAttribute("role", "button");
+      title.setAttribute("tabindex", "0");
+
+      title.addEventListener("click", () => openPreview(article.id));
+      title.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openPreview(article.id);
+        }
+      });
 
         const badge = document.createElement("span");
         badge.className = "badge " + article.status;
@@ -364,6 +452,103 @@
           message.textContent = "ログアウトできませんでした。";
         }
       });
+
+      const previewDialog = document.getElementById("previewDialog");
+      const previewTitle = document.getElementById("previewTitle");
+      const previewBody = document.getElementById("previewBody");
+
+      document.getElementById("closePreview")
+        .addEventListener("click", () => previewDialog.close());
+
+      previewDialog.addEventListener("click", (event) => {
+        if (event.target === previewDialog) previewDialog.close();
+      });
+
+      async function openPreview(id) {
+        previewTitle.textContent = "記事プレビュー";
+        previewBody.textContent = "記事を読み込み中...";
+        previewDialog.showModal();
+
+        try {
+          const response = await fetch(
+            `/api/editor-detail?id=${encodeURIComponent(id)}`,
+            {
+              credentials: "same-origin",
+              cache: "no-store"
+            }
+          );
+
+          if (response.status === 401) {
+            location.replace("/editor.html");
+            return;
+          }
+
+          if (!response.ok) throw new Error("取得失敗");
+
+          const data = await response.json();
+          const article = data.article;
+
+          previewTitle.textContent = article.title || "タイトルなし";
+          previewBody.replaceChildren();
+
+          function addText(label, value) {
+            if (!value) return;
+            const section = document.createElement("p");
+            const strong = document.createElement("strong");
+            strong.textContent = label + "：";
+            section.append(strong, document.createTextNode(String(value)));
+            previewBody.appendChild(section);
+          }
+
+          if (article.thumbnail_url) {
+            const img = document.createElement("img");
+            img.src = article.thumbnail_url;
+            img.alt = article.title || "記事画像";
+            img.loading = "lazy";
+            previewBody.appendChild(img);
+          }
+
+          addText("掲載状態", {
+            pending: "審査待ち",
+            published: "掲載中",
+            rejected: "非掲載"
+          }[article.status] || "不明");
+
+          addText("AI評価", article.importance == null
+            ? "未評価"
+            : `${article.importance}点`);
+
+          addText("概要", article.summary);
+
+          const body = document.createElement("div");
+          body.style.whiteSpace = "pre-wrap";
+          body.textContent = article.article_body || "記事本文はまだありません。";
+          previewBody.appendChild(body);
+
+          if (article.ilovegame_point) {
+            const point = document.createElement("div");
+            point.className = "preview-point";
+            const heading = document.createElement("strong");
+            heading.textContent = "ここに注目♪";
+            const description = document.createElement("p");
+            description.textContent = article.ilovegame_point;
+            point.append(heading, description);
+            previewBody.appendChild(point);
+          }
+
+          if (article.source_url) {
+            const link = document.createElement("a");
+            link.href = article.source_url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = "元記事を開く ↗";
+            previewBody.appendChild(link);
+          }
+        } catch {
+          previewBody.textContent = "記事を取得できませんでした。";
+        }
+      }
+
 
     loadArticles();
   </script>
