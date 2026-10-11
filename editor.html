@@ -164,7 +164,47 @@ await loadArticles();
         info.textContent =
           `ID: ${article.id} ／ AI評価: ${score}点 ／ ${status}`;
 
-        item.append(title, info);
+const button = document.createElement("button");
+
+const nextStatus =
+  article.status === "published" ? "rejected" : "published";
+
+button.textContent =
+  nextStatus === "published" ? "掲載する" : "非掲載にする";
+
+button.style.cssText =
+  "margin-top:10px;padding:8px 16px;border:0;border-radius:8px;background:#ff8a3d;color:white;cursor:pointer;";
+
+button.addEventListener("click", async () => {
+  const action = nextStatus === "published" ? "掲載" : "非掲載";
+
+  if (!confirm(`この記事を${action}に変更しますか？`)) return;
+
+  button.disabled = true;
+  articlesMessage.textContent = "変更を保存中...";
+
+  try {
+    const response = await fetch("/api/editor-update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ id: article.id, status: nextStatus })
+    });
+
+    if (!response.ok) {
+      articlesMessage.textContent = "変更に失敗しました。";
+      button.disabled = false;
+      return;
+    }
+
+    await loadArticles();
+  } catch {
+    articlesMessage.textContent = "通信エラーが発生しました。";
+    button.disabled = false;
+  }
+});
+
+        item.append(title, info, button);
         articlesList.appendChild(item);
       }
     } catch {
