@@ -342,17 +342,7 @@ if (openaiData.status !== "completed") {
           );
         }
 
-        let jsonText = aiText.trim();
-
-        if (jsonText.startsWith("```")) {
-          jsonText = jsonText
-            .replace(/^```json\s*/i, "")
-            .replace(/^```\s*/, "")
-            .replace(/\s*```$/, "")
-            .trim();
-        }
-
-        
+        const jsonText = aiText.trim();
         
 let aiArticle;
 
