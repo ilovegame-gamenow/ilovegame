@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>I LOVE GAME♪ 編集室</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #fff8f1;
+      color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    header {
+      background: #ff8a3d;
+      color: white;
+      padding: 18px 20px;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    h1 { font-size: 22px; margin: 0; }
+    .subtitle { font-size: 12px; margin-top: 5px; }
+    button {
+      cursor: pointer;
+      font: inherit;
+      border-radius: 9px;
+      padding: 10px 14px;
+    }
+    button:disabled { cursor: default; opacity: .65; }
+    .logout {
+      background: transparent;
+      border: 1px solid white;
+      color: white;
+    }
+    main {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .stat {
+      background: white;
+      border-radius: 14px;
+      padding: 18px;
+      border-top: 4px solid;
+    }
+    .stat.pending { border-color: #e99425; }
+    .stat.published { border-color: #249a69; }
+    .stat.rejected { border-color: #8c929b; }
+    .stat-label { font-size: 13px; color: #666; }
+    .stat-count {
+      font-size: 28px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    .panel {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .tab {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      color: #555;
+    }
+    .tab.active {
+      background: #ff8a3d;
+      border-color: #ff8a3d;
+      color: white;
+      font-weight: bold;
+    }
+    .article {
+      padding: 18px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .article:last-child { border-bottom: 0; }
+    .article-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .article-title {
+      font-size: 16px;
+      font-weight: bold;
+      line-height: 1.6;
+    }
+    .meta {
+      font-size: 13px;
+      color: #777;
+      margin: 8px 0 14px;
+    }
+    .badge {
+      display: inline-block;
+      white-space: nowrap;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .badge.pending {
+      background: #fff0d8;
+      color: #a76300;
+    }
+    .badge.published {
+      background: #ddf5e9;
+      color: #16784e;
+    }
+    .badge.rejected {
+      background: #eceef0;
+      color: #59616b;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .publish-btn {
+      border: 1px solid #249a69;
+      background: white;
+      color: #16784e;
+    }
+    .publish-btn.selected {
+      background: #249a69;
+      color: white;
+    }
+    .reject-btn {
+      border: 1px solid #8c929b;
+      background: white;
+      color: #59616b;
+    }
+    .reject-btn.selected {
+      background: #727b86;
+      color: white;
+    }
+    .message { color: #666; font-size: 14px; }
+    @media (max-width: 600px) {
+      h1 { font-size: 18px; }
+      .stats { gap: 8px; }
+      .stat { padding: 12px; }
+      .stat-count { font-size: 23px; }
+      .panel { padding: 15px; }
+      .article-top { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>🎮 I LOVE GAME♪ 編集室</h1>
+        <div class="subtitle">ゲームの今をお届け♪</div>
+      </div>
+      <button class="logout" id="logoutButton">ログアウト</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="stats">
+      <div class="stat pending">
+        <div class="stat-label">審査待ち</div>
+        <div class="stat-count" id="pendingCount">—</div>
+      </div>
+      <div class="stat published">
+        <div class="stat-label">掲載中</div>
+        <div class="stat-count" id="publishedCount">—</div>
+      </div>
+      <div class="stat rejected">
+        <div class="stat-label">非掲載</div>
+        <div class="stat-count" id="rejectedCount">—</div>
+      </div>
+    </div>
+
+    <section class="panel">
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-filter="pending">審査待ち</button>
+        <button class="tab" data-filter="published">掲載中</button>
+        <button class="tab" data-filter="rejected">非掲載</button>
+        <button class="tab" data-filter="all">すべて</button>
+      </div>
+      <p class="message" id="message" role="status" aria-live="polite"></p>
+      <div id="articlesList"></div>
+    </section>
+  </main>
+
+  <script>
+    const list = document.getElementById("articlesList");
+    const message = document.getElementById("message");
+    const tabs = document.getElementById("tabs");
+
+    let articles = [];
+    let currentFilter = "pending";
+
+    const labels = {
+      pending: "審査待ち",
+      published: "掲載中",
+      rejected: "非掲載"
+    };
+
+    async function loadArticles() {
+      message.textContent = "記事を読み込み中...";
+
+      try {
+        const response = await fetch("/api/editor-news", {
+          credentials: "same-origin",
+          cache: "no-store"
+        });
+
+        if (response.status === 401) {
+          location.replace("/editor.html");
+          return;
+        }
+
+        if (!response.ok) throw new Error("取得失敗");
+
+        const data = await response.json();
+        articles = data.articles || [];
+        render();
+      } catch {
+        message.textContent = "記事を取得できませんでした。";
+      }
+    }
+
+    function render() {
+      list.replaceChildren();
+
+      for (const status of ["pending", "published", "rejected"]) {
+        document.getElementById(status + "Count").textContent =
+          articles.filter(a => a.status === status).length;
+      }
+
+      const filtered = articles.filter(a =>
+        currentFilter === "all" || a.status === currentFilter
+      );
+
+      message.textContent = filtered.length
+        ? `${filtered.length}件の記事を表示しています。`
+        : "該当する記事はありません。";
+
+      for (const article of filtered) {
+        const item = document.createElement("div");
+        item.className = "article";
+
+        const top = document.createElement("div");
+        top.className = "article-top";
+
+        const title = document.createElement("div");
+        title.className = "article-title";
+        title.textContent = article.title || "タイトルなし";
+
+        const badge = document.createElement("span");
+        badge.className = "badge " + article.status;
+        badge.textContent = labels[article.status] || "不明";
+
+        top.append(title, badge);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent =
+          `ID: ${article.id} ／ AI評価: ${article.importance ?? "未評価"}点`;
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const publish = document.createElement("button");
+        publish.className = "publish-btn";
+        publish.textContent = "掲載する";
+
+        const reject = document.createElement("button");
+        reject.className = "reject-btn";
+        reject.textContent = "非掲載にする";
+
+        if (article.status === "published") {
+          publish.classList.add("selected");
+          publish.disabled = true;
+        }
+        if (article.status === "rejected") {
+          reject.classList.add("selected");
+          reject.disabled = true;
+        }
+
+        publish.addEventListener("click", () =>
+          updateStatus(article, "published", publish, reject)
+        );
+        reject.addEventListener("click", () =>
+          updateStatus(article, "rejected", publish, reject)
+        );
+
+        actions.append(publish, reject);
+        item.append(top, meta, actions);
+        list.appendChild(item);
+      }
+    }
+
+    async function updateStatus(article, status, publish, reject) {
+      const action = status === "published" ? "掲載" : "非掲載";
+      if (!confirm(`この記事を${action}に変更しますか？`)) return;
+
+      publish.disabled = true;
+      reject.disabled = true;
+      message.textContent = "変更を保存中...";
+
+      try {
+        const response = await fetch("/api/editor-update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ id: article.id, status })
+        });
+
+        if (response.status === 401) {
+          location.replace("/editor.html");
+          return;
+        }
+        if (!response.ok) throw new Error("保存失敗");
+
+        await loadArticles();
+      } catch {
+        message.textContent = "変更に失敗しました。";
+        render();
+      }
+    }
+
+    tabs.addEventListener("click", event => {
+      const button = event.target.closest("[data-filter]");
+      if (!button) return;
+
+      currentFilter = button.dataset.filter;
+      for (const tab of tabs.querySelectorAll(".tab")) {
+        tab.classList.toggle("active", tab === button);
+      }
+      render();
+    });
+
+    document.getElementById("logoutButton")
+      .addEventListener("click", async () => {
+        message.textContent = "ログアウト中...";
+        try {
+          const response = await fetch("/api/editor-logout", {
+            method: "POST",
+            credentials: "same-origin"
+          });
+          if (!response.ok) throw new Error("ログアウト失敗");
+          location.replace("/editor.html");
+        } catch {
+          message.textContent = "ログアウトできませんでした。";
+        }
+      });
+
+    loadArticles();
+  </script>
+</body>
+</html>
