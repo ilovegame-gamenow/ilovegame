@@ -1,218 +1,156 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>I LOVE GAME♪ 編集室</title>
+  <title>ログイン | I LOVE GAME♪ 編集室</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
+      min-height: 100vh;
       background: #fff8f1;
       color: #333;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      flex-direction: column;
     }
     header {
-      padding: 24px 20px;
       background: #ff8a3d;
       color: white;
       text-align: center;
+      padding: 28px 16px;
     }
-    header h1 { margin: 0; font-size: 24px; }
+    h1 { margin: 0; font-size: 24px; }
     header p { margin: 8px 0 0; font-size: 14px; }
-    main { max-width: 900px; margin: 30px auto; padding: 0 16px; }
-    .panel {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 3px 14px #0000000d;
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
     }
-    h2 { margin-top: 0; font-size: 20px; }
-    .notice {
-      padding: 16px;
-      background: #fff2e5;
-      border-radius: 10px;
-      line-height: 1.8;
+    .login-card {
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: 0 4px 20px #0000000d;
+    }
+    h2 { margin: 0 0 22px; font-size: 21px; }
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    input {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      font-size: 16px;
+      margin-bottom: 18px;
+    }
+    button {
+      width: 100%;
+      background: #ff8a3d;
+      color: white;
+      border: 0;
+      border-radius: 9px;
+      padding: 13px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .6; cursor: default; }
+    #message {
+      margin: 14px 0 0;
+      font-size: 14px;
+      color: #b45309;
+      min-height: 20px;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>I LOVE GAME♪ 編集室</h1>
+    <h1>🎮 I LOVE GAME♪ 編集室</h1>
     <p>ゲームの今をお届け♪</p>
   </header>
+
   <main>
-    
-<section class="panel">
-  <h2>編集室にログイン 🔐</h2>
-  <form id="loginForm">
-    <label for="password">管理者パスワード</label>
-    <input
-      id="password"
-      type="password"
-      required
-      autocomplete="current-password"
-      style="display:block;width:100%;padding:12px;margin:12px 0;border:1px solid #ddd;border-radius:8px;font-size:16px;"
-    >
-    <button
-      type="submit"
-      style="background:#ff8a3d;color:white;border:0;border-radius:8px;padding:12px 24px;font-size:16px;cursor:pointer;"
-    >ログイン</button>
-    <p id="loginMessage" role="status" aria-live="polite"></p>
-  </form>
-</section>
-
-<section class="panel" id="articlesPanel" hidden style="margin-top:20px;">
-  <h2>記事一覧 📰</h2>
-  <p id="articlesMessage" role="status" aria-live="polite"></p>
-  <div id="articlesList"></div>
-</section>
-
+    <section class="login-card">
+      <h2>編集室にログイン</h2>
+      <form id="loginForm">
+        <label for="password">管理者パスワード</label>
+        <input
+          id="password"
+          type="password"
+          required
+          autocomplete="current-password"
+        >
+        <button type="submit">ログイン</button>
+        <p id="message" role="status" aria-live="polite"></p>
+      </form>
+    </section>
   </main>
-<script>
-  const loginForm = document.getElementById("loginForm");
-  const loginMessage = document.getElementById("loginMessage");
 
-  loginForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  <script>
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("message");
 
-    const passwordInput = document.getElementById("password");
-    const password = passwordInput.value;
-    const button = loginForm.querySelector('button[type="submit"]');
+    // ログイン済みなら編集室へ移動
+    async function checkSession() {
+      try {
+        const response = await fetch("/api/editor-news", {
+          credentials: "same-origin",
+          cache: "no-store"
+        });
+        if (response.ok) {
+          location.replace("/editor-dashboard.html");
+        }
+      } catch {
+        // 通信エラー時はログイン画面を維持
+      }
+    }
 
-    button.disabled = true;
-    loginMessage.textContent = "ログイン中...";
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-    try {
-      const response = await fetch("/api/editor-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({ password })
-      });
+      const passwordInput = document.getElementById("password");
+      const password = passwordInput.value;
+      const button = form.querySelector('button[type="submit"]');
 
-      if (!response.ok) {
-        loginMessage.textContent =
-          response.status === 401
+      button.disabled = true;
+      message.textContent = "ログイン中...";
+
+      try {
+        const response = await fetch("/api/editor-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ password })
+        });
+
+        if (!response.ok) {
+          message.textContent = response.status === 401
             ? "パスワードが違います。"
             : "ログインできませんでした。";
-        return;
+          return;
+        }
+
+        passwordInput.value = "";
+        location.replace("/editor-dashboard.html");
+      } catch {
+        message.textContent = "通信エラーが発生しました。";
+      } finally {
+        button.disabled = false;
       }
-
-      passwordInput.value = "";
-      loginMessage.textContent = "ログイン成功！🎉";
-      
-articlesPanel.hidden = false;
-await loadArticles();
-
-    } catch {
-      loginMessage.textContent = "通信エラーが発生しました。";
-    } finally {
-      button.disabled = false;
-    }
-  });
-  
-  const articlesPanel = document.getElementById("articlesPanel");
-  const articlesMessage = document.getElementById("articlesMessage");
-  const articlesList = document.getElementById("articlesList");
-
-  async function loadArticles() {
-    articlesMessage.textContent = "記事を読み込み中...";
-    articlesList.replaceChildren();
-
-    try {
-      const response = await fetch("/api/editor-news", {
-        credentials: "same-origin",
-        cache: "no-store"
-      });
-
-      if (!response.ok) {
-        articlesMessage.textContent =
-          response.status === 401
-            ? "ログインが必要です。"
-            : "記事を取得できませんでした。";
-        return;
-      }
-
-      const data = await response.json();
-      const articles = data.articles || [];
-
-      articlesMessage.textContent =
-        `${articles.length}件の記事を表示しています。`;
-
-      for (const article of articles) {
-        const item = document.createElement("div");
-        item.style.cssText =
-          "padding:16px 0;border-bottom:1px solid #eee;";
-
-        const title = document.createElement("strong");
-        title.textContent = article.title || "タイトルなし";
-
-        const info = document.createElement("p");
-        info.style.cssText =
-          "margin:8px 0 0;color:#666;font-size:14px;";
-
-        const statusLabels = {
-          published: "掲載中",
-          pending: "審査待ち",
-          rejected: "非掲載"
-        };
-
-        const status = statusLabels[article.status] || "不明";
-        const score = article.importance ?? "未評価";
-
-        info.textContent =
-          `ID: ${article.id} ／ AI評価: ${score}点 ／ ${status}`;
-
-const button = document.createElement("button");
-
-const nextStatus =
-  article.status === "published" ? "rejected" : "published";
-
-button.textContent =
-  nextStatus === "published" ? "掲載する" : "非掲載にする";
-
-button.style.cssText =
-  "margin-top:10px;padding:8px 16px;border:0;border-radius:8px;background:#ff8a3d;color:white;cursor:pointer;";
-
-button.addEventListener("click", async () => {
-  const action = nextStatus === "published" ? "掲載" : "非掲載";
-
-  if (!confirm(`この記事を${action}に変更しますか？`)) return;
-
-  button.disabled = true;
-  articlesMessage.textContent = "変更を保存中...";
-
-  try {
-    const response = await fetch("/api/editor-update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-      body: JSON.stringify({ id: article.id, status: nextStatus })
     });
 
-    if (!response.ok) {
-      articlesMessage.textContent = "変更に失敗しました。";
-      button.disabled = false;
-      return;
-    }
-
-    await loadArticles();
-  } catch {
-    articlesMessage.textContent = "通信エラーが発生しました。";
-    button.disabled = false;
-  }
-});
-
-        item.append(title, info, button);
-        articlesList.appendChild(item);
-      }
-    } catch {
-      articlesMessage.textContent = "通信エラーが発生しました。";
-    }
-  }
-
-</script>
-
+    checkSession();
+  </script>
 </body>
 </html>
