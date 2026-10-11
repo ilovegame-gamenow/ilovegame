@@ -38,6 +38,10 @@ export default async function handler(req, res) {
       "eq.pending"
     );
     queueUrl.searchParams.set(
+  "manually_reviewed",
+  "not.is.true"
+);
+    queueUrl.searchParams.set(
       "order",
       "source_published_at.asc"
     );
@@ -151,8 +155,94 @@ export default async function handler(req, res) {
               cleanText.slice(0, index).trim();
           }
         }
+        // STEP 1：AIで記事の重要度だけを事前評価する
+        const scoreResponse = await fetch(
+  "https://api.openai.com/v1/responses",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${openaiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "gpt-5-mini",
+      text: {
+        format: {
+          type: "json_schema",
+          name: "game_news_score",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              importance: { type: "integer" }
+            },
+            required: ["importance"],
+            additionalProperties: false
+          }
+        }
+      },
+      input: `あなたはゲームニュースサイト「I LOVE GAME♪」の編集者です。
+以下の公式記事の掲載価値を0〜100の整数で評価してください。
+評価方針:
+${newsConfig.evaluationGuidelines.map(rule => `・${rule}`).join("\n")}
 
-        // AIで重要度判定＋記事生成
+公式タイトル:
+${item.source_title}
+
+公式記事本文:
+${cleanText.slice(0, 6000)}`
+    })
+  }
+);
+        const scoreData = await scoreResponse.json();
+
+if (!scoreResponse.ok || scoreData.status !== "completed") {
+  throw new Error(
+    `AI scoring failed: ${JSON.stringify(scoreData)}`
+  );
+}
+
+const scoreText =
+  scoreData.output_text ||
+  scoreData.output
+    ?.flatMap(item => item.content || [])
+    ?.find(part => part.type === "output_text")
+    ?.text ||
+  "";
+
+if (!scoreText) {
+  throw new Error("AI scoring returned empty text");
+}
+
+const scoreArticle = JSON.parse(scoreText);
+const preScore = Math.max(
+  0,
+  Math.min(100, Math.round(Number(scoreArticle.importance) || 0))
+);
+        // 50点以下は記事を生成せず、自動非掲載にする
+if (preScore <= newsConfig.noArticleThreshold) {
+  await updateArticle(
+    supabaseUrl,
+    supabaseKey,
+    item.id,
+    {
+      importance: preScore,
+      status: "rejected",
+      processing_status: "completed",
+      article_body: null,
+      site_published_at: null
+    }
+  );
+
+  results.push({
+    id: item.id,
+    importance: preScore,
+    status: "rejected"
+  });
+
+  continue;
+}
+        // AI記事生成（重要度の事前判定後に実行する）
         const openaiResponse = await fetch(
           "https://api.openai.com/v1/responses",
           {
@@ -174,17 +264,12 @@ text: {
         schema: {
             type: "object",
             properties: {
-                importance: {
-                    type: "integer",
-                    description: "掲載価値を0〜100で評価"
-                },
                 title: { type: "string" },
                 summary: { type: "string" },
                 ilovegame_point: { type: "string" },
                 article_body: { type: "string" }
             },
             required: [
-                "importance",
                 "title",
                 "summary",
                 "ilovegame_point",
@@ -206,11 +291,7 @@ text: {
 ただし、年を明記しないと意味が分かりにくい場合は年を付けても構いません。
 
 
-次の5項目を作成してください。出力形式は指定されたJSONスキーマに従ってください。
-
-importance：I LOVE GAME♪での掲載価値を0〜100の整数で評価してください。最優先の基準は「ゲームを遊ぶ人にとって知りたい情報か？」です。
-評価の詳しい方針:
-${newsConfig.evaluationGuidelines.map(rule => `・${rule}`).join("\n")}
+次の4項目を作成してください。出力形式は指定されたJSONスキーマに従ってください。
 title：分かりやすいニュースタイトルにしてください。
 summary：一覧カード用の要約です。必ず1文、50〜70文字程度にしてください。タイトルの内容をそのまま繰り返さないでください。
 ilovegame_point：「ここに注目♪」に表示する文章です。読者に伝えたいポイントを1〜2文で紹介してください。
@@ -291,39 +372,36 @@ try {
 
 
 
-        const importance = Math.max(
-          0,
-          Math.min(
-            100,
-            Math.round(
-              Number(aiArticle.importance) || 0
-            )
-          )
-        );
+        const importance = preScore;
 
-        // 設定した掲載基準未満は非掲載
-        if (importance < newsConfig.publishThreshold) {
-          await updateArticle(
-            supabaseUrl,
-            supabaseKey,
-            item.id,
-            {
-              importance,
-              status: "rejected",
-              processing_status: "completed",
-              published_at: null
-            }
-          );
+        // 51〜79点はAI記事を保存し、手動審査を待つ
+if (importance < newsConfig.publishThreshold) {
+  await updateArticle(
+    supabaseUrl,
+    supabaseKey,
+    item.id,
+    {
+      title: aiArticle.title || item.source_title,
+      summary: aiArticle.summary || "",
+      article_body: aiArticle.article_body || "",
+      ilovegame_point: aiArticle.ilovegame_point || "",
+      importance,
+      status: "pending",
+      processing_status: "completed",
+      published_at: null,
+      site_published_at: null
+    }
+  );
 
-          results.push({
-            id: item.id,
-            title: item.source_title,
-            importance,
-            status: "rejected"
-          });
+  results.push({
+    id: item.id,
+    title: aiArticle.title || item.source_title,
+    importance,
+    status: "pending"
+  });
 
-          continue;
-        }
+  continue;
+}
 
         // 設定した掲載基準以上は記事として公開
         await updateArticle(
