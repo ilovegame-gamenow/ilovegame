@@ -1,4 +1,4 @@
-import { newsConfig } from "./news-config.js";
+import { newsConfig } from "./lib/news-config.js";
 
 export default async function handler(req, res) {
   try {
