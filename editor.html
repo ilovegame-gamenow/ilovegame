@@ -62,6 +62,12 @@
   </form>
 </section>
 
+<section class="panel" id="articlesPanel" hidden style="margin-top:20px;">
+  <h2>記事一覧 📰</h2>
+  <p id="articlesMessage" role="status" aria-live="polite"></p>
+  <div id="articlesList"></div>
+</section>
+
   </main>
 <script>
   const loginForm = document.getElementById("loginForm");
@@ -95,12 +101,77 @@
 
       passwordInput.value = "";
       loginMessage.textContent = "ログイン成功！🎉";
+      
+articlesPanel.hidden = false;
+await loadArticles();
+
     } catch {
       loginMessage.textContent = "通信エラーが発生しました。";
     } finally {
       button.disabled = false;
     }
   });
+  
+  const articlesPanel = document.getElementById("articlesPanel");
+  const articlesMessage = document.getElementById("articlesMessage");
+  const articlesList = document.getElementById("articlesList");
+
+  async function loadArticles() {
+    articlesMessage.textContent = "記事を読み込み中...";
+    articlesList.replaceChildren();
+
+    try {
+      const response = await fetch("/api/editor-news", {
+        credentials: "same-origin",
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        articlesMessage.textContent =
+          response.status === 401
+            ? "ログインが必要です。"
+            : "記事を取得できませんでした。";
+        return;
+      }
+
+      const data = await response.json();
+      const articles = data.articles || [];
+
+      articlesMessage.textContent =
+        `${articles.length}件の記事を表示しています。`;
+
+      for (const article of articles) {
+        const item = document.createElement("div");
+        item.style.cssText =
+          "padding:16px 0;border-bottom:1px solid #eee;";
+
+        const title = document.createElement("strong");
+        title.textContent = article.title || "タイトルなし";
+
+        const info = document.createElement("p");
+        info.style.cssText =
+          "margin:8px 0 0;color:#666;font-size:14px;";
+
+        const statusLabels = {
+          published: "掲載中",
+          pending: "審査待ち",
+          rejected: "非掲載"
+        };
+
+        const status = statusLabels[article.status] || "不明";
+        const score = article.importance ?? "未評価";
+
+        info.textContent =
+          `ID: ${article.id} ／ AI評価: ${score}点 ／ ${status}`;
+
+        item.append(title, info);
+        articlesList.appendChild(item);
+      }
+    } catch {
+      articlesMessage.textContent = "通信エラーが発生しました。";
+    }
+  }
+
 </script>
 
 </body>
