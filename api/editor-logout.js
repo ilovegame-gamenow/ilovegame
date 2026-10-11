@@ -1,4 +1,4 @@
-import { requireEditor } from "./editor-auth.js";
+import { requireEditor } from "../lib/editor-auth.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
