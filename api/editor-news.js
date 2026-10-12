@@ -45,6 +45,37 @@ export default async function handler(req, res) {
   }
 
   try {
+    const countStatuses = ["pending", "published", "rejected"];
+
+const counts = Object.fromEntries(
+  await Promise.all(countStatuses.map(async (item) => {
+    const countParams = new URLSearchParams({
+      select: "id",
+      status: `eq.${item}`,
+      limit: "0"
+    });
+
+    const countResponse = await fetch(
+      `${supabaseUrl}/rest/v1/articles?${countParams.toString()}`,
+      {
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+          Prefer: "count=exact"
+        }
+      }
+    );
+
+    if (!countResponse.ok) throw new Error("Count request failed");
+
+    const range = countResponse.headers.get("content-range");
+    const count = range ? Number(range.split("/")[1]) : NaN;
+
+    if (!Number.isFinite(count)) throw new Error("Invalid count");
+
+    return [item, count];
+  }))
+);
     const response = await fetch(
       `${supabaseUrl}/rest/v1/articles?${params.toString()}`,
       {
@@ -67,11 +98,12 @@ export default async function handler(req, res) {
         : null;
 
     return res.status(200).json({
-        articles,
-        page,
-        limit,
-        total
-    });
+  articles,
+  page,
+  limit,
+  total,
+  counts
+});
 
   } catch {
     return res.status(502).json({ error: "Database request failed" });
