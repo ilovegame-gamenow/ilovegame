@@ -3,7 +3,7 @@ import { generateArticle } from "../lib/article-generator.js";
 import { extractSourceText } from "../lib/source-extractor.js";
 import { evaluateNewsImportance } from "../lib/news-evaluator.js";
 import { determinePublicationPolicy } from "../lib/publication-policy.js";
-import { updateArticle } from "../lib/article-repository.js";
+import { updateArticle, getPendingArticles } from "../lib/article-repository.js";
 export default async function handler(req, res) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -29,47 +29,8 @@ export default async function handler(req, res) {
       });
     }
 
-    // pendingの記事を古い順に最大3件取得
-    const queueUrl = new URL(
-      `${supabaseUrl}/rest/v1/articles`
-    );
-
-    queueUrl.searchParams.set(
-      "select",
-      "id,source_title,source_name,source_url,source_published_at,site_published_at"
-    );
-    queueUrl.searchParams.set(
-      "processing_status",
-      "eq.pending"
-    );
-    queueUrl.searchParams.set(
-  "manually_reviewed",
-  "not.is.true"
-);
-    queueUrl.searchParams.set(
-      "order",
-      "source_published_at.asc"
-    );
-    queueUrl.searchParams.set("limit", "3");
-
-    const queueResponse = await fetch(
-      queueUrl.toString(),
-      {
-        headers: {
-          apikey: supabaseKey,
-          Authorization: `Bearer ${supabaseKey}`
-        }
-      }
-    );
-
-    if (!queueResponse.ok) {
-      throw new Error(
-        `Queue fetch failed: ${await queueResponse.text()}`
-      );
-    }
-
-    const pendingArticles =
-      await queueResponse.json();
+    // AI処理待ちの記事をSupabaseから取得する
+    const pendingArticles = await getPendingArticles(supabaseUrl, supabaseKey);
 
     if (
       !Array.isArray(pendingArticles) ||
