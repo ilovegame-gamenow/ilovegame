@@ -259,6 +259,7 @@
       </div>
       <p class="message" id="message" role="status" aria-live="polite"></p>
       <div id="articlesList"></div>
+      <div id="pagination" class="tabs"></div>
     </section>
   </main>
   <!-- 記事プレビュー -->
@@ -281,7 +282,10 @@
 
     let articles = [];
     let currentFilter = "pending";
-
+    const pagination = document.getElementById("pagination");
+    let currentPage = 1;
+    let totalArticles = 0;
+    const pageSize = 20;
     const labels = {
       pending: "審査待ち",
       published: "掲載中",
@@ -292,7 +296,7 @@
       message.textContent = "記事を読み込み中...";
 
       try {
-        const response = await fetch("/api/editor-news", {
+        const response = await fetch(`/api/editor-news?page=${currentPage}&status=${currentFilter}`, {
           credentials: "same-origin",
           cache: "no-store"
         });
@@ -306,26 +310,56 @@
 
         const data = await response.json();
         articles = data.articles || [];
+        totalArticles = data.total ?? 0;
         render();
       } catch {
         message.textContent = "記事を取得できませんでした。";
       }
     }
+function renderPagination() {
+  pagination.replaceChildren();
 
+  const totalPages = Math.ceil(totalArticles / pageSize);
+  if (totalPages <= 1) return;
+
+  const previous = document.createElement("button");
+  previous.className = "tab";
+  previous.textContent = "← 前へ";
+  previous.disabled = currentPage === 1;
+  previous.addEventListener("click", () => {
+    currentPage--;
+    loadArticles();
+  });
+
+  const indicator = document.createElement("span");
+  indicator.textContent = `${currentPage} / ${totalPages} ページ`;
+  indicator.style.alignSelf = "center";
+
+  const next = document.createElement("button");
+  next.className = "tab";
+  next.textContent = "次へ →";
+  next.disabled = currentPage >= totalPages;
+  next.addEventListener("click", () => {
+    currentPage++;
+    loadArticles();
+  });
+
+  pagination.append(previous, indicator, next);
+}
     function render() {
       list.replaceChildren();
+      renderPagination();
 
       for (const status of ["pending", "published", "rejected"]) {
-        document.getElementById(status + "Count").textContent =
-          articles.filter(a => a.status === status).length;
+        document.getElementById(status + "Count").textContent = "—";
       }
 
       const filtered = articles.filter(a =>
         currentFilter === "all" || a.status === currentFilter
       );
 
-      message.textContent = filtered.length
-        ? `${filtered.length}件の記事を表示しています。`
+      message.textContent = totalArticles
+        ? `全${totalArticles}件中、${filtered.length}件を表示しています。`
         : "該当する記事はありません。";
 
       for (const article of filtered) {
@@ -434,7 +468,8 @@
       for (const tab of tabs.querySelectorAll(".tab")) {
         tab.classList.toggle("active", tab === button);
       }
-      render();
+      currentPage = 1;
+      loadArticles();
     });
 
     document.getElementById("logoutButton")
