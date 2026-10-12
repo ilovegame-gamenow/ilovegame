@@ -1,4 +1,4 @@
-import { newsConfig } from "./news-config.js";
+import { newsConfig } from "../lib/news-config.js";
 
 // サイト表示に必要な設定だけを公開する
 export default function handler(req, res) {
