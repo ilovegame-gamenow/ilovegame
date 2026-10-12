@@ -3,6 +3,7 @@ import { generateArticle } from "../lib/article-generator.js";
 import { extractSourceText } from "../lib/source-extractor.js";
 import { evaluateNewsImportance } from "../lib/news-evaluator.js";
 import { determinePublicationPolicy } from "../lib/publication-policy.js";
+import { updateArticle } from "../lib/article-repository.js";
 export default async function handler(req, res) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -231,43 +232,5 @@ export default async function handler(req, res) {
       success: false,
       error: error.message
     });
-  }
-}
-
-async function updateArticle(
-  supabaseUrl,
-  supabaseKey,
-  id,
-  changes
-) {
-  const updateUrl = new URL(
-    `${supabaseUrl}/rest/v1/articles`
-  );
-
-  updateUrl.searchParams.set(
-    "id",
-    `eq.${id}`
-  );
-
-  const response = await fetch(
-    updateUrl.toString(),
-    {
-      method: "PATCH",
-      headers: {
-        apikey: supabaseKey,
-        Authorization:
-          `Bearer ${supabaseKey}`,
-        "Content-Type":
-          "application/json",
-        Prefer: "return=minimal"
-      },
-      body: JSON.stringify(changes)
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `Supabase update failed: ${await response.text()}`
-    );
   }
 }
