@@ -1,6 +1,7 @@
 import { newsConfig } from "../lib/news-config.js";
 import { generateArticle } from "../lib/article-generator.js";
 import { extractSourceText } from "../lib/source-extractor.js";
+import { evaluateNewsImportance } from "../lib/news-evaluator.js";
 export default async function handler(req, res) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -94,70 +95,12 @@ export default async function handler(req, res) {
         );
         // 公式記事の本文を取得し、不要なHTML要素を除去してテキストを抽出
         const cleanText = await extractSourceText(item.source_url);
-        // STEP 1：AIで記事の重要度だけを事前評価する
-        const scoreResponse = await fetch(
-  "https://api.openai.com/v1/responses",
-  {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${openaiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "gpt-5-mini",
-      text: {
-        format: {
-          type: "json_schema",
-          name: "game_news_score",
-          strict: true,
-          schema: {
-            type: "object",
-            properties: {
-              importance: { type: "integer" }
-            },
-            required: ["importance"],
-            additionalProperties: false
-          }
-        }
-      },
-      input: `あなたはゲームニュースサイト「I LOVE GAME♪」の編集者です。
-以下の公式記事の掲載価値を0〜100の整数で評価してください。
-評価方針:
-${newsConfig.evaluationGuidelines.map(rule => `・${rule}`).join("\n")}
-
-公式タイトル:
-${item.source_title}
-
-公式記事本文:
-${cleanText.slice(0, 6000)}`
-    })
-  }
-);
-        const scoreData = await scoreResponse.json();
-
-if (!scoreResponse.ok || scoreData.status !== "completed") {
-  throw new Error(
-    `AI scoring failed: ${JSON.stringify(scoreData)}`
-  );
-}
-
-const scoreText =
-  scoreData.output_text ||
-  scoreData.output
-    ?.flatMap(item => item.content || [])
-    ?.find(part => part.type === "output_text")
-    ?.text ||
-  "";
-
-if (!scoreText) {
-  throw new Error("AI scoring returned empty text");
-}
-
-const scoreArticle = JSON.parse(scoreText);
-const preScore = Math.max(
-  0,
-  Math.min(100, Math.round(Number(scoreArticle.importance) || 0))
-);
+        // STEP 1：AIで記事の重要度を事前評価する
+        const preScore = await evaluateNewsImportance({
+          sourceTitle: item.source_title,
+          sourceText: cleanText,
+          openaiKey
+        });
         // 50点以下は記事を生成せず、自動非掲載にする
 if (preScore <= newsConfig.noArticleThreshold) {
   await updateArticle(
