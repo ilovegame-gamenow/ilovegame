@@ -1,5 +1,6 @@
 import { newsConfig } from "../lib/news-config.js";
 import { generateArticle } from "../lib/article-generator.js";
+import { extractSourceText } from "../lib/source-extractor.js";
 export default async function handler(req, res) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -91,71 +92,8 @@ export default async function handler(req, res) {
             processing_status: "processing"
           }
         );
-
-        // 公式記事本文を取得
-        const articleResponse = await fetch(
-          item.source_url,
-          {
-            headers: {
-              "User-Agent": "Mozilla/5.0"
-            }
-          }
-        );
-
-        if (!articleResponse.ok) {
-          throw new Error(
-            `Source article fetch failed: ${articleResponse.status}`
-          );
-        }
-
-        const html = await articleResponse.text();
-
-        const mainMatch =
-          html.match(/<main[\s\S]*?<\/main>/i) ||
-          html.match(/<article[\s\S]*?<\/article>/i);
-
-        const articleHtml =
-          mainMatch ? mainMatch[0] : html;
-
-        let cleanText = articleHtml
-          .replace(
-            /<script[\s\S]*?<\/script>/gi,
-            " "
-          )
-          .replace(
-            /<style[\s\S]*?<\/style>/gi,
-            " "
-          )
-          .replace(
-            /<nav[\s\S]*?<\/nav>/gi,
-            " "
-          )
-          .replace(
-            /<footer[\s\S]*?<\/footer>/gi,
-            " "
-          )
-          .replace(/<[^>]+>/g, " ")
-          .replace(/&nbsp;/g, " ")
-          .replace(/&amp;/g, "&")
-          .replace(/&quot;/g, '"')
-          .replace(/&#39;/g, "'")
-          .replace(/\s+/g, " ")
-          .trim();
-
-        const cutoffMarkers = [
-          "関連リンク",
-          "この記事のほかにも、こんな記事があります。"
-        ];
-
-        for (const marker of cutoffMarkers) {
-          const index =
-            cleanText.indexOf(marker);
-
-          if (index !== -1) {
-            cleanText =
-              cleanText.slice(0, index).trim();
-          }
-        }
+        // 公式記事の本文を取得し、不要なHTML要素を除去してテキストを抽出
+        const cleanText = await extractSourceText(item.source_url);
         // STEP 1：AIで記事の重要度だけを事前評価する
         const scoreResponse = await fetch(
   "https://api.openai.com/v1/responses",
