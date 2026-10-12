@@ -48,24 +48,31 @@ export default async function handler(req, res) {
     const response = await fetch(
       `${supabaseUrl}/rest/v1/articles?${params.toString()}`,
       {
-        headers: {
-          apikey: supabaseKey,
-          Authorization: `Bearer ${supabaseKey}`
-        }
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        Prefer: "count=exact"
       }
+    }
     );
 
     if (!response.ok) {
       return res.status(502).json({ error: "Failed to fetch articles" });
     }
-
     const articles = await response.json();
 
+    const contentRange = response.headers.get("content-range");
+    const total = contentRange
+        ? Number(contentRange.split("/")[1])
+        : null;
+
     return res.status(200).json({
-      articles,
-      page,
-      limit
+        articles,
+        page,
+        limit,
+        total
     });
+
   } catch {
     return res.status(502).json({ error: "Database request failed" });
   }
