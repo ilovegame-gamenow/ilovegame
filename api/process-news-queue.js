@@ -2,6 +2,7 @@ import { newsConfig } from "../lib/news-config.js";
 import { generateArticle } from "../lib/article-generator.js";
 import { extractSourceText } from "../lib/source-extractor.js";
 import { evaluateNewsImportance } from "../lib/news-evaluator.js";
+import { determinePublicationPolicy } from "../lib/publication-policy.js";
 export default async function handler(req, res) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -101,8 +102,9 @@ export default async function handler(req, res) {
           sourceText: cleanText,
           openaiKey
         });
+        const publicationPolicy = determinePublicationPolicy(preScore);
         // 50点以下は記事を生成せず、自動非掲載にする
-if (preScore <= newsConfig.noArticleThreshold) {
+        if (publicationPolicy === "rejected") {
   await updateArticle(
     supabaseUrl,
     supabaseKey,
@@ -134,7 +136,7 @@ if (preScore <= newsConfig.noArticleThreshold) {
         const importance = preScore;
 
         // 51〜79点はAI記事を保存し、手動審査を待つ
-if (importance < newsConfig.publishThreshold) {
+        if (publicationPolicy === "review") {
   await updateArticle(
     supabaseUrl,
     supabaseKey,
