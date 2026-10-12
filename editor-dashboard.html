@@ -286,6 +286,7 @@
     let currentPage = 1;
     let totalArticles = 0;
     const pageSize = 20;
+    let articleCounts = { pending: 0, published: 0, rejected: 0 };
     const labels = {
       pending: "審査待ち",
       published: "掲載中",
@@ -311,6 +312,7 @@
         const data = await response.json();
         articles = data.articles || [];
         totalArticles = data.total ?? 0;
+        articleCounts = data.counts || { pending: 0, published: 0, rejected: 0 };
         render();
       } catch {
         message.textContent = "記事を取得できませんでした。";
@@ -351,8 +353,8 @@ function renderPagination() {
       renderPagination();
 
       for (const status of ["pending", "published", "rejected"]) {
-        document.getElementById(status + "Count").textContent = "—";
-      }
+  document.getElementById(status + "Count").textContent = articleCounts[status] ?? "—";
+}
 
       const filtered = articles.filter(a =>
         currentFilter === "all" || a.status === currentFilter
