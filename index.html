@@ -217,7 +217,7 @@ if(pickupTitle) pickupTitle.style.display = pickupRows.length ? "" : "none";
       const updateLabel = GameDate.format(updateTime);
       const timeColor = GameDate.color(updateTime);
       return `<article class="card" onclick="location.href='article.html?id=${encodeURIComponent(a.id)}'" style="cursor:pointer">
-        ${a.thumbnail_url ? `<img class="thumb" src="https://assets.topics.apps-jp.nintendo.com/image/${esc(a.thumbnail_url)}" alt="${esc(a.title)}">` : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
+        ${a.thumbnail_url ? `<img class="thumb" src="${esc(GameImage.getUrl(a.thumbnail_url, a.source_name))}" alt="${esc(a.title)}">` : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
         <div class="meta">${esc(a.source_name||"")}</div>
         <div class="time game-date" style="color:${timeColor}">${esc(updateLabel)} UP</div>
         <h3>${esc(a.title)}</h3>
