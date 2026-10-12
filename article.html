@@ -215,9 +215,7 @@ function formatArticleText(text) {
           throw new Error("記事が見つかりません");
         }
 
-        const thumbnail = article.thumbnail_url
-          ? `https://assets.topics.apps-jp.nintendo.com/image/${article.thumbnail_url}`
-          : "";
+        const thumbnail = GameImage.getUrl(article.thumbnail_url, article.source_name);
 
         const updateTime = article.site_published_at || article.created_at || article.published_at;
 const updateLabel = GameDate.format(updateTime);
