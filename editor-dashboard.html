@@ -273,8 +273,7 @@
       </div>
     </div>
   </dialog>
-
-
+  <script src="/image-utils.js"></script>
   <script>
     const list = document.getElementById("articlesList");
     const message = document.getElementById("message");
@@ -500,13 +499,20 @@
             previewBody.appendChild(section);
           }
 
-          if (article.thumbnail_url) {
-            const img = document.createElement("img");
-            img.src = article.thumbnail_url;
-            img.alt = article.title || "記事画像";
-            img.loading = "lazy";
-            previewBody.appendChild(img);
-          }
+          
+const imageUrl = GameImage.getUrl(
+  article.thumbnail_url,
+  article.source_name
+);
+
+if (imageUrl) {
+  const img = document.createElement("img");
+  img.src = imageUrl;
+  img.alt = article.title || "記事画像";
+  img.loading = "lazy";
+  previewBody.appendChild(img);
+}
+
 
           addText("掲載状態", {
             pending: "審査待ち",
