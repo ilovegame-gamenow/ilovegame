@@ -360,6 +360,12 @@ function renderPagination() {
         const item = document.createElement("div");
         item.className = "article";
 
+        const card = document.createElement("div");
+card.innerHTML = GameNewsCard.render(article, {
+  clickable: false
+});
+item.appendChild(card);
+
         const top = document.createElement("div");
         top.className = "article-top";
 
