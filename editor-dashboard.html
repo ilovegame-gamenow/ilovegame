@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>I LOVE GAME♪ 編集室</title>
+  <link rel="stylesheet" href="/header.css">
   <style>
     * { box-sizing: border-box; }
     body {
@@ -12,33 +13,34 @@
       color: #333;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    header {
-      background: #ff8a3d;
-      color: white;
-      padding: 18px 20px;
-    }
-    .header-inner {
-      max-width: 1100px;
-      margin: auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
+    
     h1 { font-size: 22px; margin: 0; }
+
+    
     .subtitle { font-size: 12px; margin-top: 5px; }
     button {
       cursor: pointer;
       font: inherit;
       border-radius: 9px;
-      padding: 10px 14px;
+      padding: 10px 14px;うおp
     }
     button:disabled { cursor: default; opacity: .65; }
     .logout {
-      background: transparent;
-      border: 1px solid white;
-      color: white;
-    }
+  background: #fff3e9;
+  border: 1px solid #ff7a2f;
+  color: #d65f18;
+  font-weight: 700;
+}
+.editor-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.editor-header-label {
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
     main {
       max-width: 1100px;
       margin: 24px auto;
@@ -223,17 +225,8 @@
 
   </style>
 </head>
-<body>
-  <header>
-    <div class="header-inner">
-      <div>
-        <h1>🎮 I LOVE GAME♪ 編集室</h1>
-        <div class="subtitle">ゲームの今をお届け♪</div>
-      </div>
-      <button class="logout" id="logoutButton">ログアウト</button>
-    </div>
-  </header>
-
+<body data-page="editor">
+  <header></header>
   <main>
     <div class="stats">
       <div class="stat pending">
@@ -275,6 +268,7 @@
     </div>
   </dialog>
   <script src="/image-utils.js"></script>
+  <script src="/header.js"></script>
   <script>
     const list = document.getElementById("articlesList");
     const message = document.getElementById("message");
