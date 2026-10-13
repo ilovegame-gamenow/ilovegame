@@ -49,9 +49,11 @@
       ? GameDate.color(updateTime)
       : "";
 
-    const imageUrl = window.GameImage
+    const imageUrl = a.thumbnail_url
+  ? (window.GameImage
       ? GameImage.getUrl(a.thumbnail_url, a.source_name)
-      : a.thumbnail_url;
+      : a.thumbnail_url)
+  : "";
 
     const destination = options.clickable === false
       ? ""
