@@ -34,7 +34,7 @@ export default async function handler(req, res) {
   const offset = (page - 1) * limit;
 
   const params = new URLSearchParams({
-    select: "id,title,status,importance,processing_status,manually_reviewed,site_published_at,source_url",
+    select: "id,title,summary,thumbnail_url,source_name,platforms,created_at,published_at,status,importance,processing_status,manually_reviewed,site_published_at,source_url",
     order: "id.desc",
     limit: String(limit),
     offset: String(offset)
