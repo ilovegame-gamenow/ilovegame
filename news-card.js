@@ -50,9 +50,7 @@
       : "";
 
     const imageUrl = a.thumbnail_url
-  ? (window.GameImage
-      ? GameImage.getUrl(a.thumbnail_url, a.source_name)
-      : a.thumbnail_url)
+  ? GameImage.getUrl(a.thumbnail_url, a.source_name)
   : "";
 
     const destination = options.clickable === false
