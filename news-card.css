@@ -1,0 +1,88 @@
+/* I LOVE GAME♪ 共通ニュースカード */
+
+.card {
+  display: block;
+  background: #fff;
+  border: 1px solid #eee2d7;
+  border-radius: 18px;
+  padding: 17px;
+  min-height: 150px;
+  box-shadow: 0 4px 14px #d78f6317;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px #d78f6326;
+}
+
+.news-card-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.card h3 {
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+
+.card .meta {
+  font-size: 12px;
+  color: #77706a;
+}
+
+.card .time {
+  font-size: 11px;
+  color: #ff7a2f;
+  font-weight: 900;
+  margin-bottom: 9px;
+}
+
+.card .thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  object-fit: cover;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.card .thumb-placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ff7a2f, #ffb36f);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 1000;
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+.card .platforms {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.card .platform {
+  font-size: 11px;
+  font-weight: 900;
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #fff;
+  letter-spacing: .02em;
+}
+
+.card .platform.switch,
+.card .platform.switch2 { background: #e60012; }
+
+.card .platform.ps5 { background: #1674d1; }
+.card .platform.xbox { background: #107c10; }
+.card .platform.pc { background: #5d6470; }
+.card .platform.mobile { background: #8e44ad; }
+.card .platform.other { background: #ff7a2f; }
