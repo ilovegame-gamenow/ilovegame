@@ -32,7 +32,7 @@
   gap: 12px;
 }
 .editor-header-label {
-  font-size: 13px;
+  font-size: 18px;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -463,21 +463,24 @@ function renderPagination() {
       loadArticles();
     });
 
-    document.getElementById("logoutButton")
-      .addEventListener("click", async () => {
-        message.textContent = "ログアウト中...";
-        try {
-          const response = await fetch("/api/editor-logout", {
-            method: "POST",
-            credentials: "same-origin"
-          });
-          if (!response.ok) throw new Error("ログアウト失敗");
-          location.replace("/editor.html");
-        } catch {
-          message.textContent = "ログアウトできませんでした。";
-        }
-      });
+    document.addEventListener("click", async (event) => {
+  if (!event.target.closest("#logoutButton")) return;
 
+  message.textContent = "ログアウト中...";
+
+  try {
+    const response = await fetch("/api/editor-logout", {
+      method: "POST",
+      credentials: "same-origin"
+    });
+
+    if (!response.ok) throw new Error("ログアウト失敗");
+
+    location.replace("/editor.html");
+  } catch {
+    message.textContent = "ログアウトできませんでした。";
+  }
+});
       const previewDialog = document.getElementById("previewDialog");
       const previewTitle = document.getElementById("previewTitle");
       const previewBody = document.getElementById("previewBody");
