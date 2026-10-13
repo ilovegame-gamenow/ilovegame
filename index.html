@@ -211,22 +211,10 @@ if(pickupTitle) pickupTitle.style.display = pickupRows.length ? "" : "none";
     const totalPages = Math.max(1, Math.ceil(result.total / perPage));
     const currentPage = requestedPage;
     const pageRows = rows;
-
-    latest.innerHTML = pageRows.map(a=>{
-      const ps = Array.isArray(a.platforms) ? a.platforms : [];
-      const badges = ps.map(p=>`<span class="platform ${platformClass(p)}">${esc(p)}</span>`).join("");
-      const updateTime = a.site_published_at || a.created_at || a.published_at;
-      const updateLabel = GameDate.format(updateTime);
-      const timeColor = GameDate.color(updateTime);
-      return `<article class="card" onclick="location.href='article.html?id=${encodeURIComponent(a.id)}'" style="cursor:pointer">
-        ${a.thumbnail_url ? `<img class="thumb" src="${esc(GameImage.getUrl(a.thumbnail_url, a.source_name))}" alt="${esc(a.title)}">` : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
-        <div class="meta">${esc(a.source_name||"")}</div>
-        <div class="time game-date" style="color:${timeColor}">${esc(updateLabel)} UP</div>
-        <h3>${esc(a.title)}</h3>
-        <p>${esc(a.summary||"")}</p>
-        <div class="platforms">${badges}</div>
-      </article>`;
-    }).join("");
+    
+latest.innerHTML = pageRows
+  .map(article => GameNewsCard.render(article))
+  .join("");
 
     let html = "";
 
