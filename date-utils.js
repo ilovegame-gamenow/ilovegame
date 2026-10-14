@@ -55,8 +55,27 @@ GameDate.renderMeta = function (sourceName, dateValue) {
 // 更新日時の共通デザイン
 const dateStyle = document.createElement("style");
 dateStyle.textContent = `
+  .game-meta {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    column-gap: 6px;
+    row-gap: 2px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  .game-meta-source {
+    color: #77706a;
+  }
+
+  .game-meta-separator {
+    color: #8a817a;
+  }
+
   .game-date {
-    font-size: 11px;
+    font-size: inherit;
     font-weight: 400;
   }
 `;
