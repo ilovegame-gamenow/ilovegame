@@ -41,13 +41,8 @@
     const updateTime =
       a.site_published_at || a.created_at || a.published_at;
 
-    const updateLabel = window.GameDate
-      ? GameDate.format(updateTime)
-      : "";
-
-    const timeColor = window.GameDate
-      ? GameDate.color(updateTime)
-      : "";
+    const updateLabel = GameDate.format(updateTime);
+const timeColor = GameDate.color(updateTime);
 
     const imageUrl = a.thumbnail_url
   ? GameImage.getUrl(a.thumbnail_url, a.source_name)
