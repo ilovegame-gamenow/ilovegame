@@ -28,14 +28,19 @@
   margin: 0 0 12px;
 }
 
-.card .meta {
-  font-size: 12px;
-  color: #77706a;
-}
-
+.card .meta,
 .card .time {
   font-size: 12px;
   font-weight: 400;
+  line-height: 1.5;
+}
+
+.card .meta {
+  color: #77706a;
+  margin-bottom: 2px;
+}
+
+.card .time {
   margin-bottom: 9px;
 }
 
