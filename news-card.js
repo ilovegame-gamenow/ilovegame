@@ -41,9 +41,6 @@
     const updateTime =
       a.site_published_at || a.created_at || a.published_at;
 
-    const updateLabel = GameDate.format(updateTime);
-const timeColor = GameDate.color(updateTime);
-
     const imageUrl = a.thumbnail_url
   ? GameImage.getUrl(a.thumbnail_url, a.source_name)
   : "";
@@ -56,8 +53,7 @@ const timeColor = GameDate.color(updateTime);
       ${imageUrl
         ? `<img class="thumb" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(a.title)}" loading="lazy">`
         : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
-      <div class="meta">${escapeHtml(a.source_name || "")}</div>
-      <div class="time game-date" style="color:${escapeHtml(timeColor)}">${escapeHtml(updateLabel)} UP</div>
+      ${GameDate.renderMeta(a.source_name, updateTime)}
       <h3>${escapeHtml(a.title || "")}</h3>
       <p>${escapeHtml(a.summary || "")}</p>
       <div class="platforms">${badges}</div>
