@@ -40,7 +40,6 @@
 
     const updateTime =
       a.site_published_at || a.created_at || a.published_at;
-
     const imageUrl = a.thumbnail_url
   ? GameImage.getUrl(a.thumbnail_url, a.source_name)
   : "";
