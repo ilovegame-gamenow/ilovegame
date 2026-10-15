@@ -172,9 +172,18 @@
 #articlesList .article {
   min-width: 0;
   padding: 0;
-  border-bottom: none;
+  border: 1px solid #eee2d8;
+  border-radius: 14px;
+  background: white;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
-    
+/* 記事カードを伸ばし、管理エリアを下に揃える */
+#articlesList .card {
+  flex: 1;
+  min-height: 0;
+}
 /* 編集室専用の管理エリア */
 #articlesList .article-top {
   margin-top: 8px;
