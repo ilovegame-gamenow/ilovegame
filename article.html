@@ -216,10 +216,7 @@ function formatArticleText(text) {
         }
 
         const thumbnail = GameImage.getUrl(article.thumbnail_url, article.source_name);
-
         const updateTime = article.site_published_at || article.created_at || article.published_at;
-const updateLabel = GameDate.format(updateTime);
-const timeColor = GameDate.color(updateTime);
         document.title =
           `${article.title} | I LOVE GAME♪`;
 
@@ -231,11 +228,7 @@ const timeColor = GameDate.color(updateTime);
             
 
             <h1>${esc(article.title)}</h1>
-
-            <div class="meta">
-  ${article.source_name ? esc(article.source_name) : ""}
-  ${updateLabel ? ` ｜ <span class="game-date" style="color:${timeColor}">${esc(updateLabel)} UP</span>` : ""}
-</div>
+            ${GameDate.renderMeta(article.source_name, updateTime)}
 
             ${thumbnail
               ? `<img
