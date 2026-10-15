@@ -153,8 +153,19 @@
     /* 編集室の記事カード一覧 */
 #articlesList {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
+}
+    @media (max-width: 900px) {
+  #articlesList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  #articlesList {
+    grid-template-columns: 1fr;
+  }
 }
 
 #articlesList .article {
@@ -167,11 +178,6 @@
   height: 100%;
 }
 
-@media (max-width: 600px) {
-  #articlesList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
     @media (max-width: 600px) {
       h1 { font-size: 18px; }
       .stats { gap: 8px; }
