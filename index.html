@@ -145,6 +145,7 @@ footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12
 <script src="/date-utils.js"></script>
 <script src="/image-utils.js"></script>
 <script src="/news-card.js"></script>
+<script src="/pagination.js"></script>
 <script>
 
 function platformClass(name){
@@ -216,17 +217,11 @@ latest.innerHTML = pageRows
   .map(article => GameNewsCard.render(article))
   .join("");
 
-    let html = "";
-
-    html += `<button ${currentPage===1 ? "disabled" : ""} onclick="location.href='?page=${currentPage-1}#latest'">‹ 新しい記事</button>`;
-
-    for(let i=1; i<=totalPages; i++){
-      html += `<button class="${i===currentPage ? "active" : ""}" onclick="location.href='?page=${i}#latest'">${i}</button>`;
-    }
-
-    html += `<button ${currentPage===totalPages ? "disabled" : ""} onclick="location.href='?page=${currentPage+1}#latest'">古い記事 ›</button>`;
-
-    pagination.innerHTML = html;
+    pagination.replaceChildren(
+  GamePagination.render(currentPage, totalPages, page => {
+    location.href = `?page=${page}#latest`;
+  })
+);
 
   }catch(e){
     console.error(e);
