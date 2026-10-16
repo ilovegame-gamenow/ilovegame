@@ -274,7 +274,34 @@
       margin: 20px 0;
     }
 
+#editorForm:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
 
+#editorForm label {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+#editorForm input,
+#editorForm textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font: inherit;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+#editorForm button {
+  align-self: flex-end;
+  margin-top: 10px;
+}
   </style>
 </head>
 <body data-page="editor">
