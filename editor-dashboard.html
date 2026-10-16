@@ -6,6 +6,7 @@
   <title>I LOVE GAME♪ 編集室</title>
   <link rel="stylesheet" href="/header.css">
   <link rel="stylesheet" href="/news-card.css">
+  <link rel="stylesheet" href="/pagination.css">
   <style>
     * { box-sizing: border-box; }
     body {
@@ -14,7 +15,7 @@
       color: #333;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    button {
+    button:not(.pagination button) {
       cursor: pointer;
       font: inherit;
       border-radius: 9px;
@@ -270,7 +271,6 @@
 
 
   </style>
-  <link rel="stylesheet" href="/pagination.css">
 </head>
 <body data-page="editor">
   <header></header>
@@ -299,7 +299,7 @@
       </div>
       <p class="message" id="message" role="status" aria-live="polite"></p>
       <div id="articlesList"></div>
-      <div id="pagination" class="tabs"></div>
+      <div id="pagination"></div>
     </section>
   </main>
   <!-- 記事プレビュー -->
@@ -370,9 +370,13 @@ function renderPagination() {
 
   pagination.appendChild(
     GamePagination.render(currentPage, totalPages, page => {
-      currentPage = page;
-      loadArticles();
-    })
+  currentPage = page;
+  loadArticles();
+  document.getElementById("articlesList").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+})
   );
 }
 
