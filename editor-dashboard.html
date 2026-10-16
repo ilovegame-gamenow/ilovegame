@@ -464,7 +464,8 @@ meta.className = "meta";
 meta.textContent = `AI評価：${article.importance ?? "未評価"}点`;
 
 top.appendChild(meta);
-
+const actions = document.createElement("div");
+actions.className = "actions";
         const edit = document.createElement("button");
 edit.className = "edit-btn";
 edit.textContent = "編集する";
@@ -477,7 +478,7 @@ edit.textContent = "編集する";
         reject.className = "reject-btn";
         reject.textContent = "非掲載にする";
 
-        if (article.status === "published") {
+        if (article.status === "published") {ー
           publish.classList.add("selected");
           publish.disabled = true;
         }
