@@ -318,19 +318,33 @@
   <script src="/date-utils.js"></script>
   <script src="/news-card.js"></script>
   <script src="/pagination.js"></script>
+  <script src="/news-list.js"></script>
   <script src="/header.js"></script>
   <script>
     const list = document.getElementById("articlesList");
     const message = document.getElementById("message");
     const tabs = document.getElementById("tabs");
 
-    let articles = [];
-    let currentFilter = "pending";
-    const pagination = document.getElementById("pagination");
-    let currentPage = 1;
-    let totalArticles = 0;
-    const pageSize = 20;
-    let articleCounts = { pending: 0, published: 0, rejected: 0 };
+const urlParams = new URLSearchParams(window.location.search);
+
+const savedFilter = urlParams.get("status");
+const validFilters = ["pending", "published", "rejected", "all"];
+
+let articles = [];
+let currentFilter = validFilters.includes(savedFilter)
+  ? savedFilter
+  : "pending";
+
+const pagination = document.getElementById("pagination");
+
+const savedPage = Number(urlParams.get("page"));
+let currentPage = Number.isSafeInteger(savedPage) && savedPage > 0
+  ? savedPage
+  : 1;
+
+let totalArticles = 0;
+const pageSize = 20;
+let articleCounts = { pending: 0, published: 0, rejected: 0 };
     const labels = {
       pending: "審査待ち",
       published: "掲載中",
@@ -369,13 +383,8 @@ function renderPagination() {
   if (totalPages <= 1) return;
 
   pagination.appendChild(
-    GamePagination.render(currentPage, totalPages, page => {
-  currentPage = page;
-  loadArticles();
-  document.getElementById("articlesList").scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
+ GamePagination.render(currentPage, totalPages, page => {
+  GameNewsList.navigate(page);
 })
   );
 }
@@ -509,12 +518,22 @@ list.appendChild(item);
         render();
       }
     }
-
+for (const tab of tabs.querySelectorAll(".tab")) {
+  tab.classList.toggle(
+    "active",
+    tab.dataset.filter === currentFilter
+  );
+}
     tabs.addEventListener("click", event => {
       const button = event.target.closest("[data-filter]");
       if (!button) return;
 
       currentFilter = button.dataset.filter;
+
+const url = new URL(window.location.href);
+url.searchParams.set("status", currentFilter);
+url.searchParams.set("page", "1");
+window.history.replaceState(null, "", url);
       for (const tab of tabs.querySelectorAll(".tab")) {
         tab.classList.toggle("active", tab === button);
       }
