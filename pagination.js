@@ -24,7 +24,7 @@
       container.appendChild(button);
     }
 
-    addButton("‹ 前へ", current - 1, current === 1);
+    addButton("‹ 新しい記事", current - 1, current === 1);
 
     ordered.forEach((page, index) => {
       if (index > 0 && page - ordered[index - 1] > 1) {
@@ -35,7 +35,7 @@
       addButton(String(page), page, false, page === current);
     });
 
-    addButton("次へ ›", current + 1, current === total);
+    addButton("古い記事 ›", current + 1, current === total);
 
     return container;
   }
