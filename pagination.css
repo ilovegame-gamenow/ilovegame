@@ -1,0 +1,30 @@
+/* I LOVE GAME♪ 共通ページ送り */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 32px 0 10px;
+}
+
+.pagination button {
+  border: 0;
+  background: #fff3e9;
+  color: #24201d;
+  padding: 9px 13px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background: #ff7a2f;
+  color: #fff;
+}
+
+.pagination button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
