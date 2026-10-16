@@ -133,6 +133,11 @@
       gap: 10px;
       flex-wrap: wrap;
     }
+    .edit-btn {
+  border: 1px solid #e99425;
+  background: #fff4e8;
+  color: #b65c16;
+}
     .publish-btn {
       border: 1px solid #249a69;
       background: white;
@@ -460,8 +465,9 @@ meta.textContent = `AI評価：${article.importance ?? "未評価"}点`;
 
 top.appendChild(meta);
 
-        const actions = document.createElement("div");
-        actions.className = "actions";
+        const edit = document.createElement("button");
+edit.className = "edit-btn";
+edit.textContent = "編集する";
 
         const publish = document.createElement("button");
         publish.className = "publish-btn";
@@ -479,7 +485,9 @@ top.appendChild(meta);
           reject.classList.add("selected");
           reject.disabled = true;
         }
-
+edit.addEventListener("click", () => {
+  openPreview(article.id);
+});
         publish.addEventListener("click", () =>
           updateStatus(article, "published", publish, reject)
         );
@@ -487,7 +495,7 @@ top.appendChild(meta);
           updateStatus(article, "rejected", publish, reject)
         );
 
-        actions.append(publish, reject);
+        actions.append(edit, publish, reject);
 
 const management = document.createElement("div");
 management.className = "article-management";
