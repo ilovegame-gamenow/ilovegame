@@ -297,9 +297,10 @@
         <button class="tab" data-filter="rejected">非掲載</button>
         <button class="tab" data-filter="all">すべて</button>
       </div>
-      <p class="message" id="message" role="status" aria-live="polite"></p>
-      <div id="articlesList"></div>
-      <div id="pagination"></div>
+<p class="message" id="message" role="status" aria-live="polite"></p>
+<div id="paginationTop"></div>
+<div id="articlesList"></div>
+<div id="pagination"></div>
     </section>
   </main>
   <!-- 記事プレビュー -->
@@ -377,15 +378,24 @@ let articleCounts = { pending: 0, published: 0, rejected: 0 };
       }
     }
 function renderPagination() {
+  const paginationTop = document.getElementById("paginationTop");
+
+  paginationTop.replaceChildren();
   pagination.replaceChildren();
 
   const totalPages = Math.ceil(totalArticles / pageSize);
   if (totalPages <= 1) return;
 
+  const onPageChange = page => {
+    GameNewsList.navigate(page);
+  };
+
+  paginationTop.appendChild(
+    GamePagination.render(currentPage, totalPages, onPageChange)
+  );
+
   pagination.appendChild(
- GamePagination.render(currentPage, totalPages, page => {
-  GameNewsList.navigate(page);
-})
+    GamePagination.render(currentPage, totalPages, onPageChange)
   );
 }
 
