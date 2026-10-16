@@ -314,7 +314,21 @@
       <button type="button" id="closePreview">× 閉じる</button>
 
       <h2 id="previewTitle">記事プレビュー</h2>
-      <div id="editorForm" hidden></div>
+      <form id="editorForm" hidden>
+  <label for="editTitle">タイトル</label>
+  <input id="editTitle" name="title" type="text" maxlength="300" required>
+
+  <label for="editSummary">概要</label>
+  <textarea id="editSummary" name="summary" maxlength="3000" rows="4"></textarea>
+
+  <label for="editBody">記事本文</label>
+  <textarea id="editBody" name="article_body" maxlength="50000" rows="12"></textarea>
+
+  <label for="editPoint">ここに注目♪</label>
+  <textarea id="editPoint" name="ilovegame_point" maxlength="3000" rows="4"></textarea>
+
+  <button type="submit">保存する</button>
+</form>
       <div id="previewBody">
         記事を読み込み中...
       </div>
@@ -487,7 +501,7 @@ edit.textContent = "編集する";
           reject.disabled = true;
         }
 edit.addEventListener("click", () => {
-  openPreview(article.id);
+  openPreview(article.id, true);
 });
         publish.addEventListener("click", () =>
           updateStatus(article, "published", publish, reject)
@@ -590,9 +604,10 @@ window.history.replaceState(null, "", url);
         if (event.target === previewDialog) previewDialog.close();
       });
 
-      async function openPreview(id) {
+      async function openPreview(id, editMode = false) {
         editorForm.hidden = true;
-        editorForm.replaceChildren();
+        previewBody.hidden = false;
+        editorForm.reset();
         
         previewTitle.textContent = "記事プレビュー";
         previewBody.textContent = "記事を読み込み中...";
@@ -616,8 +631,13 @@ window.history.replaceState(null, "", url);
 
           const data = await response.json();
           const article = data.article;
-
-          previewTitle.textContent = article.title || "タイトルなし";
+          editorForm.elements.namedItem("title").value = article.title || "";
+          editorForm.elements.namedItem("summary").value = article.summary || "";
+          editorForm.elements.namedItem("article_body").value = article.article_body || "";
+          editorForm.elements.namedItem("ilovegame_point").value = article.ilovegame_point || "";
+          editorForm.hidden = !editMode;
+          previewBody.hidden = editMode;
+          previewTitle.textContent = editMode ? "記事を編集" : article.title || "タイトルなし";
           previewBody.replaceChildren();
 
           function addText(label, value) {
