@@ -270,6 +270,7 @@
 
 
   </style>
+  <link rel="stylesheet" href="/pagination.css">
 </head>
 <body data-page="editor">
   <header></header>
@@ -316,6 +317,7 @@
   <script src="/image-utils.js"></script>
   <script src="/date-utils.js"></script>
   <script src="/news-card.js"></script>
+  <script src="/pagination.js"></script>
   <script src="/header.js"></script>
   <script>
     const list = document.getElementById("articlesList");
@@ -366,30 +368,14 @@ function renderPagination() {
   const totalPages = Math.ceil(totalArticles / pageSize);
   if (totalPages <= 1) return;
 
-  const previous = document.createElement("button");
-  previous.className = "tab";
-  previous.textContent = "← 前へ";
-  previous.disabled = currentPage === 1;
-  previous.addEventListener("click", () => {
-    currentPage--;
-    loadArticles();
-  });
-
-  const indicator = document.createElement("span");
-  indicator.textContent = `${currentPage} / ${totalPages} ページ`;
-  indicator.style.alignSelf = "center";
-
-  const next = document.createElement("button");
-  next.className = "tab";
-  next.textContent = "次へ →";
-  next.disabled = currentPage >= totalPages;
-  next.addEventListener("click", () => {
-    currentPage++;
-    loadArticles();
-  });
-
-  pagination.append(previous, indicator, next);
+  pagination.appendChild(
+    GamePagination.render(currentPage, totalPages, page => {
+      currentPage = page;
+      loadArticles();
+    })
+  );
 }
+
     function render() {
       list.replaceChildren();
       renderPagination();
