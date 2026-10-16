@@ -172,17 +172,16 @@
 #articlesList .article {
   min-width: 0;
   padding: 0;
-  border: 1px solid #eee2d8;
-  border-radius: 14px;
-  background: white;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 /* 記事カードを伸ばし、管理エリアを下に揃える */
 #articlesList .card {
-  flex: none;
+  flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 /* 編集室専用の管理エリア */
     #articlesList .article-management {
@@ -435,7 +434,7 @@ if (cardElement) {
   });
 }
 
-item.appendChild(card);
+item.appendChild(cardElement || card);
 
         const top = document.createElement("div");
         top.className = "article-top";
@@ -484,8 +483,10 @@ top.appendChild(meta);
 const management = document.createElement("div");
 management.className = "article-management";
 management.append(top, actions);
-
-item.appendChild(management);
+management.addEventListener("click", event => {
+  event.stopPropagation();
+});
+(cardElement || card).appendChild(management);
 list.appendChild(item);
       }
     }
