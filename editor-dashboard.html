@@ -630,7 +630,54 @@ window.history.replaceState(null, "", url);
       previewDialog.addEventListener("click", (event) => {
         if (event.target === previewDialog) previewDialog.close();
       });
+      editorForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
+  const button = editorForm.querySelector('button[type="submit"]');
+  const id = Number(editorForm.dataset.articleId);
+
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    alert("記事IDを確認できませんでした。");
+    return;
+  }
+
+  const data = {
+    id,
+    title: editorForm.elements.namedItem("title").value,
+    summary: editorForm.elements.namedItem("summary").value,
+    article_body: editorForm.elements.namedItem("article_body").value,
+    ilovegame_point: editorForm.elements.namedItem("ilovegame_point").value
+  };
+
+  button.disabled = true;
+
+  try {
+    const response = await fetch("/api/editor-save", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    if (response.status === 401) {
+      location.replace("/editor.html");
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error("保存失敗");
+    }
+
+    alert("記事を保存しました！");
+    previewDialog.close();
+    await loadArticles();
+  } catch (error) {
+    console.error("記事保存エラー:", error);
+    alert("保存結果を確認できませんでした。記事を再確認してください。");
+  } finally {
+    button.disabled = false;
+  }
+});
       async function openPreview(id, editMode = false) {
         editorForm.hidden = true;
         previewBody.hidden = false;
@@ -658,6 +705,7 @@ window.history.replaceState(null, "", url);
 
           const data = await response.json();
           const article = data.article;
+          editorForm.dataset.articleId = article.id;
           editorForm.elements.namedItem("title").value = article.title || "";
           editorForm.elements.namedItem("summary").value = article.summary || "";
           editorForm.elements.namedItem("article_body").value = article.article_body || "";
