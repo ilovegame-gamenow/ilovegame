@@ -206,7 +206,15 @@
   padding: 6px 4px 0;
   gap: 6px;
 }
-
+#articlesList .actions button {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 4px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
     @media (max-width: 600px) {
       h1 { font-size: 18px; }
       .stats { gap: 8px; }
@@ -509,15 +517,15 @@ const actions = document.createElement("div");
 actions.className = "actions";
         const edit = document.createElement("button");
 edit.className = "edit-btn";
-edit.textContent = "編集する";
+edit.textContent = "編集";
 
         const publish = document.createElement("button");
         publish.className = "publish-btn";
-        publish.textContent = "掲載する";
+        publish.textContent = "掲載";
 
         const reject = document.createElement("button");
         reject.className = "reject-btn";
-        reject.textContent = "非掲載にする";
+        reject.textContent = "非掲載";
 
         if (article.status === "published") {
           publish.classList.add("selected");
