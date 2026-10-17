@@ -1,4 +1,5 @@
 import { requireEditor } from "../lib/editor-auth.js";
+import { regenerateEditorArticle } from "../lib/editor-regenerator.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -9,6 +10,35 @@ export default async function handler(req, res) {
   }
 
   if (!requireEditor(req, res)) return;
+  if (req.body?.action === "regenerate") {
+  const id = req.body.id;
+
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({ error: "Invalid article ID" });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
+
+  if (!supabaseUrl || !supabaseKey || !openaiKey) {
+    return res.status(503).json({ error: "Service unavailable" });
+  }
+
+  try {
+    const article = await regenerateEditorArticle({
+      id,
+      supabaseUrl,
+      supabaseKey,
+      openaiKey
+    });
+
+    return res.status(200).json({ article });
+  } catch (error) {
+    console.error("Article regeneration failed:", error);
+    return res.status(500).json({ error: "Regeneration failed" });
+  }
+}
 
   const { id, title, summary, article_body, ilovegame_point } = req.body || {};
 
