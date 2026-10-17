@@ -306,9 +306,30 @@
   resize: vertical;
 }
 
-#editorForm button {
-  align-self: flex-end;
-  margin-top: 10px;
+.editor-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.editor-form-actions button {
+  min-width: 120px;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#regenerateArticle {
+  background: #fff4e8;
+  border: 1px solid #e99425;
+  color: #b65c16;
+}
+
+.editor-form-actions button[type="submit"] {
+  background: #ff8a3d;
+  border: 1px solid #ff8a3d;
+  color: white;
 }
   </style>
 </head>
@@ -361,8 +382,10 @@
 
   <label for="editPoint">ここに注目♪</label>
   <textarea id="editPoint" name="ilovegame_point" maxlength="3000" rows="4"></textarea>
-  <button type="button" id="regenerateArticle">AIで再生成</button>
-  <button type="submit">保存する</button>
+  <div class="editor-form-actions">
+  <button type="button" id="regenerateArticle">AI再生成</button>
+  <button type="submit">保存</button>
+</div>
 </form>
       <div id="previewBody">
         記事を読み込み中...
@@ -744,7 +767,7 @@ window.history.replaceState(null, "", url);
     alert("AI再生成に失敗しました。元の記事は変更されていません。");
   } finally {
     regenerateButton.disabled = false;
-    regenerateButton.textContent = "AIで再生成";
+    regenerateButton.textContent = "AI再生成";
   }
 });
       async function openPreview(id, editMode = false) {
