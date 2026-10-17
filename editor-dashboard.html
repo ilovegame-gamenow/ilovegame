@@ -723,7 +723,7 @@ window.history.replaceState(null, "", url);
   }
 
   regenerateButton.disabled = true;
-  regenerateButton.textContent = "AI生成中...";
+  regenerateButton.textContent = "AI記事再生成中";
 
   try {
     const response = await fetch("/api/editor-save", {
