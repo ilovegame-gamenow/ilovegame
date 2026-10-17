@@ -331,6 +331,11 @@
   border: 1px solid #ff8a3d;
   color: white;
 }
+    #cancelEdit {
+  background: #f3f3f3;
+  border: 1px solid #ddd;
+  color: #555;
+}
   </style>
 </head>
 <body data-page="editor">
@@ -383,6 +388,7 @@
   <label for="editPoint">ここに注目♪</label>
   <textarea id="editPoint" name="ilovegame_point" maxlength="3000" rows="4"></textarea>
   <div class="editor-form-actions">
+  <button type="button" id="cancelEdit">キャンセル</button>
   <button type="button" id="regenerateArticle">AI再生成</button>
   <button type="submit">保存</button>
 </div>
@@ -655,6 +661,11 @@ window.history.replaceState(null, "", url);
       const previewBody = document.getElementById("previewBody");
       const editorForm = document.getElementById("editorForm");
       const regenerateButton = document.getElementById("regenerateArticle");
+      document.getElementById("cancelEdit").addEventListener("click", () => {
+  if (confirm("編集をキャンセルしますか？保存していない変更は失われます。")) {
+    previewDialog.close();
+  }
+});
 
       document.getElementById("closePreview")
         .addEventListener("click", () => previewDialog.close());
