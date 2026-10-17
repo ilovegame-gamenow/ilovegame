@@ -353,7 +353,7 @@
 
   <label for="editPoint">ここに注目♪</label>
   <textarea id="editPoint" name="ilovegame_point" maxlength="3000" rows="4"></textarea>
-
+  <button type="button" id="regenerateArticle">AIで再生成</button>
   <button type="submit">保存する</button>
 </form>
       <div id="previewBody">
@@ -623,6 +623,7 @@ window.history.replaceState(null, "", url);
       const previewTitle = document.getElementById("previewTitle");
       const previewBody = document.getElementById("previewBody");
       const editorForm = document.getElementById("editorForm");
+      const regenerateButton = document.getElementById("regenerateArticle");
 
       document.getElementById("closePreview")
         .addEventListener("click", () => previewDialog.close());
@@ -676,6 +677,66 @@ window.history.replaceState(null, "", url);
     alert("保存結果を確認できませんでした。記事を再確認してください。");
   } finally {
     button.disabled = false;
+  }
+});
+      regenerateButton.addEventListener("click", async () => {
+  const id = Number(editorForm.dataset.articleId);
+
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    alert("記事IDを確認できませんでした。");
+    return;
+  }
+
+  if (!confirm("AIで記事を再生成しますか？現在の入力内容は置き換わります。")) {
+    return;
+  }
+
+  regenerateButton.disabled = true;
+  regenerateButton.textContent = "AI生成中...";
+
+  try {
+    const response = await fetch("/api/editor-save", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "regenerate", id })
+    });
+
+    if (response.status === 401) {
+      location.replace("/editor.html");
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error(`再生成失敗: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const article = data.article;
+
+    for (const field of [
+      "title",
+      "summary",
+      "article_body",
+      "ilovegame_point"
+    ]) {
+      if (typeof article?.[field] !== "string") {
+        throw new Error(`生成結果が不正です: ${field}`);
+      }
+    }
+
+    editorForm.elements.namedItem("title").value = article.title;
+    editorForm.elements.namedItem("summary").value = article.summary;
+    editorForm.elements.namedItem("article_body").value = article.article_body;
+    editorForm.elements.namedItem("ilovegame_point").value = article.ilovegame_point;
+
+    alert("AIで記事を再生成しました。内容を確認してから保存してください。");
+  } catch (error) {
+    console.error("記事再生成エラー:", error);
+    alert("AI再生成に失敗しました。元の記事は変更されていません。");
+  } finally {
+    regenerateButton.disabled = false;
+    regenerateButton.textContent = "AIで再生成";
   }
 });
       async function openPreview(id, editMode = false) {
