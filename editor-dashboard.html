@@ -308,16 +308,18 @@
 
 .editor-form-actions {
   display: flex;
-  justify-content: flex-end;
   gap: 10px;
   margin-top: 12px;
 }
 
 .editor-form-actions button {
-  min-width: 120px;
+  flex: 1;
+  min-width: 0;
   min-height: 44px;
+  padding: 10px 6px;
   font-size: 14px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 #regenerateArticle {
@@ -782,6 +784,7 @@ window.history.replaceState(null, "", url);
   }
 });
       async function openPreview(id, editMode = false) {
+        document.getElementById("closePreview").hidden = editMode;
         editorForm.hidden = true;
         previewBody.hidden = false;
         editorForm.reset();
