@@ -667,7 +667,14 @@ window.history.replaceState(null, "", url);
       const editorForm = document.getElementById("editorForm");
       const regenerateButton = document.getElementById("regenerateArticle");
       document.getElementById("cancelEdit").addEventListener("click", () => {
-  if (confirm("編集をキャンセルしますか？保存していない変更は失われます。")) {
+  const fields = ["title", "summary", "article_body", "ilovegame_point"];
+
+  const changed = fields.some(name => {
+    const field = editorForm.elements.namedItem(name);
+    return field.value !== field.defaultValue;
+  });
+
+  if (!changed || confirm("編集をキャンセルしますか？保存していない変更は失われます。")) {
     previewDialog.close();
   }
 });
@@ -819,6 +826,10 @@ window.history.replaceState(null, "", url);
           editorForm.elements.namedItem("summary").value = article.summary || "";
           editorForm.elements.namedItem("article_body").value = article.article_body || "";
           editorForm.elements.namedItem("ilovegame_point").value = article.ilovegame_point || "";
+          ["title", "summary", "article_body", "ilovegame_point"].forEach(name => {
+  const field = editorForm.elements.namedItem(name);
+  field.defaultValue = field.value;
+});
           editorForm.hidden = !editMode;
           previewBody.hidden = editMode;
           previewTitle.textContent = editMode ? "記事を編集" : article.title || "タイトルなし";
