@@ -545,9 +545,9 @@ item.appendChild(cardElement || card);
         const meta = document.createElement("div");
 meta.className = "meta";
 
-meta.textContent = article.importance == null
+meta.textContent = article.processing_status !== "completed"
   ? "AI未評価"
-  : `AI評価：${article.importance}点`;
+  : `AI評価：${article.importance ?? 0}点`;
 
 top.appendChild(meta);
 const actions = document.createElement("div");
