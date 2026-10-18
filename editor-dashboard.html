@@ -544,7 +544,10 @@ item.appendChild(cardElement || card);
 
         const meta = document.createElement("div");
 meta.className = "meta";
-meta.textContent = `AI評価：${article.importance ?? "未評価"}点`;
+
+meta.textContent = article.importance == null
+  ? "AI未評価"
+  : `AI評価：${article.importance}点`;
 
 top.appendChild(meta);
 const actions = document.createElement("div");
