@@ -25,15 +25,19 @@ export default async function handler(req, res) {
       `&title=not.ilike.${encodeURIComponent("*テスト*")}` +
       `&source_name=not.ilike.${encodeURIComponent("*I LOVE GAME*")}`;
 
-    const now = Date.now();
-    const fortyEightHoursAgo = new Date(now - 48 * 60 * 60 * 1000).toISOString();
+    
+const now = Date.now();
+const breakingSince = new Date(
+  now - newsConfig.breakingMaxAgeHours * 60 * 60 * 1000
+).toISOString();
 
-    // BREAKING：48時間以内の最高得点記事
-    const breakingUrl =
-      baseUrl +
-      `&site_published_at=gte.${encodeURIComponent(fortyEightHoursAgo)}` +
-      `&order=importance.desc.nullslast,site_published_at.desc` +
-      `&limit=1`;
+// BREAKING：共通設定に基づいて速報記事を選定
+const breakingUrl =
+  baseUrl +
+  `&site_published_at=gte.${encodeURIComponent(breakingSince)}` +
+  `&importance=gte.${newsConfig.breakingThreshold}` +
+  `&order=importance.desc.nullslast,site_published_at.desc` +
+  `&limit=1`;
 
     // PICK UP：サイト全体から高評価記事を選定
     const pickupUrl =
