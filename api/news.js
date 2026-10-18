@@ -17,7 +17,10 @@ export default async function handler(req, res) {
     const url =
     `${supabaseUrl}/rest/v1/articles` +
     `?select=${encodeURIComponent(fields)}` +
-    `&status=eq.published` +
+    
+`&status=eq.published` +
+`&processing_status=eq.completed` +
+
     (articleId
         ? `&id=eq.${encodeURIComponent(articleId)}&limit=1`
         : `&order=site_published_at.desc.nullslast&limit=${limit}&offset=${offset}`);
