@@ -22,7 +22,12 @@ body{
 }
 
 main{max-width:1100px;margin:0 auto;padding:28px 20px 65px}
-.breaking{
+
+.breaking[hidden] {
+  display: none;
+}
+
+  .breaking{
   background:var(--white);border:2px solid var(--orange);border-radius:22px;
   padding:23px 25px;margin-bottom:30px;position:relative;
   box-shadow:7px 7px 0 #ffd9c2;
@@ -150,23 +155,23 @@ const [result, featuredResult] = await Promise.all([
 ]);
 const rows = result.articles || [];
     
+
 const breaking = featuredResult.breaking || null;
-if(breaking){
+const breakingBox = document.getElementById("breaking");
+
+breakingBox.hidden = !breaking;
+
+if (breaking) {
   document.getElementById("breaking-title").textContent = breaking.title || "";
   document.getElementById("breaking-meta").textContent =
     `${breaking.source_name || "I LOVE GAME♪"} ｜ 注目度 ${breaking.importance || 0}`;
-} else {
-    document.getElementById("breaking-title").textContent =
-        "現在、新しい速報はありません…";
-    document.getElementById("breaking-meta").textContent = "";
-}
-    if(breaking){
-  const breakingBox = document.getElementById("breaking");
+
   breakingBox.style.cursor = "pointer";
   breakingBox.onclick = () => {
     location.href = `article.html?id=${encodeURIComponent(breaking.id)}`;
   };
 }
+
     const pickup = document.getElementById("pickup");
 const pickupRows = featuredResult.pickup || [];
     if(pickup){
