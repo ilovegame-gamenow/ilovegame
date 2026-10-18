@@ -64,6 +64,29 @@
       font-weight: bold;
       margin-top: 5px;
     }
+    
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  color: inherit;
+  border-left: 1px solid #eee2d8;
+  border-right: 1px solid #eee2d8;
+  border-bottom: 1px solid #eee2d8;
+}
+
+.stat.active {
+  background: #fff4e8;
+  box-shadow: 0 0 0 2px #ff8a3d;
+}
+
+.stat:focus-visible {
+  outline: 3px solid #ff8a3d;
+  outline-offset: 3px;
+}
+
      .panel {
       background: transparent;
       border-radius: 0;
@@ -346,20 +369,21 @@
 <body data-page="editor">
   <header></header>
   <main>
-    <div class="stats">
-      <div class="stat pending">
-        <div class="stat-label">審査待ち</div>
-        <div class="stat-count" id="pendingCount">—</div>
-      </div>
-      <div class="stat published">
-        <div class="stat-label">掲載中</div>
-        <div class="stat-count" id="publishedCount">—</div>
-      </div>
-      <div class="stat rejected">
-        <div class="stat-label">非掲載</div>
-        <div class="stat-count" id="rejectedCount">—</div>
-      </div>
-    </div>
+    
+<div class="stats">
+  <button type="button" class="stat pending" data-filter="pending">
+    <span class="stat-label">審査待ち</span>
+    <span class="stat-count" id="pendingCount">—</span>
+  </button>
+  <button type="button" class="stat published" data-filter="published">
+    <span class="stat-label">掲載中</span>
+    <span class="stat-count" id="publishedCount">—</span>
+  </button>
+  <button type="button" class="stat rejected" data-filter="rejected">
+    <span class="stat-label">非掲載</span>
+    <span class="stat-count" id="rejectedCount">—</span>
+  </button>
+</div>
 
     <section class="panel" id="latest">
       <div class="tabs" id="tabs">
@@ -623,28 +647,39 @@ list.appendChild(item);
         render();
       }
     }
-for (const tab of tabs.querySelectorAll(".tab")) {
-  tab.classList.toggle(
-    "active",
-    tab.dataset.filter === currentFilter
-  );
+
+function updateFilterButtons() {
+  document.querySelectorAll("[data-filter]").forEach(button => {
+    const active = button.dataset.filter === currentFilter;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
 }
-    tabs.addEventListener("click", event => {
-      const button = event.target.closest("[data-filter]");
-      if (!button) return;
 
-      currentFilter = button.dataset.filter;
+function changeFilter(filter) {
+  if (!validFilters.includes(filter)) return;
 
-const url = new URL(window.location.href);
-url.searchParams.set("status", currentFilter);
-url.searchParams.set("page", "1");
-window.history.replaceState(null, "", url);
-      for (const tab of tabs.querySelectorAll(".tab")) {
-        tab.classList.toggle("active", tab === button);
-      }
-      currentPage = 1;
-      loadArticles();
-    });
+  currentFilter = filter;
+  currentPage = 1;
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("status", currentFilter);
+  url.searchParams.set("page", "1");
+  window.history.replaceState(null, "", url);
+
+  updateFilterButtons();
+  loadArticles();
+}
+
+document.addEventListener("click", event => {
+  const button = event.target.closest("[data-filter]");
+  if (!button) return;
+
+  changeFilter(button.dataset.filter);
+});
+
+updateFilterButtons();
+
 
     document.addEventListener("click", async (event) => {
   if (!event.target.closest("#logoutButton")) return;
