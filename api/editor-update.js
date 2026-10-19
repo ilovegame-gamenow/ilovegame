@@ -1,4 +1,5 @@
 import { requireEditor } from "../lib/editor-auth.js";
+import { getArticleById } from "../lib/article-repository.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -32,6 +33,35 @@ export default async function handler(req, res) {
 
   const url =
     `${supabaseUrl}/rest/v1/articles?id=eq.${id}`;
+  if (status === "published") {
+  try {
+    const article = await getArticleById(
+      supabaseUrl,
+      supabaseKey,
+      id
+    );
+
+    if (!article) {
+      return res.status(404).json({
+        error: "Article not found"
+      });
+    }
+
+    if (
+      article.processing_status !== "completed" ||
+      !article.title?.trim() ||
+      !article.article_body?.trim()
+    ) {
+      return res.status(409).json({
+        error: "AI処理が未完了、または記事本文が未完成のため掲載できません"
+      });
+    }
+  } catch {
+    return res.status(502).json({
+      error: "Failed to verify article"
+    });
+  }
+}
 
   const updates = {
     status,
