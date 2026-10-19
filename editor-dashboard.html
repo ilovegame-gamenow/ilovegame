@@ -712,6 +712,7 @@ updateFilterButtons();
       const previewBody = document.getElementById("previewBody");
       const editorForm = document.getElementById("editorForm");
       const regenerateButton = document.getElementById("regenerateArticle");
+      let regeneratedArticleId = null;
       document.getElementById("cancelEdit").addEventListener("click", () => {
   const fields = ["title", "summary", "article_body", "ilovegame_point"];
 
@@ -744,6 +745,7 @@ updateFilterButtons();
 
   const data = {
     id,
+    regenerated: regeneratedArticleId === id,
     title: editorForm.elements.namedItem("title").value,
     summary: editorForm.elements.namedItem("summary").value,
     article_body: editorForm.elements.namedItem("article_body").value,
@@ -770,6 +772,7 @@ updateFilterButtons();
     }
 
     alert("記事を保存しました！");
+    regeneratedArticleId = null;
     previewDialog.close();
     await loadArticles();
   } catch (error) {
@@ -830,7 +833,9 @@ updateFilterButtons();
     editorForm.elements.namedItem("article_body").value = article.article_body;
     editorForm.elements.namedItem("ilovegame_point").value = article.ilovegame_point;
 
+    regeneratedArticleId = id;
     alert("AIで記事を再生成しました。内容を確認してから保存してください。");
+    
   } catch (error) {
     console.error("記事再生成エラー:", error);
     alert("AI再生成に失敗しました。元の記事は変更されていません。");
@@ -840,6 +845,7 @@ updateFilterButtons();
   }
 });
       async function openPreview(id, editMode = false) {
+        regeneratedArticleId = null;
         document.getElementById("closePreview").hidden = editMode;
         editorForm.hidden = true;
         previewBody.hidden = false;
