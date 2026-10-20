@@ -15,11 +15,10 @@ export default async function handler(req, res) {
       "id,title,summary,article_body,ilovegame_point,platforms,category,thumbnail_url,source_name,source_url,source_published_at,importance,is_breaking,status,published_at,created_at,site_published_at";
     const articleId = req.query.id;
     const url =
-    `${supabaseUrl}/rest/v1/articles` +
-    `?select=${encodeURIComponent(fields)}` +
     
-`&status=eq.published` +
-`&processing_status=eq.completed` +
+    `${supabaseUrl}/rest/v1/published_articles` +
+    `?select=${encodeURIComponent(fields)}` +
+
 
     (articleId
         ? `&id=eq.${encodeURIComponent(articleId)}&limit=1`
