@@ -1,6 +1,9 @@
 import { requireEditor } from "../lib/editor-auth.js";
 import { regenerateEditorArticle } from "../lib/editor-regenerator.js";
-import { updateArticle } from "../lib/article-repository.js";
+import {
+  getArticleById,
+  updateArticle
+} from "../lib/article-repository.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -78,6 +81,35 @@ export default async function handler(req, res) {
   };
 
   try {
+    const existingArticle = await getArticleById(
+  supabaseUrl,
+  supabaseKey,
+  id
+);
+
+if (!existingArticle) {
+  return res.status(404).json({
+    error: "Article not found"
+  });
+}
+    const isRegeneratedSave =
+  req.body?.regenerated === true &&
+  Boolean(existingArticle.editor_regenerated_at) &&
+  (
+    !existingArticle.editor_regenerated_saved_at ||
+    new Date(existingArticle.editor_regenerated_at).getTime() >
+      new Date(existingArticle.editor_regenerated_saved_at).getTime()
+  );
+    if (
+  isRegeneratedSave &&
+  updates.title &&
+  updates.summary &&
+  updates.article_body &&
+  updates.ilovegame_point
+) {
+  updates.editor_regenerated_saved_at =
+    new Date().toISOString();
+}
     const response = await fetch(
       `${supabaseUrl}/rest/v1/articles?id=eq.${id}`,
       {
