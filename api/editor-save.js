@@ -1,5 +1,6 @@
 import { requireEditor } from "../lib/editor-auth.js";
 import { regenerateEditorArticle } from "../lib/editor-regenerator.js";
+import { updateArticle } from "../lib/article-repository.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -33,6 +34,10 @@ export default async function handler(req, res) {
       openaiKey
     });
 
+    await updateArticle(supabaseUrl, supabaseKey, id, {
+  editor_regenerated_at: new Date().toISOString()
+});
+    
     return res.status(200).json({ article });
   } catch (error) {
     console.error("Article regeneration failed:", error);
