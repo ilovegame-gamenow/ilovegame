@@ -92,13 +92,6 @@ if (!existingArticle) {
     error: "Article not found"
   });
 }
-  
-console.log("Editor save regeneration check:", {
-  id,
-  regenerated: req.body?.regenerated,
-  hasRegeneratedAt: Boolean(existingArticle.editor_regenerated_at),
-  hasSavedAt: Boolean(existingArticle.editor_regenerated_saved_at)
-});
 
     const isRegeneratedSave =
   req.body?.regenerated === true &&
