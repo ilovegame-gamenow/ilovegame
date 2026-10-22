@@ -1,5 +1,6 @@
 import { requireEditor } from "../lib/editor-auth.js";
 import { getArticleById } from "../lib/article-repository.js";
+import { canPublishArticle } from "../lib/article-publication.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -47,15 +48,11 @@ export default async function handler(req, res) {
       });
     }
 
-    if (
-      article.processing_status !== "completed" ||
-      !article.title?.trim() ||
-      !article.article_body?.trim()
-    ) {
-      return res.status(409).json({
-        error: "AI処理が未完了、または記事本文が未完成のため掲載できません"
-      });
-    }
+    if (!canPublishArticle(article)) {
+  return res.status(409).json({
+    error: "AI処理またはAI再生成後の保存が未完了、もしくは記事内容が未完成のため掲載できません"
+  });
+}
   } catch {
     return res.status(502).json({
       error: "Failed to verify article"
