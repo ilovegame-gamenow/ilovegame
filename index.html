@@ -130,16 +130,6 @@ footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12
 <script src="/pagination.js"></script>
 <script>
 
-function platformClass(name){
-  const n=(name||"").toLowerCase();
-  if(n.includes("switch 2")) return "switch2";
-  if(n.includes("switch")) return "switch";
-  if(n.includes("ps5") || n.includes("playstation")) return "ps5";
-  if(n.includes("xbox")) return "xbox";
-  if(n.includes("pc") || n.includes("steam")) return "pc";
-  if(n.includes("ios") || n.includes("android") || n.includes("スマホ") || n.includes("mobile")) return "mobile";
-  return "other";
-}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
 async function loadLiveNews(){
   try{
