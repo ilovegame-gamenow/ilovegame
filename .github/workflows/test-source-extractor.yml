@@ -1,4 +1,3 @@
-
 name: Test Source Extractor
 
 on:
@@ -25,7 +24,8 @@ jobs:
           const feeds = [
             {
               name: "Nintendo",
-              url: "https://www.nintendo.com/jp/topics/index.html",
+              url: "https://www.nintendo.com/jp/topics/article/a5ec42eb-efb3-4c90-95b0-618e143da7e2",
+
               direct: true
             },
             {
