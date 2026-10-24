@@ -103,6 +103,36 @@ jobs:
               return this;
             }
           };
+          
+          // 認証エラー時は収集処理を実行しない
+          const requestsBeforeAuthTest = requests.length;
+
+          let unauthorizedStatus;
+          let unauthorizedBody;
+
+          await handler(
+            {
+              headers: {
+                authorization: "Bearer wrong-secret"
+              }
+            },
+            {
+              status(code) {
+                unauthorizedStatus = code;
+                return this;
+              },
+              json(body) {
+                unauthorizedBody = body;
+                return this;
+              }
+            }
+          );
+
+          assert.equal(unauthorizedStatus, 401);
+          assert.equal(unauthorizedBody.success, false);
+          assert.equal(requests.length, requestsBeforeAuthTest);
+
+          console.log("Unauthorized access protection: PASS");
 
           await handler(req, res);
 
