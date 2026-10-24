@@ -21,12 +21,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    const articles = await collectPlayStationArticles();
+    
+  const articles = await collectPlayStationArticles();
 
-    const results = [];
+  // テスト時のみ登録件数を1件に制限する
+  const isTestMode = req.query?.test === "1";
+  const targetArticles = isTestMode
+    ? articles.slice(0, 1)
+    : articles;
 
-    for (const article of articles) {
-      
+  const results = [];
+
+    for (const article of targetArticles) {
       const result = await registerPendingArticle(article, {
       supabaseUrl: process.env.SUPABASE_URL,
       supabaseKey: process.env.SUPABASE_SECRET_KEY
