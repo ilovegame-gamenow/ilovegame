@@ -26,7 +26,12 @@ export default async function handler(req, res) {
     const results = [];
 
     for (const article of articles) {
-      const result = await registerPendingArticle(article);
+      
+      const result = await registerPendingArticle(article, {
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabaseKey: process.env.SUPABASE_SECRET_KEY
+    });
+
       results.push(result);
     }
 
