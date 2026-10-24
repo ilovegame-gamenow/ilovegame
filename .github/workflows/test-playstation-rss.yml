@@ -105,6 +105,33 @@ jobs:
 
               print("Extracted text length:", len(clean_text))
               print("Extracted text preview:", clean_text[:500])
+              
+              # PlayStation記事の本文領域を調査
+              for tag_name in ("main", "article"):
+                  matches = re.findall(
+                      rf"<{tag_name}\b[^>]*>",
+                      article_html,
+                      re.IGNORECASE
+                  )
+                  print(f"{tag_name} tags:", matches[:5])
+
+              # 本文らしいHTML要素のclass名を調査
+              class_matches = re.findall(
+                  r'<(?:div|section)\b[^>]*class=["\']([^"\']+)["\']',
+                  article_html,
+                  re.IGNORECASE
+              )
+
+              content_classes = [
+                  name for name in class_matches
+                  if any(
+                      word in name.lower()
+                      for word in ("content", "body", "entry", "post")
+                  )
+              ]
+
+              print("Content classes:", content_classes[:20])
+
 
 
 
