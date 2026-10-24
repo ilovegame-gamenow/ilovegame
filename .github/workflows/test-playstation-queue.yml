@@ -1,0 +1,138 @@
+name: Test PlayStation Queue
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-playstation-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test PlayStation queue without database
+        env:
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_SECRET_KEY: test-key
+          CRON_SECRET: test-cron-secret
+        run: |
+          node --input-type=module <<'JS'
+          import assert from "node:assert/strict";
+          import handler from "./api/collect-playstation-queue.js";
+
+          const savedArticles = [];
+          const requests = [];
+
+          const sampleRss = `
+            <rss>
+              <channel>
+                <item>
+                  <title><![CDATA[PlayStationテスト記事]]></title>
+                  <link>https://blog.ja.playstation.com/test/</link>
+                  <pubDate>Fri, 23 Oct 2026 09:00:00 GMT</pubDate>
+                  <description><![CDATA[
+                    <img src="https://example.com/rss.jpg">
+                  ]]></description>
+                </item>
+              </channel>
+            </rss>
+          `;
+
+          globalThis.fetch = async (url, options = {}) => {
+            const requestUrl = String(url);
+            requests.push(requestUrl);
+
+            // PlayStation RSS
+            if (requestUrl === "https://blog.ja.playstation.com/feed/") {
+              return new Response(sampleRss, {
+                status: 200
+              });
+            }
+
+            // PlayStation記事ページ（OG画像）
+            if (requestUrl === "https://blog.ja.playstation.com/test/") {
+              return new Response(`
+                <html>
+                  <head>
+                    <meta property="og:image"
+                      content="https://example.com/og.jpg">
+                  </head>
+                </html>
+              `, {
+                status: 200
+              });
+            }
+
+            // Supabaseの模擬応答
+            if (requestUrl.startsWith("https://example.supabase.co/")) {
+              if (options.method === "POST") {
+                savedArticles.push(JSON.parse(options.body));
+
+                return new Response(null, {
+                  status: 201
+                });
+              }
+
+              return Response.json([]);
+            }
+
+            throw new Error(`Unexpected request: ${requestUrl}`);
+          };
+
+          let statusCode;
+          let responseBody;
+
+          const req = {
+            headers: {
+              authorization: "Bearer test-cron-secret"
+            }
+          };
+
+          const res = {
+            status(code) {
+              statusCode = code;
+              return this;
+            },
+            json(body) {
+              responseBody = body;
+              return this;
+            }
+          };
+
+          await handler(req, res);
+
+          assert.equal(statusCode, 200);
+          assert.equal(responseBody.success, true);
+          assert.equal(responseBody.checked, 1);
+          assert.equal(responseBody.pending, 1);
+          assert.equal(responseBody.existing, 0);
+          assert.equal(responseBody.error, 0);
+
+          assert.equal(savedArticles.length, 1);
+
+          const article = savedArticles[0];
+
+          assert.equal(article.source_name, "PlayStation");
+          assert.equal(article.source_title, "PlayStationテスト記事");
+          assert.equal(
+            article.source_url,
+            "https://blog.ja.playstation.com/test/"
+          );
+          assert.equal(
+            article.thumbnail_url,
+            "https://example.com/og.jpg"
+          );
+          assert.equal(article.status, "pending");
+          assert.equal(article.processing_status, "pending");
+          assert.equal(article.importance, 0);
+
+          console.log("PlayStation collection: PASS");
+          console.log("OG image priority: PASS");
+          console.log("Pending registration: PASS");
+          console.log("All PlayStation queue tests passed.");
+          JS
