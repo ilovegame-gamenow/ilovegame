@@ -1,9 +1,16 @@
+import { registerPendingArticle } from "../lib/article-queue-repository.js";
+
+/**
+ * Nintendo Topicsの新着記事を収集し、
+ * 共通の記事登録処理を使ってpendingで保存する。
+ */
 export default async function handler(req, res) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
     const cronSecret = process.env.CRON_SECRET;
 
+    // Cron認証
     const authHeader = req.headers.authorization;
 
     if (
@@ -15,6 +22,7 @@ export default async function handler(req, res) {
         error: "Unauthorized"
       });
     }
+
     if (!supabaseUrl || !supabaseKey) {
       return res.status(500).json({
         success: false,
@@ -37,7 +45,9 @@ export default async function handler(req, res) {
       );
 
       if (!response.ok) {
-        throw new Error(`Nintendo API failed on page ${page}`);
+        throw new Error(
+          `Nintendo API failed on page ${page}`
+        );
       }
 
       const data = await response.json();
@@ -55,90 +65,22 @@ export default async function handler(req, res) {
       const sourceUrl =
         `https://www.nintendo.com/jp/topics/article/${item.slug}`;
 
-      // 既存記事を確認
-      const checkUrl = new URL(
-        `${supabaseUrl}/rest/v1/articles`
-      );
-
-      checkUrl.searchParams.set("select", "id");
-      checkUrl.searchParams.set("source_url", `eq.${sourceUrl}`);
-
-      const checkResponse = await fetch(checkUrl.toString(), {
-        headers: {
-          apikey: supabaseKey,
-          Authorization: `Bearer ${supabaseKey}`
-        }
-      });
-
-      if (!checkResponse.ok) {
-        throw new Error("Supabase check failed");
-      }
-
-      const existing = await checkResponse.json();
-
-      // すでに存在する記事は何もしない
-      if (Array.isArray(existing) && existing.length > 0) {
-        results.push({
-          title: item.title,
-          status: "existing"
-        });
-        continue;
-      }
-
-      // 新着記事はAI処理せずpendingで保存
+      // Nintendo固有のデータを共通形式に変換
       const article = {
         source_title: item.title,
-        title: item.title,
-        category: "NEWS",
-        thumbnail_url: item.thumbnail?.url_key || null,
         source_name: "Nintendo",
         source_url: sourceUrl,
         source_published_at: item.display_date,
-        importance: 0,
-        is_breaking: false,
-        status: "pending",
-        processing_status: "pending",
-        published_at: null
+        thumbnail_url: item.thumbnail?.url_key || null
       };
 
-      const saveResponse = await fetch(
-        `${supabaseUrl}/rest/v1/articles`,
-        {
-          method: "POST",
-          headers: {
-            apikey: supabaseKey,
-            Authorization: `Bearer ${supabaseKey}`,
-            "Content-Type": "application/json",
-            Prefer: "return=minimal"
-          },
-          body: JSON.stringify(article)
-        }
-      );
-
-      if (!saveResponse.ok) {
-  const errorText = await saveResponse.text();
-
-  // 同じsource_urlがすでに存在する場合は正常扱い
-  if (saveResponse.status === 409 || errorText.includes("23505")) {
-    results.push({
-      title: item.title,
-      status: "existing"
-    });
-    continue;
-  }
-
-  results.push({
-    title: item.title,
-    status: "error",
-    error: errorText
-  });
-  continue;
-}
-
-      results.push({
-        title: item.title,
-        status: "pending"
+      // 重複確認・pending登録は共通処理に任せる
+      const result = await registerPendingArticle(article, {
+        supabaseUrl,
+        supabaseKey
       });
+
+      results.push(result);
     }
 
     return res.status(200).json({
