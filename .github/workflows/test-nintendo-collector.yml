@@ -1,0 +1,115 @@
+
+name: Test Nintendo Collector
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-collector:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test Nintendo collector without database
+        env:
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_SECRET_KEY: test-key
+          CRON_SECRET: test-cron-secret
+        run: |
+          node --input-type=module <<'JS'
+          import assert from "node:assert/strict";
+          import handler from "./api/collect-nintendo-queue.js";
+
+          const requests = [];
+          const savedArticles = [];
+
+          globalThis.fetch = async (url, options = {}) => {
+            const requestUrl = String(url);
+            requests.push(requestUrl);
+
+            // Nintendo公式APIの模擬応答
+            if (requestUrl.includes("nintendo.com")) {
+              const page = new URL(requestUrl)
+                .searchParams.get("page");
+
+              if (page === "1") {
+                return Response.json([
+                  {
+                    slug: "test-article-001",
+                    title: "Nintendoテスト記事",
+                    display_date: "2026-10-24T09:00:00Z",
+                    thumbnail: {
+                      url_key: "test-thumbnail"
+                    }
+                  }
+                ]);
+              }
+
+              return Response.json([]);
+            }
+
+            // Supabaseの模擬応答
+            if (options.method === "POST") {
+              savedArticles.push(JSON.parse(options.body));
+
+              return new Response(null, {
+                status: 201
+              });
+            }
+
+            return Response.json([]);
+          };
+
+          const req = {
+            headers: {
+              authorization: "Bearer test-cron-secret"
+            }
+          };
+
+          let statusCode;
+          let responseBody;
+
+          const res = {
+            status(code) {
+              statusCode = code;
+              return this;
+            },
+            json(body) {
+              responseBody = body;
+              return this;
+            }
+          };
+
+          await handler(req, res);
+
+          assert.equal(statusCode, 200);
+          assert.equal(responseBody.success, true);
+          assert.equal(responseBody.checked, 1);
+          assert.equal(responseBody.results[0].status, "pending");
+
+          assert.equal(savedArticles.length, 1);
+
+          const article = savedArticles[0];
+
+          assert.equal(article.source_name, "Nintendo");
+          assert.equal(article.source_title, "Nintendoテスト記事");
+          assert.equal(
+            article.source_url,
+            "https://www.nintendo.com/jp/topics/article/test-article-001"
+          );
+          assert.equal(article.thumbnail_url, "test-thumbnail");
+          assert.equal(article.status, "pending");
+          assert.equal(article.processing_status, "pending");
+          assert.equal(article.importance, 0);
+
+          console.log("Nintendo collector: PASS");
+          console.log("Article mapping: PASS");
+          console.log("Pending registration: PASS");
+          console.log("All Nintendo collector tests passed.");
+          JS
