@@ -164,5 +164,42 @@ jobs:
           console.log("PlayStation collection: PASS");
           console.log("OG image priority: PASS");
           console.log("Pending registration: PASS");
+          
+          // 1件制限モードの確認
+          const savedCountBeforeTest = savedArticles.length;
+
+          let limitedStatus;
+          let limitedBody;
+
+          await handler(
+            {
+              headers: {
+                authorization: "Bearer test-cron-secret"
+              },
+              query: {
+                test: "1"
+              }
+            },
+            {
+              status(code) {
+                limitedStatus = code;
+                return this;
+              },
+              json(body) {
+                limitedBody = body;
+                return this;
+              }
+            }
+          );
+
+          assert.equal(limitedStatus, 200);
+          assert.equal(limitedBody.success, true);
+          assert.equal(limitedBody.checked, 1);
+          assert.equal(
+            savedArticles.length - savedCountBeforeTest,
+            1
+          );
+          console.log("Single-article test mode: PASS");
+
           console.log("All PlayStation queue tests passed.");
           JS
