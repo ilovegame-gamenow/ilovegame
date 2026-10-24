@@ -40,7 +40,7 @@ jobs:
                   ]]></description>
                 </item>
                 <item>
-                   <title>PlayStationテスト記事2</title>
+                   <title><![CDATA[PlayStationテスト記事2]]></title>
                   <link>https://blog.ja.playstation.com/test2/</link>
                    <pubDate>Fri, 23 Oct 2026 10:00:00 GMT</pubDate>
                 </item>
