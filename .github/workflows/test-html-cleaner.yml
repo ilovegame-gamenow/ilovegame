@@ -1,0 +1,78 @@
+
+name: Test HTML Cleaner
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-cleaner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compare old and shared cleaner
+        run: |
+          node --input-type=module <<'JS'
+          import assert from "node:assert/strict";
+          import { cleanArticleHtml } from "./lib/html-text-cleaner.js";
+
+          // 変更前のsource-extractor.jsと同じ整形処理
+          function oldCleaner(articleHtml) {
+            let cleanText = articleHtml
+              .replace(/<script[\s\S]*?<\/script>/gi, " ")
+              .replace(/<style[\s\S]*?<\/style>/gi, " ")
+              .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+              .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+              .replace(/<[^>]+>/g, " ")
+              .replace(/&nbsp;/g, " ")
+              .replace(/&amp;/g, "&")
+              .replace(/&quot;/g, '"')
+              .replace(/&#39;/g, "'")
+              .replace(/\s+/g, " ")
+              .trim();
+
+            const cutoffMarkers = [
+              "関連リンク",
+              "この記事のほかにも、こんな記事があります。"
+            ];
+
+            for (const marker of cutoffMarkers) {
+              const index = cleanText.indexOf(marker);
+              if (index !== -1) {
+                cleanText = cleanText.slice(0, index).trim();
+              }
+            }
+
+            return cleanText;
+          }
+
+          const samples = [
+            "<main><h1>ゲームニュース</h1><p>本文です。</p></main>",
+            "<article><p>A &amp; B &quot;test&quot;</p></article>",
+            "<main><script>ignore()</script><p>ニュース</p><nav>menu</nav></main>",
+            "<main><p>本文</p><p>関連リンク</p><p>関連記事</p></main>",
+            "<main><p>本文</p><p>この記事のほかにも、こんな記事があります。</p></main>",
+            "<main><p>空白&nbsp;テスト &#39;OK&#39;</p></main>"
+          ];
+
+          for (const [index, html] of samples.entries()) {
+            const expected = oldCleaner(html);
+            const actual = cleanArticleHtml(html);
+
+            assert.equal(
+              actual,
+              expected,
+              `Sample ${index + 1} differs`
+            );
+
+            console.log(`Sample ${index + 1}: PASS`);
+          }
+
+          console.log("All HTML cleaner comparisons passed.");
+          JS
