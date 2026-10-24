@@ -1,0 +1,47 @@
+
+name: Test PlayStation RSS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-rss:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Fetch PlayStation RSS
+        run: |
+          python3 - <<'PY'
+          import urllib.request
+          import xml.etree.ElementTree as ET
+
+          url = "https://blog.ja.playstation.com/feed/"
+          request = urllib.request.Request(
+              url,
+              headers={"User-Agent": "Mozilla/5.0"}
+          )
+
+          with urllib.request.urlopen(request, timeout=20) as response:
+              print("HTTP status:", response.status)
+              print("Content-Type:", response.headers.get("Content-Type"))
+              data = response.read(2_000_000)
+
+          root = ET.fromstring(data)
+          items = root.findall("./channel/item")
+
+          print("RSS items:", len(items))
+
+          for item in items[:3]:
+              print("---")
+              print("Title:", item.findtext("title"))
+              print("URL:", item.findtext("link"))
+              print("Date:", item.findtext("pubDate"))
+              print("Tags:", [child.tag for child in item])
+
+          if not items:
+              raise RuntimeError("No RSS items found")
+          PY
