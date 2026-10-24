@@ -54,6 +54,58 @@ jobs:
               )
 
               print("Images:", images[:3])
+              
+              # 公式記事ページから本文を抽出するテスト
+              article_url = item.findtext("link")
+              article_request = urllib.request.Request(
+                  article_url,
+                  headers={"User-Agent": "Mozilla/5.0"}
+              )
+
+              with urllib.request.urlopen(
+                  article_request, timeout=20
+              ) as article_response:
+                  article_html = article_response.read().decode(
+                      "utf-8", errors="replace"
+                  )
+
+              import re
+              import html as html_lib
+
+              main_match = (
+                  re.search(
+                      r"<main[\s\S]*?</main>",
+                      article_html,
+                      re.IGNORECASE
+                  )
+                  or re.search(
+                      r"<article[\s\S]*?</article>",
+                      article_html,
+                      re.IGNORECASE
+                  )
+              )
+
+              article_html = (
+                  main_match.group(0)
+                  if main_match else article_html
+              )
+
+              clean_text = article_html
+              for tag in ("script", "style", "nav", "footer"):
+                  clean_text = re.sub(
+                      rf"<{tag}\b[^>]*>[\s\S]*?</{tag}>",
+                      " ",
+                      clean_text,
+                      flags=re.IGNORECASE
+                  )
+
+              clean_text = re.sub(r"<[^>]+>", " ", clean_text)
+              clean_text = html_lib.unescape(clean_text)
+              clean_text = re.sub(r"\s+", " ", clean_text).strip()
+
+              print("Extracted text length:", len(clean_text))
+              print("Extracted text preview:", clean_text[:500])
+
 
 
           if not items:
