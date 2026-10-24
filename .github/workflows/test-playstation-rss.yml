@@ -134,26 +134,54 @@ jobs:
               # PlayStation記事の本文領域だけを抽出
               from html.parser import HTMLParser
 
-              class ArticleBodyParser(HTMLParser):
-                  def __init__(self):
-                      super().__init__(convert_charrefs=True)
-                      self.depth = 0
-                      self.parts = []
+              
+class ArticleBodyParser(HTMLParser):
+    VOID_TAGS = {
+        "area", "base", "br", "col", "embed",
+        "hr", "img", "input", "link", "meta",
+        "param", "source", "track", "wbr"
+    }
 
-                  def handle_starttag(self, tag, attrs):
-                      classes = dict(attrs).get("class", "").split()
-                      if self.depth:
-                          self.depth += 1
-                      elif "post-single__content" in classes:
-                          self.depth = 1
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.depth = 0
+        self.parts = []
+        self.found = False
+        self.skip_depth = 0
 
-                  def handle_endtag(self, tag):
-                      if self.depth:
-                          self.depth -= 1
+    def handle_starttag(self, tag, attrs):
+        classes = dict(attrs).get("class", "").split()
 
-                  def handle_data(self, data):
-                      if self.depth:
-                          self.parts.append(data)
+        if self.depth == 0:
+            if "post-single__content" in classes:
+                self.depth = 1
+                self.found = True
+            return
+
+        if self.skip_depth:
+            if tag not in self.VOID_TAGS:
+                self.skip_depth += 1
+        elif tag in ("script", "style", "noscript"):
+            self.skip_depth = 1
+        elif tag not in self.VOID_TAGS:
+            self.depth += 1
+
+    def handle_startendtag(self, tag, attrs):
+        pass
+
+    def handle_endtag(self, tag):
+        if not self.depth:
+            return
+
+        if self.skip_depth:
+            self.skip_depth -= 1
+        else:
+            self.depth -= 1
+
+    def handle_data(self, data):
+        if self.depth and not self.skip_depth:
+            self.parts.append(data)
+
 
               parser = ArticleBodyParser()
               parser.feed(article_html)
