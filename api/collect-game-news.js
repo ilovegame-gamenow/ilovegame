@@ -3,30 +3,19 @@ import { registerPendingArticle } from "../lib/article-queue-repository.js";
 
 /**
  * ゲームニュース共通収集API
- *
- * source=nintendo または source=playstation
- * source省略時はNintendoを収集する。
+ * source省略時は有効な全メーカーを収集する。
+ * source指定時は指定メーカーのみ収集する。
  */
-
 export default async function handler(req, res) {
   const cronSecret = process.env.CRON_SECRET;
 
-  if (
-    !cronSecret ||
-    req.headers.authorization !== `Bearer ${cronSecret}`
-  ) {
-    return res.status(401).json({
-      success: false,
-      error: "Unauthorized"
-    });
+  if (!cronSecret || req.headers.authorization !== `Bearer ${cronSecret}`) {
+    return res.status(401).json({ success: false, error: "Unauthorized" });
   }
 
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
-    return res.status(405).json({
-      success: false,
-      error: "Method not allowed"
-    });
+    return res.status(405).json({ success: false, error: "Method not allowed" });
   }
 
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -39,70 +28,56 @@ export default async function handler(req, res) {
     });
   }
 
-  const source = req.query?.source || "nintendo";
-
-  if (
-  typeof source !== "string" ||
-  !Object.hasOwn(newsSources, source) ||
-  !newsSources[source].enabled
-) {
-    return res.status(400).json({
-      success: false,
-      error: "Unsupported news source"
-    });
+  const source = req.query?.source;
+  if (source !== undefined && (
+    typeof source !== "string" ||
+    !Object.hasOwn(newsSources, source) ||
+    !newsSources[source].enabled
+  )) {
+    return res.status(400).json({ success: false, error: "Unsupported news source" });
   }
 
-  const collector = newsSources[source];
+  const selectedSources = source
+    ? [[source, newsSources[source]]]
+    : Object.entries(newsSources).filter(([, config]) => config.enabled);
 
-  try {
-    const articles = await collector.collect();
+  if (selectedSources.length === 0) {
+    return res.status(400).json({ success: false, error: "No enabled news sources" });
+  }
 
-    // 検証時は登録対象を最大1件に制限
-    const targetArticles =
-      req.query?.test === "1"
-        ? articles.slice(0, 1)
-        : articles;
+  const totals = { checked: 0, pending: 0, existing: 0, error: 0 };
+  const sources = [];
 
-    const results = [];
+  for (const [key, collector] of selectedSources) {
+    try {
+      const articles = await collector.collect();
+      const targetArticles = req.query?.test === "1" ? articles.slice(0, 1) : articles;
+      const results = [];
 
-    for (const article of targetArticles) {
-      const result = await registerPendingArticle(article, {
-        supabaseUrl,
-        supabaseKey
-      });
+      for (const article of targetArticles) {
+        try {
+          results.push(await registerPendingArticle(article, { supabaseUrl, supabaseKey }));
+        } catch (error) {
+          console.error(`${collector.name} article registration failed:`, error);
+          results.push({ status: "error", error: error.message });
+        }
+      }
 
-      results.push(result);
+      const counts = {
+        pending: results.filter(result => result.status === "pending").length,
+        existing: results.filter(result => result.status === "existing").length,
+        error: results.filter(result => result.status === "error").length
+      };
+      totals.checked += articles.length;
+      for (const field of ["pending", "existing", "error"]) totals[field] += counts[field];
+      sources.push({ source: key, name: collector.name, checked: articles.length, ...counts, results });
+    } catch (error) {
+      console.error(`${collector.name} collection failed:`, error);
+      totals.error += 1;
+      sources.push({ source: key, name: collector.name, success: false, error: error.message });
     }
-
-    const counts = {
-      pending: results.filter(
-        result => result.status === "pending"
-      ).length,
-      existing: results.filter(
-        result => result.status === "existing"
-      ).length,
-      error: results.filter(
-        result => result.status === "error"
-      ).length
-    };
-
-    return res.status(counts.error > 0 ? 500 : 200).json({
-      success: counts.error === 0,
-      source: collector.name,
-      checked: articles.length,
-      ...counts,
-      results
-    });
-  } catch (error) {
-    console.error(
-      `${collector.name} collection failed:`,
-      error
-    );
-
-    return res.status(500).json({
-      success: false,
-      source: collector.name,
-      error: error.message
-    });
   }
+
+  const success = totals.error === 0;
+  return res.status(success ? 200 : 500).json({ success, ...totals, sources });
 }
