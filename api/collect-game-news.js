@@ -1,5 +1,5 @@
-import { collectNintendoArticles } from "../lib/nintendo-collector.js";
-import { collectPlayStationArticles } from "../lib/playstation-collector.js";
+import { collectNintendoArticles } from "../lib/collectors/nintendo.js";
+import { collectPlayStationArticles } from "../lib/collectors/playstation.js";
 import { registerPendingArticle } from "../lib/article-queue-repository.js";
 
 /**
