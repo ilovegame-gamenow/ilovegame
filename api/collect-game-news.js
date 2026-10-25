@@ -1,15 +1,13 @@
-import { collectNintendoArticles } from "../lib/collectors/nintendo.js";
-import { collectPlayStationArticles } from "../lib/collectors/playstation.js";
+import { newsSources } from "../lib/news-sources.js";
 import { registerPendingArticle } from "../lib/article-queue-repository.js";
 
 /**
  * ゲームニュース共通収集API
  *
  * source=nintendo または source=playstation
- * source省略時は従来互換でNintendoを収集する。
- *
- * 収集処理はメーカー別、記事登録は共通。
+ * source省略時はNintendoを収集する。
  */
+
 const collectors = {
   nintendo: {
     name: "Nintendo",
@@ -54,14 +52,18 @@ export default async function handler(req, res) {
 
   const source = req.query?.source || "nintendo";
 
-  if (typeof source !== "string" || !collectors[source]) {
+  if (
+  typeof source !== "string" ||
+  !Object.hasOwn(newsSources, source) ||
+  !newsSources[source].enabled
+) {
     return res.status(400).json({
       success: false,
       error: "Unsupported news source"
     });
   }
 
-  const collector = collectors[source];
+  const collector = newsSources[source];
 
   try {
     const articles = await collector.collect();
