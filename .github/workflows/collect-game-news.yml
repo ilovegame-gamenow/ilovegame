@@ -33,4 +33,4 @@ jobs:
             --max-time 240 \
             --retry 2 \
             -H "Authorization: Bearer $CRON_SECRET" \
-            "https://ilovegame.vercel.app/api/collect-playstation-queue"
+            "https://ilovegame.vercel.app/api/collect-nintendo-queue?source=playstation&test=1"
