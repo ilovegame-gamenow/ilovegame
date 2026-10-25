@@ -22,7 +22,7 @@ jobs:
           import {
             collectPlayStationArticles,
             parsePlayStationRss
-          } from "./lib/playstation-collector.js";
+          } from "./lib/collectors/playstation.js";
 
           // まずは固定データで基本動作を確認
           const sampleRss = `
