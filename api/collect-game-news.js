@@ -8,17 +8,6 @@ import { registerPendingArticle } from "../lib/article-queue-repository.js";
  * source省略時はNintendoを収集する。
  */
 
-const collectors = {
-  nintendo: {
-    name: "Nintendo",
-    collect: collectNintendoArticles
-  },
-  playstation: {
-    name: "PlayStation",
-    collect: collectPlayStationArticles
-  }
-};
-
 export default async function handler(req, res) {
   const cronSecret = process.env.CRON_SECRET;
 
