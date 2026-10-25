@@ -36,8 +36,10 @@ export default async function handler(req, res) {
 
     const remaining = getEditorSessionRemainingSeconds(req);
 
-    // 残り時間が1時間未満の場合だけ更新
-    if (remaining > 0 && remaining < 60 * 60) {
+    
+    // 認証が有効ならログイン期限を更新
+    if (remaining > 0) {
+
       const secret = process.env.EDITOR_SECRET;
       if (!secret) {
         return res.status(503).json({ error: "Session unavailable" });
