@@ -254,6 +254,12 @@
       .stat-count { font-size: 23px; }
       .article-top { flex-direction: column; }
     }
+    
+    /* プレビュー表示中は背後のページをスクロールさせない */
+    html:has(#previewDialog[open]),
+    body:has(#previewDialog[open]) {
+      overflow: hidden;
+    }
 
     /* 記事プレビュー */
     #previewDialog {
