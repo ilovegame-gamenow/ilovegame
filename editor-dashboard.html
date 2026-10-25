@@ -443,15 +443,18 @@
   <script src="/header.js"></script>
   <script>
     
-    // 編集室の操作に応じてログイン期限を延長
-    let lastSessionRenewal = 0;
+    
+    // 最後の操作から1分後にログイン期限を更新
+    const EDITOR_IDLE_DELAY = 60 * 1000;
+    const EDITOR_SESSION_REFRESH = 60 * 60 * 1000;
+
+    let lastEditorActivity = Date.now();
+    let lastSessionRenewal = Date.now();
+    let editorIdleTimer = null;
     let renewingEditorSession = false;
 
     async function renewEditorSession() {
-      if (renewingEditorSession || document.hidden) return;
-
-      // 通信は最大60秒に1回
-      if (Date.now() - lastSessionRenewal < 60 * 1000) return;
+      if (renewingEditorSession || document.hidden) return false;
 
       renewingEditorSession = true;
 
@@ -467,28 +470,56 @@
 
         if (response.status === 401) {
           location.replace("/editor.html");
-          return;
+          return false;
         }
 
         if (!response.ok) {
           console.warn("ログイン期限の延長に失敗:", response.status);
-          return;
+          return false;
         }
 
         lastSessionRenewal = Date.now();
+        return true;
       } catch (error) {
         console.warn("ログイン期限の延長に失敗:", error);
+        return false;
       } finally {
         renewingEditorSession = false;
       }
     }
 
-    // 実際の操作だけを検知する
-    document.addEventListener("pointerdown", renewEditorSession);
-    document.addEventListener("keydown", renewEditorSession);
-    document.addEventListener("input", renewEditorSession);
+    function recordEditorActivity() {
+      if (document.hidden) return;
 
-    // 編集室のログイン状態を確認する
+      lastEditorActivity = Date.now();
+      clearTimeout(editorIdleTimer);
+
+      editorIdleTimer = setTimeout(() => {
+        renewEditorSession();
+      }, EDITOR_IDLE_DELAY);
+
+      // 長時間連続で操作している場合の期限切れ防止
+      if (Date.now() - lastSessionRenewal >= EDITOR_SESSION_REFRESH) {
+        renewEditorSession();
+      }
+    }
+
+    document.addEventListener("pointerdown", recordEditorActivity);
+    document.addEventListener("keydown", recordEditorActivity);
+    document.addEventListener("input", recordEditorActivity);
+
+    // iPadで画面を離れる際にも、操作があれば更新を試みる
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        clearTimeout(editorIdleTimer);
+      } else if (Date.now() - lastEditorActivity < EDITOR_IDLE_DELAY) {
+        editorIdleTimer = setTimeout(
+          renewEditorSession,
+          EDITOR_IDLE_DELAY
+        );
+      }
+    });
+
 let checkingEditorAuth = false;
 
 async function checkEditorAuth() {
