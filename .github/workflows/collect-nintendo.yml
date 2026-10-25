@@ -1,5 +1,4 @@
-
-name: Collect Nintendo News
+name: Collect Game News
 
 on:
   workflow_dispatch:
@@ -25,3 +24,13 @@ jobs:
             --retry 2 \
             -H "Authorization: Bearer $CRON_SECRET" \
             "https://ilovegame.vercel.app/api/collect-nintendo-queue"
+
+      - name: Collect one PlayStation article
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --max-time 240 \
+            --retry 2 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "https://ilovegame.vercel.app/api/collect-playstation-queue?test=1"
