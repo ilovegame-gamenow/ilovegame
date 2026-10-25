@@ -10,6 +10,14 @@ export default async function handler(req, res) {
 
   if (!requireEditor(req, res)) return;
 
+  // 編集室のログイン状態だけを確認する
+  // 記事データやSupabaseにはアクセスしない
+  if (req.query.auth === "check") {
+    return res.status(200).json({
+      authenticated: true
+    });
+  }
+
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SECRET_KEY;
 
