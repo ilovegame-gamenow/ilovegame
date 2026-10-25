@@ -25,7 +25,7 @@ jobs:
             -H "Authorization: Bearer $CRON_SECRET" \
             "https://ilovegame.vercel.app/api/collect-nintendo-queue"
 
-      - name: Collect one PlayStation article
+      - name: Collect new PlayStation article
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
@@ -33,4 +33,4 @@ jobs:
             --max-time 240 \
             --retry 2 \
             -H "Authorization: Bearer $CRON_SECRET" \
-            "https://ilovegame.vercel.app/api/collect-playstation-queue?test=1"
+            "https://ilovegame.vercel.app/api/collect-playstation-queue"
