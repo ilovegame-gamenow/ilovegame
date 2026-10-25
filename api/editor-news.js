@@ -1,14 +1,56 @@
-import { requireEditor } from "../lib/editor-auth.js";
+import {
+  requireEditor,
+  setEditorCookie,
+  getEditorSessionRemainingSeconds
+} from "../lib/editor-auth.js";
+
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET");
+  if (req.method !== "GET" && req.method !== "POST") {
+    res.setHeader("Allow", "GET, POST");
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   if (!requireEditor(req, res)) return;
+
+  // 操作中のログイン期限を延長する
+  if (req.method === "POST") {
+    if (req.query.auth !== "renew") {
+      return res.status(400).json({ error: "Invalid action" });
+    }
+
+    // 同一オリジンからのリクエストだけ許可
+    const origin = req.headers.origin;
+    const host = req.headers.host;
+
+    if (
+      !origin ||
+      !host ||
+      origin !== `https://${host}` ||
+      req.headers["x-editor-action"] !== "renew"
+    ) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const remaining = getEditorSessionRemainingSeconds(req);
+
+    // 残り時間が1時間未満の場合だけ更新
+    if (remaining > 0 && remaining < 60 * 60) {
+      const secret = process.env.EDITOR_SECRET;
+      if (!secret) {
+        return res.status(503).json({ error: "Session unavailable" });
+      }
+
+      setEditorCookie(res, secret);
+      return res.status(200).json({ renewed: true });
+    }
+
+    return res.status(200).json({ renewed: false });
+  }
+
+  // ここから下は既存のGET処理
 
   // 編集室のログイン状態だけを確認する
   // 記事データやSupabaseにはアクセスしない
