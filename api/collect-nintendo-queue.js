@@ -1,80 +1,80 @@
+import { collectNintendoArticles } from "../lib/nintendo-collector.js";
+import { collectPlayStationArticles } from "../lib/playstation-collector.js";
 import { registerPendingArticle } from "../lib/article-queue-repository.js";
 
 /**
- * Nintendo Topicsの新着記事を収集し、
- * 共通の記事登録処理を使ってpendingで保存する。
+ * ゲームニュース共通収集API
+ *
+ * source=nintendo または source=playstation
+ * source省略時は従来互換でNintendoを収集する。
+ *
+ * 収集処理はメーカー別、記事登録は共通。
  */
+const collectors = {
+  nintendo: {
+    name: "Nintendo",
+    collect: collectNintendoArticles
+  },
+  playstation: {
+    name: "PlayStation",
+    collect: collectPlayStationArticles
+  }
+};
+
 export default async function handler(req, res) {
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (
+    !cronSecret ||
+    req.headers.authorization !== `Bearer ${cronSecret}`
+  ) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized"
+    });
+  }
+
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return res.status(405).json({
+      success: false,
+      error: "Method not allowed"
+    });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({
+      success: false,
+      error: "Supabase environment variables are missing"
+    });
+  }
+
+  const source = req.query?.source || "nintendo";
+
+  if (typeof source !== "string" || !collectors[source]) {
+    return res.status(400).json({
+      success: false,
+      error: "Unsupported news source"
+    });
+  }
+
+  const collector = collectors[source];
+
   try {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SECRET_KEY;
-    const cronSecret = process.env.CRON_SECRET;
+    const articles = await collector.collect();
 
-    // Cron認証
-    const authHeader = req.headers.authorization;
-
-    if (
-      !cronSecret ||
-      authHeader !== `Bearer ${cronSecret}`
-    ) {
-      return res.status(401).json({
-        success: false,
-        error: "Unauthorized"
-      });
-    }
-
-    if (!supabaseUrl || !supabaseKey) {
-      return res.status(500).json({
-        success: false,
-        error: "Supabase environment variables are missing"
-      });
-    }
-
-    const latest = [];
-
-    // Nintendo Topics 1〜4ページを取得
-    for (let page = 1; page <= 4; page++) {
-      const response = await fetch(
-        `https://www.nintendo.com/jp/topics/c/_/v0/posts/search?page=${page}`,
-        {
-          headers: {
-            "User-Agent": "Mozilla/5.0",
-            "Accept": "application/json"
-          }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `Nintendo API failed on page ${page}`
-        );
-      }
-
-      const data = await response.json();
-
-      if (!Array.isArray(data) || data.length === 0) {
-        break;
-      }
-
-      latest.push(...data);
-    }
+    // 検証時は登録対象を最大1件に制限
+    const targetArticles =
+      req.query?.test === "1"
+        ? articles.slice(0, 1)
+        : articles;
 
     const results = [];
 
-    for (const item of latest) {
-      const sourceUrl =
-        `https://www.nintendo.com/jp/topics/article/${item.slug}`;
-
-      // Nintendo固有のデータを共通形式に変換
-      const article = {
-        source_title: item.title,
-        source_name: "Nintendo",
-        source_url: sourceUrl,
-        source_published_at: item.display_date,
-        thumbnail_url: item.thumbnail?.url_key || null
-      };
-
-      // 重複確認・pending登録は共通処理に任せる
+    for (const article of targetArticles) {
       const result = await registerPendingArticle(article, {
         supabaseUrl,
         supabaseKey
@@ -83,15 +83,34 @@ export default async function handler(req, res) {
       results.push(result);
     }
 
-    return res.status(200).json({
-      success: true,
-      checked: latest.length,
+    const counts = {
+      pending: results.filter(
+        result => result.status === "pending"
+      ).length,
+      existing: results.filter(
+        result => result.status === "existing"
+      ).length,
+      error: results.filter(
+        result => result.status === "error"
+      ).length
+    };
+
+    return res.status(counts.error > 0 ? 500 : 200).json({
+      success: counts.error === 0,
+      source: collector.name,
+      checked: articles.length,
+      ...counts,
       results
     });
-
   } catch (error) {
+    console.error(
+      `${collector.name} collection failed:`,
+      error
+    );
+
     return res.status(500).json({
       success: false,
+      source: collector.name,
       error: error.message
     });
   }
