@@ -22,7 +22,7 @@ jobs:
           import {
             collectPlayStationArticles,
             fetchPlayStationOgImage
-          } from "./lib/playstation-collector.js";
+          } from "./lib/collectors/playstation.js";
 
           const articles = await collectPlayStationArticles();
 
