@@ -442,6 +442,52 @@
   <script src="/news-list.js"></script>
   <script src="/header.js"></script>
   <script>
+    
+    // 編集室の操作に応じてログイン期限を延長
+    let lastSessionRenewal = 0;
+    let renewingEditorSession = false;
+
+    async function renewEditorSession() {
+      if (renewingEditorSession || document.hidden) return;
+
+      // 通信は最大60秒に1回
+      if (Date.now() - lastSessionRenewal < 60 * 1000) return;
+
+      renewingEditorSession = true;
+
+      try {
+        const response = await fetch("/api/editor-news?auth=renew", {
+          method: "POST",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            "X-Editor-Action": "renew"
+          }
+        });
+
+        if (response.status === 401) {
+          location.replace("/editor.html");
+          return;
+        }
+
+        if (!response.ok) {
+          console.warn("ログイン期限の延長に失敗:", response.status);
+          return;
+        }
+
+        lastSessionRenewal = Date.now();
+      } catch (error) {
+        console.warn("ログイン期限の延長に失敗:", error);
+      } finally {
+        renewingEditorSession = false;
+      }
+    }
+
+    // 実際の操作だけを検知する
+    document.addEventListener("pointerdown", renewEditorSession);
+    document.addEventListener("keydown", renewEditorSession);
+    document.addEventListener("input", renewEditorSession);
+
     // 編集室のログイン状態を確認する
 let checkingEditorAuth = false;
 
