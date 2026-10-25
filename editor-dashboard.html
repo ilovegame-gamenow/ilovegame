@@ -442,6 +442,43 @@
   <script src="/news-list.js"></script>
   <script src="/header.js"></script>
   <script>
+    // 編集室のログイン状態を確認する
+let checkingEditorAuth = false;
+
+async function checkEditorAuth() {
+  if (checkingEditorAuth) return;
+
+  checkingEditorAuth = true;
+
+  try {
+    const response = await fetch("/api/editor-news?auth=check", {
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+
+    if (response.status === 401) {
+      location.replace("/editor.html");
+    }
+  } catch (error) {
+    // 一時的な通信エラーではログアウトさせない
+    console.warn("ログイン状態の確認に失敗:", error);
+  } finally {
+    checkingEditorAuth = false;
+  }
+}
+
+// 60秒ごとにログイン状態を確認
+setInterval(checkEditorAuth, 60 * 1000);
+
+// iPadで編集室に戻ったときにも確認
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    checkEditorAuth();
+  }
+});
+
+// 初回表示時にも確認
+checkEditorAuth();
     const list = document.getElementById("articlesList");
     const message = document.getElementById("message");
     const tabs = document.getElementById("tabs");
