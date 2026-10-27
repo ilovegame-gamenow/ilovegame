@@ -172,21 +172,21 @@ const pickupRows = featuredResult.pickup || [];
     if(pickup){
       const pickupTitle = pickup.previousElementSibling;
 if(pickupTitle) pickupTitle.style.display = pickupRows.length ? "" : "none";
-  pickup.innerHTML = pickupRows.map(a => `
+  pickup.innerHTML = pickupRows.map(a => {
+  const imageUrl = GameImage.getUrl(a.thumbnail_url, a.source_name);
+
+  return `
     <article class="card" onclick="location.href='article.html?id=${encodeURIComponent(a.id)}'" style="cursor:pointer">
       <div class="time">PICK UP</div>
-      ${GameImage.getUrl(a.thumbnail_url, a.source_name)
-  ? `<img
-    class="thumb"
-    src="${esc(GameImage.getUrl(a.thumbnail_url, a.source_name))}"
-    alt=""
-  >`
-  : ""}
+      ${imageUrl
+        ? `<img class="thumb" src="${esc(imageUrl)}" alt="">`
+        : ""}
       <h3>${esc(a.title || "")}</h3>
       <p class="meta">${esc(a.summary || "")}</p>
       <span class="tag">注目度 ${a.importance || 0}</span>
     </article>
-  `).join("");
+  `;
+}).join("");
 }
     const latest = document.querySelector(".news-grid,.grid");
     const pagination = document.getElementById("pagination");
