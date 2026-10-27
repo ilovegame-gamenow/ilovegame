@@ -10,8 +10,8 @@ export default async function handler(req, res) {
         error: "Supabase environment variables are missing"
       });
     }
-
-    const fields = "id,title,summary,source_name,importance,site_published_at,created_at,published_at";
+    
+    const fields = "id,title,summary,source_name,thumbnail_url,importance,site_published_at,created_at,published_at";
 
     const headers = {
       apikey: supabaseKey,
