@@ -177,10 +177,10 @@ if(pickupTitle) pickupTitle.style.display = pickupRows.length ? "" : "none";
       <div class="time">PICK UP</div>
       ${GameImage.getUrl(a.thumbnail_url, a.source_name)
   ? `<img
-       src="${esc(GameImage.getUrl(a.thumbnail_url, a.source_name))}"
-       alt=""
-       style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;margin-bottom:12px"
-     >`
+    class="thumb"
+    src="${esc(GameImage.getUrl(a.thumbnail_url, a.source_name))}"
+    alt=""
+  >`
   : ""}
       <h3>${esc(a.title || "")}</h3>
       <p class="meta">${esc(a.summary || "")}</p>
