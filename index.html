@@ -94,6 +94,7 @@ footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12
 <main>
 <section id="breaking" class="breaking">
   <div class="breaking-label">● BREAKING / 速報</div>
+  <img id="breaking-image" alt="" hidden>
   <h1 id="breaking-title">速報をチェック中...</h1>
 <div id="breaking-meta" class="meta"></div>
 </section>
@@ -148,6 +149,16 @@ breakingBox.hidden = !breaking;
 
 if (breaking) {
   document.getElementById("breaking-title").textContent = breaking.title || "";
+  const breakingImage = document.getElementById("breaking-image");
+const breakingImageUrl = GameImage.getUrl(
+  breaking.thumbnail_url,
+  breaking.source_name
+);
+
+breakingImage.hidden = !breakingImageUrl;
+if (breakingImageUrl) {
+  breakingImage.src = breakingImageUrl;
+}
   document.getElementById("breaking-meta").textContent =
     `${breaking.source_name || "I LOVE GAME♪"} ｜ 注目度 ${breaking.importance || 0}`;
 
