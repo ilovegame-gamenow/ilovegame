@@ -672,13 +672,13 @@ if (cardElement) {
   cardElement.setAttribute("tabindex", "0");
 
   cardElement.addEventListener("click", () => {
-    openPreview(article.id);
-  });
+  location.href = `/editor-article.html?id=${encodeURIComponent(article.id)}`;
+});
 
   cardElement.addEventListener("keydown", event => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      openPreview(article.id);
+      location.href = `/editor-article.html?id=${encodeURIComponent(article.id)}`;
     }
   });
 }
