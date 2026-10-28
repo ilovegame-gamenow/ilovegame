@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>記事プレビュー | I LOVE GAME♪ 編集室</title>
+  <link rel="stylesheet" href="/header.css">
+  <link rel="stylesheet" href="/article.css">
+</head>
+<body data-page="editor">
+  <header></header>
+
+  <main id="app">
+    <div class="error">記事を読み込んでいます…</div>
+  </main>
+
+  <script src="/header.js"></script>
+  <script src="/date-utils.js"></script>
+  <script src="/image-utils.js"></script>
+  <script src="/article-renderer.js"></script>
+  <script>
+    const app = document.getElementById("app");
+
+    const esc = (value = "") =>
+      String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+    async function loadArticle() {
+      try {
+        const params = new URLSearchParams(location.search);
+        const id = params.get("id");
+
+        if (!id || !/^[1-9]\d*$/.test(id)) {
+          throw new Error("記事IDが正しくありません");
+        }
+
+        const response = await fetch(
+          `/api/editor-detail?id=${encodeURIComponent(id)}`,
+          {
+            credentials: "same-origin",
+            cache: "no-store"
+          }
+        );
+
+        if (response.status === 401) {
+          location.replace("/editor.html");
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("記事を取得できませんでした");
+        }
+
+        const data = await response.json();
+        const article = data.article;
+
+        if (!article) {
+          throw new Error("記事が見つかりません");
+        }
+
+        document.title =
+          `${article.title} | I LOVE GAME♪ 編集室`;
+
+        app.innerHTML = GameArticle.render(article) + `
+          <a class="back" href="/editor-dashboard.html">
+            ← 編集室に戻る
+          </a>
+        `;
+
+        GameArticle.observeBody(app, article);
+      } catch (error) {
+        app.innerHTML = `
+          <div class="error">
+            <h2>記事を表示できませんでした</h2>
+            <p>${esc(error.message)}</p>
+            <a href="/editor-dashboard.html">
+              ← 編集室に戻る
+            </a>
+          </div>
+        `;
+      }
+    }
+
+    loadArticle();
+  </script>
+</body>
+</html>
