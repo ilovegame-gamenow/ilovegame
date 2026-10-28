@@ -22,6 +22,7 @@
   <script src="/header.js"></script>
   <script src="/date-utils.js"></script>
   <script src="/image-utils.js"></script>
+  <script src="/article-renderer.js"></script>
   <script>
     const esc = (value = "") =>
       String(value)
@@ -31,29 +32,6 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     
-function formatArticleText(text) {
-    const width = Math.min(
-        document.querySelector(".article-card")?.clientWidth || window.innerWidth,
-        window.innerWidth
-    );
-    const charsPerLine = Math.max(12, Math.floor((width - 64) / 17));
-    const target = Math.round(charsPerLine * 1.7);
-
-    let count = 0;
-
-    return String(text).replace(/([。！？♪])(?=\S)/g, (match) => {
-        count += 1;
-        return match;
-    }).split(/(?<=[。！？♪])/).map(sentence => {
-        count += sentence.length;
-        if (count >= target) {
-            count = 0;
-            return sentence + "\n";
-        }
-        return sentence;
-    }).join("").trim();
-}
-
     async function loadArticle() {
       const app = document.getElementById("app");
 
@@ -83,100 +61,13 @@ function formatArticleText(text) {
         const updateTime = article.site_published_at || article.created_at || article.published_at;
         document.title =
           `${article.title} | I LOVE GAME♪`;
+  
+app.innerHTML = GameArticle.render(article) + `
+  <a class="back" href="#" onclick="if(history.length>1){history.back();}else{location.href='/';}return false;">← 一覧に戻る</a>
+`;
 
-        app.innerHTML = `
-          
-
-          <article class="article-card">
-
-            
-
-            <h1>${esc(article.title)}</h1>
-            ${GameDate.renderMeta(article.source_name, updateTime)}
-
-            ${thumbnail
-              ? `<img
-                   class="hero"
-                   src="${esc(thumbnail)}"
-                   alt="${esc(article.title)}"
-                 >`
-              : ""}
-
-            ${article.summary
-              ? `<div class="summary">
-                   ${esc(article.summary)}
-                 </div>`
-              : ""}
-
-            <div class="body">
-              
-
-${esc(formatArticleText(
-    (
-        article.article_body ||
-        article.summary ||
-        ""
-    ).trim()
-))}
-
-
-            </div>
-
-            ${article.ilovegame_point
-              ? `
-                <div class="point">
-                  <div class="point-title">
-                    ここに注目♪
-                  </div>
-                  <div>
-                    ${esc(article.ilovegame_point)}
-                  </div>
-                </div>
-              `
-              : ""}
-
-            ${article.source_url
-              ? `
-                <div class="source">
-                  情報元：
-                  <a
-                    href="${esc(article.source_url)}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    ${esc(
-                      article.source_name ||
-                      "公式サイト"
-                    )}
-                  </a>
-                </div>
-              `
-              : ""}
-        
-          </article>
-<a class="back" href="#" onclick="if(history.length>1){history.back();}else{location.href='/';}return false;">← 一覧に戻る</a>
-        `;
-      
-const bodyElement = app.querySelector(".body");
-const originalText = (
-    article.article_body ||
-    article.summary ||
-    ""
-).trim();
-
-let previousWidth = 0;
-
-const observer = new ResizeObserver(() => {
-    const currentWidth = Math.round(bodyElement.clientWidth);
-
-    if (currentWidth === previousWidth) return;
-    previousWidth = currentWidth;
-
-    bodyElement.textContent = formatArticleText(originalText);
-});
-
-observer.observe(bodyElement);
-
+GameArticle.observeBody(app, article);
+  
       } catch (error) {
         app.innerHTML = `
           <div class="error">
