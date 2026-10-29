@@ -78,11 +78,25 @@ app.innerHTML = GameArticle.render(article) + `
 </div>
 
   </section>
-  <a class="back" href="/editor-dashboard.html">
+  <a class="back" id="editorBackLink" href="/editor-dashboard.html">
     ← 編集室に戻る
   </a>
+
 `;
         GameArticle.observeBody(app, article);
+        
+const returnUrl = params.get("return");
+const backLink = document.getElementById("editorBackLink");
+
+const dashboardPath = "/editor-dashboard.html";
+
+if (
+  returnUrl &&
+  (returnUrl === dashboardPath ||
+    returnUrl.startsWith(dashboardPath + "?"))
+) {
+  backLink.href = returnUrl;
+}
         
 const publishButton = document.getElementById("publishButton");
 const rejectButton = document.getElementById("rejectButton");
