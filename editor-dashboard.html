@@ -896,21 +896,11 @@ updateFilterButtons();
   button.disabled = true;
 
   try {
-    const response = await fetch("/api/editor-save", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
+    
+const success = await GameEditorSave.save(data);
 
-    if (response.status === 401) {
-      location.replace("/editor.html");
-      return;
-    }
+if (!success) return;
 
-    if (!response.ok) {
-      throw new Error("保存失敗");
-    }
 
     alert("記事を保存しました！");
     regeneratedArticleId = null;
