@@ -120,7 +120,20 @@ if (
 ) {
   backLink.href = returnUrl;
 }
-        
+
+const editButton = document.getElementById("editArticleButton");
+const editForm = document.getElementById("articleEditForm");
+
+editButton.addEventListener("click", () => {
+  editForm.elements.namedItem("title").value = article.title || "";
+  editForm.elements.namedItem("summary").value = article.summary || "";
+  editForm.elements.namedItem("article_body").value = article.article_body || "";
+  editForm.elements.namedItem("ilovegame_point").value = article.ilovegame_point || "";
+
+  editForm.hidden = false;
+  editButton.hidden = true;
+});
+
 const publishButton = document.getElementById("publishButton");
 const rejectButton = document.getElementById("rejectButton");
 
