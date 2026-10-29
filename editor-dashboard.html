@@ -930,35 +930,10 @@ if (!success) return;
   regenerateButton.textContent = "AI記事再生成中";
 
   try {
-    const response = await fetch("/api/editor-save", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "regenerate", id })
-    });
+    
+const article = await GameEditorRegenerate.regenerate(id);
 
-    if (response.status === 401) {
-      location.replace("/editor.html");
-      return;
-    }
-
-    if (!response.ok) {
-      throw new Error(`再生成失敗: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const article = data.article;
-
-    for (const field of [
-      "title",
-      "summary",
-      "article_body",
-      "ilovegame_point"
-    ]) {
-      if (typeof article?.[field] !== "string") {
-        throw new Error(`生成結果が不正です: ${field}`);
-      }
-    }
+if (!article) return;
 
     editorForm.elements.namedItem("title").value = article.title;
     editorForm.elements.namedItem("summary").value = article.summary;
