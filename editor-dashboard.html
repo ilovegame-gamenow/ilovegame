@@ -614,6 +614,20 @@ let articleCounts = { pending: 0, published: 0, rejected: 0 };
         totalArticles = data.total ?? 0;
         articleCounts = data.counts || { pending: 0, published: 0, rejected: 0 };
         render();
+        
+const savedScrollY = sessionStorage.getItem("editorScrollY");
+
+if (savedScrollY !== null) {
+  sessionStorage.removeItem("editorScrollY");
+
+  const scrollY = Number(savedScrollY);
+  if (Number.isFinite(scrollY) && scrollY >= 0) {
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollY);
+    });
+  }
+}
+
       } catch {
         message.textContent = "記事を取得できませんでした。";
       }
