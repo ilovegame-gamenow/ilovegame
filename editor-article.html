@@ -134,6 +134,23 @@ editButton.addEventListener("click", () => {
   editButton.hidden = true;
 });
 
+document.getElementById("cancelArticleEdit").addEventListener("click", () => {
+  const fields = ["title", "summary", "article_body", "ilovegame_point"];
+
+  const changed = fields.some(name => {
+    const field = editForm.elements.namedItem(name);
+    const original = article[name] || "";
+    return field.value !== original;
+  });
+
+  if (changed && !confirm("編集をキャンセルしますか？保存していない変更は失われます。")) {
+    return;
+  }
+
+  editForm.hidden = true;
+  editButton.hidden = false;
+});
+
 const publishButton = document.getElementById("publishButton");
 const rejectButton = document.getElementById("rejectButton");
 
