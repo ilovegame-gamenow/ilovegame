@@ -672,16 +672,23 @@ if (cardElement) {
   cardElement.setAttribute("role", "button");
   cardElement.setAttribute("tabindex", "0");
 
-  cardElement.addEventListener("click", () => {
-  location.href = `/editor-article.html?id=${encodeURIComponent(article.id)}`;
+cardElement.addEventListener("click", () => {
+  const returnUrl = location.pathname + location.search;
+  const params = new URLSearchParams({
+    id: String(article.id),
+    return: returnUrl
+  });
+
+  location.href = `/editor-article.html?${params.toString()}`;
+});
+  
+cardElement.addEventListener("keydown", event => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    cardElement.click();
+  }
 });
 
-  cardElement.addEventListener("keydown", event => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      location.href = `/editor-article.html?id=${encodeURIComponent(article.id)}`;
-    }
-  });
 }
 
 item.appendChild(cardElement || card);
