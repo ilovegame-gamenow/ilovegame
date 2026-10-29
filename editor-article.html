@@ -78,6 +78,28 @@ app.innerHTML = GameArticle.render(article) + `
   <button type="button" id="rejectButton">非掲載にする</button>
 </div>
 
+<form id="articleEditForm" hidden>
+  <h2>記事を編集</h2>
+
+  <label for="editTitle">タイトル</label>
+  <input id="editTitle" name="title" type="text" maxlength="300" required>
+
+  <label for="editSummary">概要</label>
+  <textarea id="editSummary" name="summary" maxlength="3000" rows="4"></textarea>
+
+  <label for="editBody">記事本文</label>
+  <textarea id="editBody" name="article_body" maxlength="50000" rows="12"></textarea>
+
+  <label for="editPoint">ここに注目♪</label>
+  <textarea id="editPoint" name="ilovegame_point" maxlength="3000" rows="4"></textarea>
+
+  <div class="editor-form-actions">
+    <button type="button" id="cancelArticleEdit">キャンセル</button>
+    <button type="button" id="regenerateArticle">AI再生成</button>
+    <button type="submit">保存</button>
+  </div>
+</form>
+
   </section>
   <a class="back" id="editorBackLink" href="/editor-dashboard.html">
     ← 編集室に戻る
