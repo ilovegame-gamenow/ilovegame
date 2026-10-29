@@ -748,34 +748,31 @@ list.appendChild(item);
       }
     }
 
-    async function updateStatus(article, status, publish, reject) {
-      const action = status === "published" ? "掲載" : "非掲載";
-      if (!confirm(`この記事を${action}に変更しますか？`)) return;
+ 
+async function updateStatus(article, status, publish, reject) {
+  const action = status === "published" ? "掲載" : "非掲載";
+  if (!confirm(`この記事を${action}に変更しますか？`)) return;
 
-      publish.disabled = true;
-      reject.disabled = true;
-      message.textContent = "変更を保存中...";
+  publish.disabled = true;
+  reject.disabled = true;
+  message.textContent = "変更を保存中...";
 
-      try {
-        const response = await fetch("/api/editor-update", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "same-origin",
-          body: JSON.stringify({ id: article.id, status })
-        });
+  try {
+    const success = await GameEditorStatus.update(
+      Number(article.id),
+      status
+    );
 
-        if (response.status === 401) {
-          location.replace("/editor.html");
-          return;
-        }
-        if (!response.ok) throw new Error("保存失敗");
+    if (!success) return;
 
-        await loadArticles();
-      } catch {
-        message.textContent = "変更に失敗しました。";
-        render();
-      }
-    }
+    await loadArticles();
+  } catch (error) {
+    console.error("掲載状態の変更エラー:", error);
+    message.textContent = "変更に失敗しました。";
+    render();
+  }
+}
+
 
 function updateFilterButtons() {
   document.querySelectorAll("[data-filter]").forEach(button => {
