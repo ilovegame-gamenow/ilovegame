@@ -150,6 +150,35 @@ document.getElementById("cancelArticleEdit").addEventListener("click", () => {
 
   editForm.hidden = true;
   editButton.hidden = false;
+  });
+editForm.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const saveButton = editForm.querySelector('button[type="submit"]');
+
+  const data = {
+    id: Number(article.id),
+    regenerated: false,
+    title: editForm.elements.namedItem("title").value,
+    summary: editForm.elements.namedItem("summary").value,
+    article_body: editForm.elements.namedItem("article_body").value,
+    ilovegame_point: editForm.elements.namedItem("ilovegame_point").value
+  };
+
+  saveButton.disabled = true;
+
+  try {
+    const success = await GameEditorSave.save(data);
+    if (!success) return;
+
+    alert("記事を保存しました！");
+    location.reload();
+  } catch (error) {
+    console.error("記事保存エラー:", error);
+    alert("保存結果を確認できませんでした。記事を再確認してください。");
+  } finally {
+    saveButton.disabled = false;
+  }
 });
 
 const publishButton = document.getElementById("publishButton");
