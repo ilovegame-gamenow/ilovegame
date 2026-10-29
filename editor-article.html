@@ -71,6 +71,12 @@ app.innerHTML = GameArticle.render(article) + `
     <h2>記事管理</h2>
     <p>AI評価：${article.importance == null ? "未評価" : `${article.importance}点`}</p>
     <p>掲載状態：${({ pending: "審査待ち", published: "掲載中", rejected: "非掲載" })[article.status] || "不明"}</p>
+  
+<div class="editor-actions">
+  <button type="button" id="publishButton">掲載する</button>
+  <button type="button" id="rejectButton">非掲載にする</button>
+</div>
+
   </section>
   <a class="back" href="/editor-dashboard.html">
     ← 編集室に戻る
