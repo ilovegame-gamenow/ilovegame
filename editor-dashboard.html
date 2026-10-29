@@ -673,6 +673,7 @@ if (cardElement) {
   cardElement.setAttribute("tabindex", "0");
 
 cardElement.addEventListener("click", () => {
+  sessionStorage.setItem("editorScrollY", String(window.scrollY));
   const returnUrl = location.pathname + location.search;
   const params = new URLSearchParams({
     id: String(article.id),
