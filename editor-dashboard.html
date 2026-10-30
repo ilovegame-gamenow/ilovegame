@@ -945,7 +945,7 @@ if (!article) return;
     
   } catch (error) {
     console.error("記事再生成エラー:", error);
-    alert("AI再生成に失敗しました。元の記事は変更されていません。");
+    alert(`AI再生成に失敗しました。\n${error.message}`);
   } finally {
     regenerateButton.disabled = false;
     regenerateButton.textContent = "AI再生成";
