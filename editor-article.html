@@ -150,9 +150,39 @@ document.getElementById("cancelArticleEdit").addEventListener("click", () => {
     return;
   }
 
-  editForm.hidden = true;
-  editButton.hidden = false;
+regenerated = false;
+editForm.hidden = true;
+editButton.hidden = false;
+
   });
+        
+document.getElementById("regenerateArticle").addEventListener("click", async event => {
+  const button = event.currentTarget;
+
+  if (!confirm("AIで記事を再生成しますか？現在の入力内容は置き換わります。")) return;
+
+  button.disabled = true;
+  button.textContent = "AI記事再生成中";
+
+  try {
+    const result = await GameEditorRegenerate.regenerate(Number(article.id));
+    if (!result) return;
+
+    for (const name of ["title", "summary", "article_body", "ilovegame_point"]) {
+      editForm.elements.namedItem(name).value = result[name];
+    }
+
+    regenerated = true;
+    alert("AIで記事を再生成しました。内容を確認してから保存してください。");
+  } catch (error) {
+    console.error("記事再生成エラー:", error);
+    alert(`AI再生成に失敗しました。\n${error.message}`);
+  } finally {
+    button.disabled = false;
+    button.textContent = "AI再生成";
+  }
+});
+
 editForm.addEventListener("submit", async event => {
   event.preventDefault();
 
