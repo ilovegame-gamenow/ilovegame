@@ -281,15 +281,15 @@
 <div class="tabs" id="tabs">
   <button type="button" class="tab" data-filter="all">すべて</button>
 </div>
-
+script>
+  <script src="/date-utils.js"></script>
 <p class="message" id="message" role="status" aria-live="polite"></p>
 <div id="paginationTop"></div>
 <div id="articlesList"></div>
 <div id="pagination"></div>
     </section>
   </main>
-  <script src="/image-utils.js"></script>
-  <script src="/date-utils.js"></script>
+  <script src="/image-utils.js"></
   <script src="/news-card.js"></script>
   <script src="/pagination.js"></script>
   <script src="/news-list.js"></script>
@@ -298,119 +298,8 @@
   <script src="/editor-session.js"></script>
   <script>
     
-    
-    // 最後の操作から1分後にログイン期限を更新
-    const EDITOR_IDLE_DELAY = 60 * 1000;
-    const EDITOR_SESSION_REFRESH = 60 * 60 * 1000;
-
-    let lastEditorActivity = Date.now();
-    let lastSessionRenewal = Date.now();
-    let editorIdleTimer = null;
-    let renewingEditorSession = false;
-
-    async function renewEditorSession() {
-      if (renewingEditorSession || document.hidden) return false;
-
-      renewingEditorSession = true;
-
-      try {
-        const response = await fetch("/api/editor-news?auth=renew", {
-          method: "POST",
-          credentials: "same-origin",
-          cache: "no-store",
-          headers: {
-            "X-Editor-Action": "renew"
-          }
-        });
-
-        if (response.status === 401) {
-          location.replace("/editor.html");
-          return false;
-        }
-
-        if (!response.ok) {
-          console.warn("ログイン期限の延長に失敗:", response.status);
-          return false;
-        }
-
-        lastSessionRenewal = Date.now();
-        return true;
-      } catch (error) {
-        console.warn("ログイン期限の延長に失敗:", error);
-        return false;
-      } finally {
-        renewingEditorSession = false;
-      }
-    }
-
-    function recordEditorActivity() {
-      if (document.hidden) return;
-
-      lastEditorActivity = Date.now();
-      clearTimeout(editorIdleTimer);
-
-      editorIdleTimer = setTimeout(() => {
-        renewEditorSession();
-      }, EDITOR_IDLE_DELAY);
-
-      // 長時間連続で操作している場合の期限切れ防止
-      if (Date.now() - lastSessionRenewal >= EDITOR_SESSION_REFRESH) {
-        renewEditorSession();
-      }
-    }
-
-    document.addEventListener("pointerdown", recordEditorActivity);
-    document.addEventListener("keydown", recordEditorActivity);
-    document.addEventListener("input", recordEditorActivity);
-
-    // iPadで画面を離れる際にも、操作があれば更新を試みる
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) {
-        clearTimeout(editorIdleTimer);
-      } else if (Date.now() - lastEditorActivity < EDITOR_IDLE_DELAY) {
-        editorIdleTimer = setTimeout(
-          renewEditorSession,
-          EDITOR_IDLE_DELAY
-        );
-      }
-    });
-
-let checkingEditorAuth = false;
-
-async function checkEditorAuth() {
-  if (checkingEditorAuth) return;
-
-  checkingEditorAuth = true;
-
-  try {
-    const response = await fetch("/api/editor-news?auth=check", {
-      credentials: "same-origin",
-      cache: "no-store"
-    });
-
-    if (response.status === 401) {
-      location.replace("/editor.html");
-    }
-  } catch (error) {
-    // 一時的な通信エラーではログアウトさせない
-    console.warn("ログイン状態の確認に失敗:", error);
-  } finally {
-    checkingEditorAuth = false;
-  }
-}
-
-// 60秒ごとにログイン状態を確認
-setInterval(checkEditorAuth, 60 * 1000);
-
-// iPadで編集室に戻ったときにも確認
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    checkEditorAuth();
-  }
-});
-
-// 初回表示時にも確認
-checkEditorAuth();
+GameEditorSession.start();
+ 
     const list = document.getElementById("articlesList");
     const message = document.getElementById("message");
     const tabs = document.getElementById("tabs");
