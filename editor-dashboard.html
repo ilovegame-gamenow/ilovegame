@@ -749,9 +749,16 @@ edit.textContent = "編集";
           reject.classList.add("selected");
           reject.disabled = true;
         }
+
 edit.addEventListener("click", () => {
-  openPreview(article.id, true);
+  sessionStorage.setItem("editorScrollY", String(window.scrollY));
+  const params = new URLSearchParams({
+    id: String(article.id),
+    return: location.pathname + location.search
+  });
+  location.href = `/editor-article.html?${params.toString()}`;
 });
+
         publish.addEventListener("click", () =>
           updateStatus(article, "published", publish, reject)
         );
