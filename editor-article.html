@@ -125,6 +125,7 @@ if (
 
 const editButton = document.getElementById("editArticleButton");
 const editForm = document.getElementById("articleEditForm");
+let regenerated = false;
 
 editButton.addEventListener("click", () => {
   editForm.elements.namedItem("title").value = article.title || "";
@@ -159,7 +160,7 @@ editForm.addEventListener("submit", async event => {
 
   const data = {
     id: Number(article.id),
-    regenerated: false,
+    regenerated,
     title: editForm.elements.namedItem("title").value,
     summary: editForm.elements.namedItem("summary").value,
     article_body: editForm.elements.namedItem("article_body").value,
