@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -21,7 +22,10 @@
   <script src="/editor-status.js"></script>
   <script src="/editor-save.js"></script>
   <script src="/editor-regenerate.js"></script>
+  <script src="/editor-session.js"></script>
   <script>
+    GameEditorSession.start();
+
     const app = document.getElementById("app");
 
     const esc = (value = "") =>
@@ -68,7 +72,7 @@
         document.title =
           `${article.title} | I LOVE GAME♪ 編集室`;
 
-app.innerHTML = GameArticle.render(article) + `
+        app.innerHTML = GameArticle.render(article) + `
   <section class="editor-management" aria-label="記事管理情報">
     <h2>記事管理</h2>
     <p>AI評価：${article.importance == null ? "未評価" : `${article.importance}点`}</p>
@@ -109,159 +113,158 @@ app.innerHTML = GameArticle.render(article) + `
 
 `;
         GameArticle.observeBody(app, article);
-        
-const returnUrl = params.get("return");
-const backLink = document.getElementById("editorBackLink");
 
-const dashboardPath = "/editor-dashboard.html";
+        const returnUrl = params.get("return");
+        const backLink = document.getElementById("editorBackLink");
 
-if (
-  returnUrl &&
-  (returnUrl === dashboardPath ||
-    returnUrl.startsWith(dashboardPath + "?"))
-) {
-  backLink.href = returnUrl;
-}
+        const dashboardPath = "/editor-dashboard.html";
 
-const editButton = document.getElementById("editArticleButton");
-const editForm = document.getElementById("articleEditForm");
-let regenerated = false;
+        if (
+          returnUrl &&
+          (returnUrl === dashboardPath ||
+            returnUrl.startsWith(dashboardPath + "?"))
+        ) {
+          backLink.href = returnUrl;
+        }
 
-editButton.addEventListener("click", () => {
-  editForm.elements.namedItem("title").value = article.title || "";
-  editForm.elements.namedItem("summary").value = article.summary || "";
-  editForm.elements.namedItem("article_body").value = article.article_body || "";
-  editForm.elements.namedItem("ilovegame_point").value = article.ilovegame_point || "";
+        const editButton = document.getElementById("editArticleButton");
+        const editForm = document.getElementById("articleEditForm");
+        let regenerated = false;
 
-  editForm.hidden = false;
-  editButton.hidden = true;
-});
+        editButton.addEventListener("click", () => {
+          editForm.elements.namedItem("title").value = article.title || "";
+          editForm.elements.namedItem("summary").value = article.summary || "";
+          editForm.elements.namedItem("article_body").value = article.article_body || "";
+          editForm.elements.namedItem("ilovegame_point").value = article.ilovegame_point || "";
 
-document.getElementById("cancelArticleEdit").addEventListener("click", () => {
-  const fields = ["title", "summary", "article_body", "ilovegame_point"];
+          editForm.hidden = false;
+          editButton.hidden = true;
+        });
 
-  const changed = fields.some(name => {
-    const field = editForm.elements.namedItem(name);
-    const original = article[name] || "";
-    return field.value !== original;
-  });
+        document.getElementById("cancelArticleEdit").addEventListener("click", () => {
+          const fields = ["title", "summary", "article_body", "ilovegame_point"];
 
-  if (changed && !confirm("編集をキャンセルしますか？保存していない変更は失われます。")) {
-    return;
-  }
+          const changed = fields.some(name => {
+            const field = editForm.elements.namedItem(name);
+            const original = article[name] || "";
+            return field.value !== original;
+          });
 
-regenerated = false;
-editForm.hidden = true;
-editButton.hidden = false;
+          if (changed && !confirm("編集をキャンセルしますか？保存していない変更は失われます。")) {
+            return;
+          }
 
-  });
-        
-document.getElementById("regenerateArticle").addEventListener("click", async event => {
-  const button = event.currentTarget;
+          regenerated = false;
+          editForm.hidden = true;
+          editButton.hidden = false;
+        });
 
-  if (!confirm("AIで記事を再生成しますか？現在の入力内容は置き換わります。")) return;
+        document.getElementById("regenerateArticle").addEventListener("click", async event => {
+          const button = event.currentTarget;
 
-  button.disabled = true;
-  button.textContent = "AI記事再生成中";
+          if (!confirm("AIで記事を再生成しますか？現在の入力内容は置き換わります。")) return;
 
-  try {
-    const result = await GameEditorRegenerate.regenerate(Number(article.id));
-    if (!result) return;
+          button.disabled = true;
+          button.textContent = "AI記事再生成中";
 
-    for (const name of ["title", "summary", "article_body", "ilovegame_point"]) {
-      editForm.elements.namedItem(name).value = result[name];
-    }
+          try {
+            const result = await GameEditorRegenerate.regenerate(Number(article.id));
+            if (!result) return;
 
-    regenerated = true;
-    alert("AIで記事を再生成しました。内容を確認してから保存してください。");
-  } catch (error) {
-    console.error("記事再生成エラー:", error);
-    alert(`AI再生成に失敗しました。\n${error.message}`);
-  } finally {
-    button.disabled = false;
-    button.textContent = "AI再生成";
-  }
-});
+            for (const name of ["title", "summary", "article_body", "ilovegame_point"]) {
+              editForm.elements.namedItem(name).value = result[name];
+            }
 
-editForm.addEventListener("submit", async event => {
-  event.preventDefault();
+            regenerated = true;
+            alert("AIで記事を再生成しました。内容を確認してから保存してください。");
+          } catch (error) {
+            console.error("記事再生成エラー:", error);
+            alert(`AI再生成に失敗しました。\n${error.message}`);
+          } finally {
+            button.disabled = false;
+            button.textContent = "AI再生成";
+          }
+        });
 
-  const saveButton = editForm.querySelector('button[type="submit"]');
+        editForm.addEventListener("submit", async event => {
+          event.preventDefault();
 
-  const data = {
-    id: Number(article.id),
-    regenerated,
-    title: editForm.elements.namedItem("title").value,
-    summary: editForm.elements.namedItem("summary").value,
-    article_body: editForm.elements.namedItem("article_body").value,
-    ilovegame_point: editForm.elements.namedItem("ilovegame_point").value
-  };
+          const saveButton = editForm.querySelector('button[type="submit"]');
 
-  saveButton.disabled = true;
+          const data = {
+            id: Number(article.id),
+            regenerated,
+            title: editForm.elements.namedItem("title").value,
+            summary: editForm.elements.namedItem("summary").value,
+            article_body: editForm.elements.namedItem("article_body").value,
+            ilovegame_point: editForm.elements.namedItem("ilovegame_point").value
+          };
 
-  try {
-    const success = await GameEditorSave.save(data);
-    if (!success) return;
+          saveButton.disabled = true;
 
-    alert("記事を保存しました！");
-    location.reload();
-  } catch (error) {
-    console.error("記事保存エラー:", error);
-    alert("保存結果を確認できませんでした。記事を再確認してください。");
-  } finally {
-    saveButton.disabled = false;
-  }
-});
+          try {
+            const success = await GameEditorSave.save(data);
+            if (!success) return;
 
-const publishButton = document.getElementById("publishButton");
-const rejectButton = document.getElementById("rejectButton");
+            alert("記事を保存しました！");
+            location.reload();
+          } catch (error) {
+            console.error("記事保存エラー:", error);
+            alert("保存結果を確認できませんでした。記事を再確認してください。");
+          } finally {
+            saveButton.disabled = false;
+          }
+        });
 
-function updateButtons() {
-  publishButton.disabled = article.status === "published";
-  rejectButton.disabled = article.status === "rejected";
-}
+        const publishButton = document.getElementById("publishButton");
+        const rejectButton = document.getElementById("rejectButton");
 
-updateButtons();
+        function updateButtons() {
+          publishButton.disabled = article.status === "published";
+          rejectButton.disabled = article.status === "rejected";
+        }
 
-async function changeStatus(status) {
-  const action = status === "published" ? "掲載" : "非掲載";
+        updateButtons();
 
-  if (!confirm(`この記事を${action}に変更しますか？`)) return;
+        async function changeStatus(status) {
+          const action = status === "published" ? "掲載" : "非掲載";
 
-  publishButton.disabled = true;
-  rejectButton.disabled = true;
+          if (!confirm(`この記事を${action}に変更しますか？`)) return;
 
-  try {
-    const success = await GameEditorStatus.update(
-      Number(article.id),
-      status
-    );
+          publishButton.disabled = true;
+          rejectButton.disabled = true;
 
-    if (!success) return;
+          try {
+            const success = await GameEditorStatus.update(
+              Number(article.id),
+              status
+            );
 
-    article.status = status;
+            if (!success) return;
 
-    const statusLabel = {
-      pending: "審査待ち",
-      published: "掲載中",
-      rejected: "非掲載"
-    };
+            article.status = status;
 
-    const statusText = document.getElementById("articleStatus");
-    if (statusText) {
-      statusText.textContent = statusLabel[status] || "不明";
-    }
+            const statusLabel = {
+              pending: "審査待ち",
+              published: "掲載中",
+              rejected: "非掲載"
+            };
 
-    updateButtons();
-  } catch (error) {
-    console.error("掲載状態の変更エラー:", error);
-    alert("変更に失敗しました。");
-    updateButtons();
-  }
-}
+            const statusText = document.getElementById("articleStatus");
+            if (statusText) {
+              statusText.textContent = statusLabel[status] || "不明";
+            }
 
-publishButton.addEventListener("click", () => changeStatus("published"));
-rejectButton.addEventListener("click", () => changeStatus("rejected"));
+            updateButtons();
+          } catch (error) {
+            console.error("掲載状態の変更エラー:", error);
+            alert("変更に失敗しました。");
+            updateButtons();
+          }
+        }
+
+        publishButton.addEventListener("click", () => changeStatus("published"));
+        rejectButton.addEventListener("click", () => changeStatus("rejected"));
 
       } catch (error) {
         app.innerHTML = `
