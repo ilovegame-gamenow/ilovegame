@@ -73,9 +73,22 @@
 
         app.innerHTML = GameArticle.render(article) + `
   <section class="editor-management" aria-label="記事管理情報">
-    <h2>記事管理</h2>
-    <p>AI評価：${article.importance == null ? "未評価" : `${article.importance}点`}</p>
-    <p>掲載状態：<span id="articleStatus">${({ pending: "審査待ち", published: "掲載中", rejected: "非掲載" })[article.status] || "不明"}</span></p>
+    
+<div class="editor-management-header">
+  <h2>記事管理</h2>
+  <span class="editor-importance">
+    AI評価：${article.importance == null ? "未評価" : `${article.importance}点`}
+  </span>
+</div>
+
+<div class="editor-status-row">
+  <span class="editor-status-label">掲載状態</span>
+  <span
+    id="articleStatus"
+    class="editor-status-badge"
+    data-status="${article.status}"
+  >${({ pending: "審査待ち", published: "掲載中", rejected: "非掲載" })[article.status] || "不明"}</span>
+</div>
 
 
 <div id="articleViewActions">
@@ -263,9 +276,11 @@ document.getElementById("articleViewActions").hidden = false;
             };
 
             const statusText = document.getElementById("articleStatus");
-            if (statusText) {
-              statusText.textContent = statusLabel[status] || "不明";
-            }
+            
+if (statusText) {
+  statusText.textContent = statusLabel[status] || "不明";
+  statusText.dataset.status = status;
+}
 
             updateButtons();
           } catch (error) {
