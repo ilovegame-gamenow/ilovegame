@@ -412,35 +412,6 @@
 <div id="pagination"></div>
     </section>
   </main>
-  <!-- 記事プレビュー -->
-  <dialog id="previewDialog" aria-labelledby="previewTitle">
-    <div class="preview-content">
-      <button type="button" id="closePreview">× 閉じる</button>
-
-      <h2 id="previewTitle">記事プレビュー</h2>
-      <form id="editorForm" hidden>
-  <label for="editTitle">タイトル</label>
-  <input id="editTitle" name="title" type="text" maxlength="300" required>
-
-  <label for="editSummary">概要</label>
-  <textarea id="editSummary" name="summary" maxlength="3000" rows="4"></textarea>
-
-  <label for="editBody">記事本文</label>
-  <textarea id="editBody" name="article_body" maxlength="50000" rows="12"></textarea>
-
-  <label for="editPoint">ここに注目♪</label>
-  <textarea id="editPoint" name="ilovegame_point" maxlength="3000" rows="4"></textarea>
-  <div class="editor-form-actions">
-  <button type="button" id="cancelEdit">キャンセル</button>
-  <button type="button" id="regenerateArticle">AI再生成</button>
-  <button type="submit">保存</button>
-</div>
-</form>
-      <div id="previewBody">
-        記事を読み込み中...
-      </div>
-    </div>
-  </dialog>
   <script src="/image-utils.js"></script>
   <script src="/date-utils.js"></script>
   <script src="/news-card.js"></script>
