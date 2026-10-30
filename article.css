@@ -306,3 +306,63 @@ body[data-page="editor"] #regenerateArticle {
   margin-left: auto;
 }
 
+/* 編集室：記事管理ヘッダー */
+
+body[data-page="editor"] .editor-management-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+body[data-page="editor"] .editor-management-header h2 {
+  margin: 0;
+}
+
+body[data-page="editor"] .editor-importance {
+  color: #888;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 掲載状態のラベル */
+
+body[data-page="editor"] .editor-status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+body[data-page="editor"] .editor-status-label {
+  color: #777;
+  font-size: 14px;
+}
+
+body[data-page="editor"] .editor-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  background: #f1f1f1;
+  color: #666;
+}
+
+body[data-page="editor"] .editor-status-badge[data-status="published"] {
+  background: #e7f6eb;
+  color: #278344;
+}
+
+body[data-page="editor"] .editor-status-badge[data-status="pending"] {
+  background: #fff2df;
+  color: #b97418;
+}
+
+body[data-page="editor"] .editor-status-badge[data-status="rejected"] {
+  background: #f3eeee;
+  color: #9b5555;
+}
+
