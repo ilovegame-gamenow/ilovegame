@@ -240,3 +240,12 @@ body[data-page="editor"] .editor-form-actions button[type="submit"] {
   }
 }
 
+/* 編集室：タイトル入力欄 */
+body[data-page="editor"] #editTitle {
+  width: 100%;
+  min-height: 72px;
+  line-height: 1.6;
+  resize: vertical;
+  overflow-wrap: anywhere;
+}
+
