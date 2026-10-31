@@ -259,9 +259,11 @@ body[data-page="editor"] #articleViewActions {
   margin-top: 20px;
 }
 
-body[data-page="editor"] #editArticleButton {
+body[data-page="editor"] #editArticleButton,
+body[data-page="editor"] #applyDraftButton {
   display: block;
   width: 100%;
+  min-height: 52px;
   padding: 15px 20px;
   border: 1px solid #ff8a3d;
   border-radius: 12px;
@@ -270,6 +272,28 @@ body[data-page="editor"] #editArticleButton {
   font: inherit;
   font-weight: 800;
   cursor: pointer;
+}
+
+/* 反映操作は編集ボタンとサイズを揃え、間隔と配色で区別する。 */
+body[data-page="editor"] #applyDraftButton {
+  margin-bottom: 12px;
+  background: #a95012;
+  border-color: #a95012;
+}
+
+body[data-page="editor"] #applyDraftButton[hidden] {
+  display: none;
+}
+
+body[data-page="editor"] #applyDraftButton:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+body[data-page="editor"] #applyDraftButton:focus-visible,
+body[data-page="editor"] #editArticleButton:focus-visible {
+  outline: 3px solid #a95012;
+  outline-offset: 3px;
 }
 
 body[data-page="editor"] .editor-publication {
