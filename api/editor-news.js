@@ -1,3 +1,4 @@
+import { getSiteSettings } from "../lib/site-settings.js";
 import {
   requireEditor,
   setEditorCookie,
@@ -78,13 +79,18 @@ if (req.query.auth === "check") {
     return res.status(400).json({ error: "Invalid status" });
   }
 
-  const page = Number(req.query.page || 1);
+  let page = Number(req.query.page || 1);
 
   if (!Number.isSafeInteger(page) || page < 1 || page > 1000) {
     return res.status(400).json({ error: "Invalid page" });
   }
 
-  const limit = 20;
+  let limit;
+  try {
+    limit = (await getSiteSettings(supabaseUrl, supabaseKey)).editor_page_size;
+  } catch {
+    return res.status(503).json({ error: "Settings unavailable" });
+  }
   const offset = (page - 1) * limit;
 
   const params = new URLSearchParams({
@@ -130,7 +136,7 @@ const counts = Object.fromEntries(
     return [item, count];
   }))
 );
-    const response = await fetch(
+    let response = await fetch(
       `${supabaseUrl}/rest/v1/articles?${params.toString()}`,
       {
       headers: {
@@ -141,15 +147,20 @@ const counts = Object.fromEntries(
     }
     );
 
-    if (!response.ok) {
-      return res.status(502).json({ error: "Failed to fetch articles" });
+    if (!response.ok && response.status !== 416) throw new Error("Article request failed");
+    const range = response.headers.get("content-range");
+    const total = range ? Number(range.split("/")[1]) : NaN;
+    if (!Number.isSafeInteger(total) || total < 0) throw new Error("Invalid article count");
+    const lastPage = Math.max(1, Math.ceil(total / limit));
+    if (page > lastPage) {
+      page = lastPage;
+      params.set("offset", String((page - 1) * limit));
+      response = await fetch(`${supabaseUrl}/rest/v1/articles?${params}`, {
+        headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` }
+      });
     }
+    if (!response.ok) throw new Error("Article request failed");
     const articles = await response.json();
-
-    const contentRange = response.headers.get("content-range");
-    const total = contentRange
-        ? Number(contentRange.split("/")[1])
-        : null;
 
     return res.status(200).json({
   articles,

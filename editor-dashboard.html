@@ -278,6 +278,7 @@
 
     <section class="panel" id="latest">
       
+<a href="/editor-settings.html" style="display:inline-block;margin-bottom:16px;color:#a95012;font-weight:700">⚙ 編集室の設定</a>
 <div class="tabs" id="tabs">
   <button type="button" class="tab" data-filter="all">すべて</button>
 </div>
@@ -323,7 +324,7 @@ let currentPage = Number.isSafeInteger(savedPage) && savedPage > 0
   : 1;
 
 let totalArticles = 0;
-const pageSize = 20;
+let pageSize = 20;
 let articleCounts = { pending: 0, published: 0, rejected: 0 };
     const labels = {
       pending: "審査待ち",
@@ -348,6 +349,13 @@ let articleCounts = { pending: 0, published: 0, rejected: 0 };
         if (!response.ok) throw new Error("取得失敗");
 
         const data = await response.json();
+        pageSize = data.limit;
+        if (currentPage !== data.page) {
+          currentPage = data.page;
+          const url = new URL(location.href);
+          url.searchParams.set("page", String(currentPage));
+          history.replaceState(null, "", url);
+        }
         articles = data.articles || [];
         totalArticles = data.total ?? 0;
         articleCounts = data.counts || { pending: 0, published: 0, rejected: 0 };

@@ -1,3 +1,4 @@
+import { getSiteSettings } from "../lib/site-settings.js";
 import { newsSources } from "../lib/news-sources.js";
 import { registerPendingArticle } from "../lib/article-queue-repository.js";
 
@@ -8,7 +9,7 @@ import { registerPendingArticle } from "../lib/article-queue-repository.js";
  * source指定時は指定メーカーのみ収集する。
  *
  * 各メーカーの最大確認件数は
- * news-sources.js の maxArticles で管理する。
+ * 編集室の設定で管理する。
  */
 export default async function handler(req, res) {
   const cronSecret = process.env.CRON_SECRET;
@@ -57,6 +58,13 @@ export default async function handler(req, res) {
     });
   }
 
+  let settings;
+  try {
+    settings = await getSiteSettings(supabaseUrl, supabaseKey);
+  } catch {
+    return res.status(503).json({ success: false, error: "Collection settings unavailable" });
+  }
+
   const selectedSources = source
     ? [[source, newsSources[source]]]
     : Object.entries(newsSources).filter(
@@ -81,8 +89,12 @@ export default async function handler(req, res) {
 
   for (const [key, collector] of selectedSources) {
     try {
-      // news-sources.js の最大確認件数を適用
-      const maxArticles = collector.maxArticles;
+      // 0件のメーカーは外部サイトへアクセスせず、一時停止する。
+      const maxArticles = settings[collector.limitSetting];
+      if (maxArticles === 0) {
+        sources.push({ source: key, name: collector.name, maxArticles, checked: 0, pending: 0, existing: 0, error: 0, skipped: true });
+        continue;
+      }
 
       if (
         !Number.isSafeInteger(maxArticles) ||
