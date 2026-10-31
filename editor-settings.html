@@ -6,54 +6,47 @@
   <title>設定 | I LOVE GAME♪ 編集室</title>
   <link rel="stylesheet" href="/header.css">
   <link rel="stylesheet" href="/article.css">
-  <style>
-    .settings-section { background:#fff; border:1px solid #f0e5da; border-radius:18px; padding:24px; margin:20px 0; }
-    h1 { font-size:28px; } h2 { font-size:21px; margin-top:0; }
-    .settings-note { color:#666; line-height:1.8; }
-    .setting-field { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin:20px 0; }
-    .setting-field label { font-weight:700; }
-    .setting-field input { width:100px; min-height:48px; border:1px solid #dacabb; border-radius:10px; padding:10px; font:inherit; font-size:18px; }
-    #saveSettings { width:100%; min-height:52px; border:0; border-radius:12px; background:#c6530c; color:#fff; font:inherit; font-weight:800; cursor:pointer; }
-    #saveSettings:disabled { opacity:.5; cursor:default; }
-    #settingsMessage { min-height:1.8em; line-height:1.8; }
-    #settingsMessage[data-error="true"] { color:#a52330; }
-    #saveSettings[data-saved="true"] { background:#278344; }
-    #saveResult { margin:14px 0 0; padding:14px 16px; border-radius:12px; background:#e7f6eb; color:#205f34; text-align:center; font-weight:700; line-height:1.7; }
-    #saveResult[data-error="true"] { background:#fff1f2; color:#a52330; }
-    #saveResult[hidden] { display:none; }
-    input:focus-visible,button:focus-visible { outline:3px solid #a95012; outline-offset:3px; }
-    .settings-section[disabled] { opacity:.6; }
-  </style>
+  <link rel="stylesheet" href="/editor-settings.css">
 </head>
 <body data-page="editor">
   <header></header>
-  <main>
+  <main class="settings-main">
     <a class="back" href="/editor-dashboard.html">← 編集室に戻る</a>
-    <h1>編集室の設定</h1>
+    <div class="settings-heading">
+      <h1>編集室の設定</h1>
+      <p>記事の表示と、ニュースの収集を調整できます。</p>
+    </div>
     <p id="settingsMessage" role="status" aria-live="polite">設定を読み込み中…</p>
     <form id="settingsForm">
       <fieldset id="settingsFields" disabled style="border:0;padding:0;margin:0">
-        <section class="settings-section">
-          <h2>公開一覧の表示件数</h2>
-          <p class="settings-note">公開サイトの一覧1ページに表示する記事数です。収集する件数とは別の設定です。</p>
-          <div class="setting-field"><label for="public_page_size">1ページの記事数</label><div><input id="public_page_size" name="public_page_size" type="number" min="1" max="100" step="1" required> 件</div></div>
-          <p class="settings-note">1〜100件。保存後、公開ページを読み込み直すと反映されます。</p>
+        <section class="settings-section" aria-labelledby="displayHeading">
+          <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="displayHeading">一覧の表示</h2><p>1ページに表示する記事数</p></div><span class="setting-range">1〜100件</span></div>
+          <div class="setting-field">
+            <div class="field-description"><label for="public_page_size">公開サイト</label><p id="publicHelp">読者が見る記事一覧</p></div>
+            <div class="number-field"><input id="public_page_size" name="public_page_size" type="number" min="1" max="100" step="1" aria-describedby="publicHelp" required><span>件</span></div>
+          </div>
+          <div class="setting-field">
+            <div class="field-description"><label for="editor_page_size">編集室</label><p id="editorHelp">記事を管理する一覧</p></div>
+            <div class="number-field"><input id="editor_page_size" name="editor_page_size" type="number" min="1" max="100" step="1" aria-describedby="editorHelp" required><span>件</span></div>
+          </div>
+          <p class="section-note">保存後、一覧を読み込み直すと反映されます。</p>
         </section>
-        <section class="settings-section">
-          <h2>編集室一覧の表示件数</h2>
-          <p class="settings-note">編集室の一覧1ページに表示する記事数です。公開一覧とは別に設定できます。</p>
-          <div class="setting-field"><label for="editor_page_size">1ページの記事数</label><div><input id="editor_page_size" name="editor_page_size" type="number" min="1" max="100" step="1" required> 件</div></div>
-          <p class="settings-note">1〜100件。保存後、編集室一覧を読み込み直すと反映されます。</p>
+        <section class="settings-section" aria-labelledby="collectionHeading">
+          <div class="section-heading"><span class="section-mark" aria-hidden="true">↻</span><div><h2 id="collectionHeading">ニュースの収集</h2><p>1回に確認する最大記事数</p></div><span class="setting-range">0〜100件</span></div>
+          <div class="setting-field">
+            <label for="nintendo_limit">Nintendo</label>
+            <div class="number-field"><input id="nintendo_limit" name="nintendo_limit" type="number" min="0" max="100" step="1" aria-describedby="collectionHelp" required><span>件</span></div>
+          </div>
+          <div class="setting-field">
+            <label for="playstation_limit">PlayStation</label>
+            <div class="number-field"><input id="playstation_limit" name="playstation_limit" type="number" min="0" max="100" step="1" aria-describedby="collectionHelp" required><span>件</span></div>
+          </div>
+          <p class="section-note" id="collectionHelp">次回の収集から適用。0件で収集を一時停止します。<br>保存済みの記事はそのまま残ります。</p>
         </section>
-        <section class="settings-section">
-          <h2>メーカー別の収集件数</h2>
-          <p class="settings-note">1回の自動収集で確認する最大記事数です。変更は次回の収集から適用されます。</p>
-          <div class="setting-field"><label for="nintendo_limit">Nintendo</label><div><input id="nintendo_limit" name="nintendo_limit" type="number" min="0" max="100" step="1" required> 件</div></div>
-          <div class="setting-field"><label for="playstation_limit">PlayStation</label><div><input id="playstation_limit" name="playstation_limit" type="number" min="0" max="100" step="1" required> 件</div></div>
-          <p class="settings-note">各0〜100件。0件でそのメーカーの収集を一時停止します。保存済みの記事は削除されません。</p>
-        </section>
+        <div class="settings-actions">
         <button id="saveSettings" type="submit">設定を保存</button>
         <p id="saveResult" role="status" aria-live="polite" hidden></p>
+        </div>
       </fieldset>
     </form>
   </main>
