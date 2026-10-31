@@ -17,7 +17,7 @@
 .field-description p { margin:5px 0 0; color:#81766b; font-size:13px; line-height:1.6; }
 .number-field { display:flex; align-items:center; gap:10px; flex-shrink:0; }
 .number-field input { box-sizing:border-box; width:90px; min-height:48px; padding:10px; border:1px solid #d8c5b2; border-radius:10px; background:#fffdfa; color:#302a25; font:inherit; font-size:20px; font-weight:700; text-align:center; }
-.number-field span { color:#81766b; font-size:14px; }
+.number-field span { flex:0 0 2em; white-space:nowrap; color:#81766b; font-size:14px; }
 .section-note { margin:0; padding:14px 16px; background:#faf7f2; border-radius:10px; color:#71675e; font-size:13px; line-height:1.8; }
 .settings-actions { padding:4px 0 12px; }
 #saveSettings { width:100%; min-height:54px; border:0; border-radius:12px; background:#c6530c; color:#fff; font:inherit; font-weight:800; cursor:pointer; }
