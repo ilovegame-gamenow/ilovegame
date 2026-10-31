@@ -2,6 +2,7 @@ import { getEditorNews, parseEditorNewsQuery } from "../lib/editor-news-reposito
 import { getSiteSettings } from "../lib/site-settings.js";
 import {
   requireEditor,
+  SESSION_SECONDS,
   setEditorCookie,
   getEditorSessionRemainingSeconds
 } from "../lib/editor-auth.js";
@@ -56,10 +57,14 @@ export default async function handler(req, res) {
 
   // Session checks must remain independent of filters and database availability.
   if (req.query.auth === "check") {
-    return res.status(200).json({
-      authenticated: true,
-      remainingSeconds: getEditorSessionRemainingSeconds(req)
-    });
+    let remainingSeconds = getEditorSessionRemainingSeconds(req);
+    // Adopt the shorter policy for existing three-hour cookies once, without
+    // turning ordinary auth polling into continuous session renewal.
+    if (remainingSeconds > SESSION_SECONDS) {
+      setEditorCookie(res, process.env.EDITOR_SECRET);
+      remainingSeconds = SESSION_SECONDS;
+    }
+    return res.status(200).json({ authenticated:true, remainingSeconds });
   }
 
   const filters = parseEditorNewsQuery(req.query);

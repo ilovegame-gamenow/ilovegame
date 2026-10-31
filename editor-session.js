@@ -1,6 +1,7 @@
 window.GameEditorSession = (() => {
   const IDLE_DELAY = 60 * 1000;
-  const SESSION_REFRESH = 60 * 60 * 1000;
+  // Renew well before the one-hour token expires during continuous activity.
+  const SESSION_REFRESH = 15 * 60 * 1000;
 
   let lastEditorActivity = Date.now();
   let lastSessionRenewal = Date.now();
