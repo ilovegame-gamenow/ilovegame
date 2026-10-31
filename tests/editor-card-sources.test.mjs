@@ -41,6 +41,8 @@ test('card-source links preserve status, reset pagination and support future reg
 test('interactive maker text does not trigger the parent card click or Enter navigation',()=>{
  const callbacks={};let cardClicks=0;const stored=[];
  const context=vm.createContext({cardElement:{addEventListener:(name,fn)=>{callbacks[name]=fn;},click:()=>cardClicks++},sessionStorage:{setItem:(...args)=>stored.push(args)},window:{scrollY:10},location:{href:'unchanged',pathname:'/editor-dashboard.html',search:'?source=nintendo'},URLSearchParams,article:{id:1}});
+ vm.runInContext(readFileSync(new URL('../editor-navigation.js',import.meta.url),'utf8'),context);
+ context.GameEditorNavigation=context.window.GameEditorNavigation;
  for(const eventName of ['click','keydown']){
   const registration=html.match(new RegExp(`cardElement\\.addEventListener\\("${eventName}", event => \\{[\\s\\S]*?\\n\\}\\);`))[0];
   vm.runInContext(registration,context);

@@ -112,6 +112,9 @@ window.GameEditorSession = (() => {
       }
     });
 
+    window.addEventListener("pageshow", event => {
+      if (event.persisted) checkEditorAuth();
+    });
     setInterval(checkEditorAuth, 60 * 1000);
     checkEditorAuth();
   }
