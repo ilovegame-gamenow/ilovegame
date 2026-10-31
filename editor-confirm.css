@@ -1,0 +1,31 @@
+.editor-confirm {
+  width: min(480px, calc(100% - 32px));
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  padding: 30px 24px 24px;
+  border: 1px solid #f0e5da;
+  border-radius: 20px;
+  background: #fffaf3;
+  color: #2b2b2b;
+  box-shadow: 0 16px 60px rgb(0 0 0 / 20%);
+  text-align: center;
+  font: inherit;
+}
+.editor-confirm::backdrop { background: rgb(0 0 0 / 40%); }
+.editor-confirm h2 { margin: 0 0 16px; font-size: 22px; line-height: 1.5; }
+.editor-confirm p { margin: 0; line-height: 1.8; white-space: pre-line; }
+.editor-confirm-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 26px; }
+.editor-confirm button {
+  min-height: 48px;
+  padding: 12px 8px;
+  border: 1px solid #dacabb;
+  border-radius: 12px;
+  background: #fff;
+  color: #555;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.editor-confirm .confirm-primary { background: #c6530c; border-color: #c6530c; color: #fff; }
+.editor-confirm .confirm-danger { background: #a52330; border-color: #a52330; color: #fff; }
+.editor-confirm button:focus-visible { outline: 3px solid #2b2b2b; outline-offset: 3px; }
