@@ -41,7 +41,7 @@ test('public pagination uses configured size and corrects a page beyond the new 
   const u=new URL(url);calls.push(u);
   if(u.pathname.endsWith('/site_settings'))return new Response(JSON.stringify([settings]));
   assert.equal(options.headers.apikey,'public-test');
-  return new Response(JSON.stringify(u.searchParams.get('offset')==='20'?[{id:1}]:[]),{headers:{'content-range':'*/25'}});
+  return new Response(JSON.stringify(u.searchParams.get('offset')==='20'?[{id:1}]:[]),{status:u.searchParams.get('offset')==='20'?200:416,headers:{'content-range':'*/25'}});
  },async()=>{
   const res=response();await news({query:{page:'100'}},res);
   assert.equal(res.code,200);assert.equal(res.body.page,3);assert.equal(res.body.limit,10);assert.equal(res.body.total,25);assert.equal(res.body.articles.length,1);

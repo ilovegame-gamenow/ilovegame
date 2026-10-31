@@ -38,7 +38,7 @@ export default async function handler(req, res) {
 
     let data = await response.json();
 
-    if (!response.ok) {
+    if (!response.ok && !(response.status === 416 && !articleId)) {
       return res.status(response.status).json({
         error: "Supabase request failed",
         details: data
@@ -51,7 +51,10 @@ export default async function handler(req, res) {
     return res.status(200).json(data[0]);
     }
     const contentRange = response.headers.get("content-range");
-    const total = Number(contentRange?.split("/")[1]) || 0;
+    const total = Number(contentRange?.split("/")[1]);
+    if (!contentRange || !Number.isSafeInteger(total) || total < 0) {
+      throw new Error("Invalid article count");
+    }
 
     const lastPage = Math.max(1, Math.ceil(total / limit));
     if (page > lastPage) {
