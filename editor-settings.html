@@ -17,6 +17,10 @@
     #saveSettings:disabled { opacity:.5; cursor:default; }
     #settingsMessage { min-height:1.8em; line-height:1.8; }
     #settingsMessage[data-error="true"] { color:#a52330; }
+    #saveSettings[data-saved="true"] { background:#278344; }
+    #saveResult { margin:14px 0 0; padding:14px 16px; border-radius:12px; background:#e7f6eb; color:#205f34; text-align:center; font-weight:700; line-height:1.7; }
+    #saveResult[data-error="true"] { background:#fff1f2; color:#a52330; }
+    #saveResult[hidden] { display:none; }
     input:focus-visible,button:focus-visible { outline:3px solid #a95012; outline-offset:3px; }
     .settings-section[disabled] { opacity:.6; }
   </style>
@@ -43,6 +47,7 @@
           <p class="settings-note">各0〜100件。0件でそのメーカーの収集を一時停止します。保存済みの記事は削除されません。</p>
         </section>
         <button id="saveSettings" type="submit">設定を保存</button>
+        <p id="saveResult" role="status" aria-live="polite" hidden></p>
       </fieldset>
     </form>
   </main>

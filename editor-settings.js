@@ -14,6 +14,7 @@
   const fields = document.getElementById('settingsFields');
   const message = document.getElementById('settingsMessage');
   const button = document.getElementById('saveSettings');
+  const saveResult = document.getElementById('saveResult');
   let original = null;
   let busy = false;
   const values = () => Object.fromEntries([...form.querySelectorAll('input[name]')].map(input => [input.name, input.value === '' ? null : Number(input.value)]));
@@ -35,13 +36,30 @@
     if (busy || !form.reportValidity()) return;
     const data = values();
     busy = true; fields.disabled = true; button.textContent = '保存中…';
+    button.dataset.saved = 'false'; saveResult.hidden = true;
     try {
       const result = await request({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       if (!result) return;
       fill(result.settings);
-      notify('設定を保存しました。');
-    } catch (error) { notify(error.message, true); }
-    finally { busy = false; fields.disabled = false; button.textContent = '設定を保存'; }
+      notify('');
+      button.dataset.saved = 'true';
+      saveResult.dataset.error = 'false';
+      saveResult.textContent = '✓ 設定を保存しました。';
+      saveResult.hidden = false;
+    } catch (error) {
+      saveResult.dataset.error = 'true';
+      saveResult.textContent = error.message;
+      saveResult.hidden = false;
+    }
+    finally {
+      busy = false; fields.disabled = false;
+      button.textContent = button.dataset.saved === 'true' ? '✓ 保存しました' : '設定を保存';
+    }
+  });
+  form.addEventListener('input', () => {
+    button.dataset.saved = 'false';
+    button.textContent = '設定を保存';
+    saveResult.hidden = true;
   });
   window.addEventListener('beforeunload', event => {
     if (busy || dirty()) { event.preventDefault(); event.returnValue = ''; }
