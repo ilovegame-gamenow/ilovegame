@@ -45,82 +45,12 @@
       margin: 24px auto;
       padding: 0 16px;
     }
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 22px;
-    }
-    .stat {
-      background: white;
-      border-radius: 14px;
-      padding: 18px;
-      border-top: 4px solid;
-    }
-    .stat.pending { border-color: #e99425; }
-    .stat.published { border-color: #249a69; }
-    .stat.rejected { border-color: #8c929b; }
-    .stat-label { font-size: 13px; color: #666; }
-    .stat-count {
-      font-size: 28px;
-      font-weight: bold;
-      margin-top: 5px;
-    }
-    
-.stat {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  width: 100%;
-  color: inherit;
-  border-left: 1px solid #eee2d8;
-  border-right: 1px solid #eee2d8;
-  border-bottom: 1px solid #eee2d8;
-}
-
-
-.stat.pending.active {
-  background: #fff0d8;
-}
-
-.stat.published.active {
-  background: #ddf5e9;
-}
-
-.stat.rejected.active {
-  background: #eceef0;
-}
-
-
-.stat:focus-visible {
-  outline: 3px solid #ff8a3d;
-  outline-offset: 3px;
-}
-
      .panel {
       background: transparent;
       border-radius: 0;
       padding: 0;
     }
       
-    .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .tab {
-      background: #f5f5f5;
-      border: 1px solid #ddd;
-      color: #555;
-    }
-    .tab.active {
-      background: #ff8a3d;
-      border-color: #ff8a3d;
-      color: white;
-      font-weight: bold;
-    }
     .article {
       padding: 18px 0;
       border-bottom: 1px solid #eee;
@@ -251,9 +181,6 @@
 }
     @media (max-width: 600px) {
       h1 { font-size: 18px; }
-      .stats { gap: 8px; }
-      .stat { padding: 12px; }
-      .stat-count { font-size: 23px; }
       .article-top { flex-direction: column; }
     }
     
@@ -263,17 +190,20 @@
   <header></header>
   <main>
     
+<div class="dashboard-toolbar">
+  <h1>記事管理</h1>
+  <a class="dashboard-settings" href="/editor-settings.html"><span aria-hidden="true">⚙︎</span> 編集室の設定</a>
+</div>
 <section id="pendingRecovery" class="editor-recovery-notice" hidden aria-label="中断した記事編集"></section>
-<section class="editor-source-panel" aria-labelledby="sourceFilterHeading">
-  <h2 id="sourceFilterHeading">メーカーで絞り込み</h2>
-  <p id="sourceCountNote" class="filter-note">メーカー別の件数を読み込み中…</p>
-  <div id="sourceFilters" class="source-filters" role="group" aria-labelledby="sourceFilterHeading" aria-describedby="sourceCountNote">
-    <button type="button" class="source-filter active" data-source="all" aria-pressed="true">すべて</button>
-  </div>
-</section>
-<h2 class="filter-heading">掲載状態</h2>
-<p id="statusCountNote" class="filter-note">全メーカーの掲載状態別件数</p>
-<div class="stats">
+<section class="editor-filters-panel" aria-label="記事の絞り込み">
+  <div class="editor-filter-group">
+    <h2 id="statusFilterHeading" class="filter-heading">掲載状態</h2>
+    <p id="statusCountNote" class="filter-note">全メーカーの掲載状態別件数</p>
+<div class="stats" role="group" aria-labelledby="statusFilterHeading" aria-describedby="statusCountNote">
+  <button type="button" class="stat all" data-filter="all">
+    <span class="stat-label">すべて</span>
+    <span class="stat-count" id="allCount">—</span>
+  </button>
   <button type="button" class="stat pending" data-filter="pending">
     <span class="stat-label">審査待ち</span>
     <span class="stat-count" id="pendingCount">—</span>
@@ -287,15 +217,16 @@
     <span class="stat-count" id="rejectedCount">—</span>
   </button>
 </div>
-
-    <section class="panel" id="latest">
-      
-<a href="/editor-settings.html" style="display:inline-block;margin-bottom:16px;color:#a95012;font-weight:700">⚙ 編集室の設定</a>
-<div class="tabs" id="tabs">
-  <button type="button" class="tab" data-filter="all">すべて</button>
-</div>
-
-      
+  </div>
+  <div class="editor-filter-group">
+    <h2 id="sourceFilterHeading" class="filter-heading">メーカー</h2>
+    <p id="sourceCountNote" class="filter-note">メーカー別の件数を読み込み中…</p>
+  <div id="sourceFilters" class="source-filters" role="group" aria-labelledby="sourceFilterHeading" aria-describedby="sourceCountNote">
+    <button type="button" class="source-filter active" data-source="all" aria-pressed="true">すべて</button>
+  </div>
+  </div>
+</section>
+<section class="panel" id="latest">
 <p class="message" id="message" role="status" aria-live="polite"></p>
 <div id="paginationTop"></div>
 <div id="articlesList"></div>
@@ -317,7 +248,6 @@ GameEditorSession.start();
  
     const list = document.getElementById("articlesList");
     const message = document.getElementById("message");
-    const tabs = document.getElementById("tabs");
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -327,7 +257,7 @@ const validFilters = ["pending", "published", "rejected", "all"];
 let articles = [];
 let currentFilter = validFilters.includes(savedFilter)
   ? savedFilter
-  : "pending";
+  : "all";
 
 const pagination = document.getElementById("pagination");
 
@@ -431,10 +361,7 @@ function renderPagination() {
       list.replaceChildren();
       renderPagination();
       renderSources();
-      const allButton = document.querySelector('[data-filter="all"]');
-      allButton.textContent = `すべて（${articleCounts.all ?? 0}件）`;
-
-      for (const status of ["pending", "published", "rejected"]) {
+      for (const status of ["all", "pending", "published", "rejected"]) {
   document.getElementById(status + "Count").textContent = articleCounts[status] ?? "—";
 }
 

@@ -12,6 +12,7 @@
     if (!header) return;
 
     const isEditor = document.body.dataset.page === "editor";
+    const homeUrl = isEditor ? "/editor-dashboard.html" : "/";
 
     const links = navigation.map(item =>
       `<a href="${item.href}">${item.label}</a>`
@@ -26,7 +27,7 @@
 
     header.innerHTML = `
       <div class="header-inner">
-        <a class="brand" href="/">
+        <a class="brand" href="${homeUrl}">
           <div class="logo-mark">♥</div>
           <div>
             <div class="logo">
