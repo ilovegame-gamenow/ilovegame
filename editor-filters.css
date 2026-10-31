@@ -1,0 +1,9 @@
+.editor-source-panel { padding:20px; margin:0 0 24px; background:#fff; border:1px solid #eee2d8; border-radius:16px; }
+.editor-source-panel h2,.filter-heading { font-size:17px; margin:0 0 8px; }
+.filter-note { color:#77706a; font-size:13px; line-height:1.7; margin:0 0 14px; }
+.source-filters { display:flex; gap:10px; flex-wrap:wrap; }
+.source-filter { min-height:48px; background:#fffdfa; border:1px solid #dac9b9; color:#64564b; font-weight:700; }
+.source-filter.active { background:#fff0e3; border-color:#c6530c; color:#a5430a; box-shadow:inset 0 0 0 1px #c6530c; }
+.source-filter:focus-visible { outline:3px solid #c6530c; outline-offset:3px; }
+#articlesList[aria-busy="true"] { opacity:.55; pointer-events:none; }
+@media(max-width:480px) { .editor-source-panel { padding:16px; } .source-filter { flex:1 1 auto; } }
