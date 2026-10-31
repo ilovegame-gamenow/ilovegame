@@ -63,6 +63,8 @@
 
         const data = await response.json();
         const article = data.article;
+        const draft = data.draft;
+        const editable = draft || article;
 
         if (!article) {
           throw new Error("記事が見つかりません");
@@ -71,7 +73,7 @@
         document.title =
           `${article.title} | I LOVE GAME♪ 編集室`;
 
-        app.innerHTML = GameArticle.render(article) + `
+        app.innerHTML = GameArticle.render({ ...article, ...editable }) + `
   <section class="editor-management" aria-label="記事管理情報">
     
 <div class="editor-management-header">
@@ -91,10 +93,16 @@
 </div>
 
 
+<p id="draftNotice">${draft ? "保存済みの下書きを表示しています。公開版へは未反映です。" : "公開版の記事を表示しています。"}</p>
 <div id="articleViewActions">
   <button type="button" id="editArticleButton">
     記事を編集する
   </button>
+
+  <div class="editor-draft-actions" aria-label="下書きの操作" ${draft ? "" : "hidden"}>
+    <button type="button" id="applyDraftButton">下書きを反映</button>
+    <button type="button" id="discardDraftButton">下書きを破棄</button>
+  </div>
 
   <div class="editor-publication">
     <p class="editor-section-label">掲載状態の変更</p>
@@ -110,7 +118,7 @@
   <h2>記事を編集</h2>
 
   <label for="editTitle">タイトル</label>
-  <textarea id="editTitle" name="title" maxlength="300" rows="2" required></textarea>
+  <textarea id="editTitle" name="title" maxlength="300" rows="2"></textarea>
   <label for="editSummary">概要</label>
   <textarea id="editSummary" name="summary" maxlength="3000" rows="4"></textarea>
 
@@ -123,7 +131,7 @@
   <div class="editor-form-actions">
     <button type="button" id="cancelArticleEdit">キャンセル</button>
     <button type="button" id="regenerateArticle">AI再生成</button>
-    <button type="submit">保存</button>
+    <button type="submit">下書き保存</button>
   </div>
 </form>
 
@@ -133,7 +141,7 @@
   </a>
 
 `;
-        GameArticle.observeBody(app, article);
+        GameArticle.observeBody(app, { ...article, ...editable });
 
         const returnUrl = params.get("return");
         const backLink = document.getElementById("editorBackLink");
@@ -150,13 +158,23 @@
 
         const editButton = document.getElementById("editArticleButton");
         const editForm = document.getElementById("articleEditForm");
-        let regenerated = false;
+        let regenerated = draft?.regenerated === true;
+        let busy = false;
+        const fields = ["title", "summary", "article_body", "ilovegame_point"];
+        const isDirty = () => fields.some(name => editForm.elements.namedItem(name).value !== (editable[name] || ""));
+        function setBusy(value) {
+          busy = value;
+          editForm.querySelectorAll("button, textarea").forEach(control => control.disabled = value);
+        }
+        window.addEventListener("beforeunload", event => {
+          if (!editForm.hidden && (busy || isDirty())) { event.preventDefault(); event.returnValue = ""; }
+        });
 
         editButton.addEventListener("click", () => {
-          editForm.elements.namedItem("title").value = article.title || "";
-          editForm.elements.namedItem("summary").value = article.summary || "";
-          editForm.elements.namedItem("article_body").value = article.article_body || "";
-          editForm.elements.namedItem("ilovegame_point").value = article.ilovegame_point || "";
+          editForm.elements.namedItem("title").value = editable.title || "";
+          editForm.elements.namedItem("summary").value = editable.summary || "";
+          editForm.elements.namedItem("article_body").value = editable.article_body || "";
+          editForm.elements.namedItem("ilovegame_point").value = editable.ilovegame_point || "";
 
           
 editForm.hidden = false;
@@ -165,11 +183,9 @@ document.getElementById("articleViewActions").hidden = true;
         });
 
         document.getElementById("cancelArticleEdit").addEventListener("click", () => {
-          const fields = ["title", "summary", "article_body", "ilovegame_point"];
-
           const changed = fields.some(name => {
             const field = editForm.elements.namedItem(name);
-            const original = article[name] || "";
+            const original = editable[name] || "";
             return field.value !== original;
           });
 
@@ -177,7 +193,7 @@ document.getElementById("articleViewActions").hidden = true;
             return;
           }
 
-          regenerated = false;
+          regenerated = draft?.regenerated === true;
           
 editForm.hidden = true;
 document.getElementById("articleViewActions").hidden = false;
@@ -189,7 +205,8 @@ document.getElementById("articleViewActions").hidden = false;
 
           if (!confirm("AIで記事を再生成しますか？現在の入力内容は置き換わります。")) return;
 
-          button.disabled = true;
+          if (busy) return;
+          setBusy(true);
           button.textContent = "AI記事再生成中";
 
           try {
@@ -201,20 +218,18 @@ document.getElementById("articleViewActions").hidden = false;
             }
 
             regenerated = true;
-            alert("AIで記事を再生成しました。内容を確認してから保存してください。");
+            alert("AIで記事を再生成しました。内容を確認して下書き保存してください。公開版へは未反映です。");
           } catch (error) {
             console.error("記事再生成エラー:", error);
             alert(`AI再生成に失敗しました。\n${error.message}`);
           } finally {
-            button.disabled = false;
+            setBusy(false);
             button.textContent = "AI再生成";
           }
         });
 
         editForm.addEventListener("submit", async event => {
           event.preventDefault();
-
-          const saveButton = editForm.querySelector('button[type="submit"]');
 
           const data = {
             id: Number(article.id),
@@ -225,21 +240,49 @@ document.getElementById("articleViewActions").hidden = false;
             ilovegame_point: editForm.elements.namedItem("ilovegame_point").value
           };
 
-          saveButton.disabled = true;
+          if (busy) return;
+          setBusy(true);
 
           try {
             const success = await GameEditorSave.save(data);
             if (!success) return;
 
-            alert("記事を保存しました！");
+            alert("下書きを保存しました。公開版へは未反映です。");
+            editForm.hidden = true;
             location.reload();
           } catch (error) {
             console.error("記事保存エラー:", error);
             alert("保存結果を確認できませんでした。記事を再確認してください。");
           } finally {
-            saveButton.disabled = false;
+            setBusy(false);
           }
         });
+
+        // 反映・破棄の通信中は操作をまとめて無効化し、競合する操作を防ぐ。
+        let draftActionBusy = false;
+        async function runDraftAction(action, message) {
+          if (draftActionBusy || !confirm(message)) return;
+          draftActionBusy = true;
+          const controls = [...document.querySelectorAll("#articleViewActions button")];
+          const disabledStates = controls.map(control => control.disabled);
+          controls.forEach(control => control.disabled = true);
+          try {
+            if (!await GameEditorSave.save({ id: Number(article.id), action })) return;
+            location.reload();
+          } catch (error) {
+            alert(error.message);
+          } finally {
+            draftActionBusy = false;
+            controls.forEach((control, index) => control.disabled = disabledStates[index]);
+          }
+        }
+
+        document.getElementById("applyDraftButton").addEventListener("click", () =>
+          runDraftAction("apply", "下書きの内容を公開版へ反映しますか？掲載状態は変わりません。")
+        );
+        document.getElementById("discardDraftButton").addEventListener("click", () =>
+          runDraftAction("discard", "下書きを破棄して、公開版の内容に戻しますか？この操作は取り消せません。公開版は変更されません。")
+        );
 
         const publishButton = document.getElementById("publishButton");
         const rejectButton = document.getElementById("rejectButton");

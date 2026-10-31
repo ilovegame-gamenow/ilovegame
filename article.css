@@ -259,9 +259,11 @@ body[data-page="editor"] #articleViewActions {
   margin-top: 20px;
 }
 
-body[data-page="editor"] #editArticleButton {
+body[data-page="editor"] #editArticleButton,
+body[data-page="editor"] #applyDraftButton {
   display: block;
   width: 100%;
+  min-height: 52px;
   padding: 15px 20px;
   border: 1px solid #ff8a3d;
   border-radius: 12px;
@@ -270,6 +272,27 @@ body[data-page="editor"] #editArticleButton {
   font: inherit;
   font-weight: 800;
   cursor: pointer;
+}
+
+/* 反映はオレンジの塗り、破棄は赤の枠で役割を区別する。 */
+body[data-page="editor"] #applyDraftButton {
+  background: #c6530c;
+  border-color: #c6530c;
+}
+
+body[data-page="editor"] #applyDraftButton[hidden] {
+  display: none;
+}
+
+body[data-page="editor"] #applyDraftButton:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+body[data-page="editor"] #applyDraftButton:focus-visible,
+body[data-page="editor"] #editArticleButton:focus-visible {
+  outline: 3px solid #a95012;
+  outline-offset: 3px;
 }
 
 body[data-page="editor"] .editor-publication {
@@ -366,3 +389,38 @@ body[data-page="editor"] .editor-status-badge[data-status="rejected"] {
   color: #9b5555;
 }
 
+
+/* 編集の下に、下書きの反映・破棄を同じサイズで並べる。 */
+body[data-page="editor"] .editor-draft-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+body[data-page="editor"] .editor-draft-actions[hidden] {
+  display: none;
+}
+
+body[data-page="editor"] #discardDraftButton {
+  width: 100%;
+  min-height: 52px;
+  padding: 15px 20px;
+  border: 2px solid #b83a42;
+  border-radius: 12px;
+  background: #fff1f2;
+  color: #a52330;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+body[data-page="editor"] #discardDraftButton:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+body[data-page="editor"] #discardDraftButton:focus-visible {
+  outline: 3px solid #a52330;
+  outline-offset: 3px;
+}

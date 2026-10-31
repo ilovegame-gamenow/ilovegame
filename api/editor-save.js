@@ -1,145 +1,54 @@
-import { requireEditor } from "../lib/editor-auth.js";
-import { regenerateEditorArticle } from "../lib/editor-regenerator.js";
-import {
-  getArticleById,
-  updateArticle
-} from "../lib/article-repository.js";
+import { requireEditor } from '../lib/editor-auth.js';
+import { regenerateEditorArticle } from '../lib/editor-regenerator.js';
+import { getArticleById } from '../lib/article-repository.js';
+import { getArticleDraft, saveArticleDraft, applyArticleDraft, discardArticleDraft } from '../lib/article-draft-repository.js';
+import { readDraftContent } from '../lib/article-draft-content.js';
+import { hasCompleteArticleContent } from '../lib/article-publication.js';
 
 export default async function handler(req, res) {
-  res.setHeader("Cache-Control", "no-store");
-
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({ error: "Method not allowed" });
+  res.setHeader('Cache-Control', 'no-store');
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ error: 'Method not allowed' });
   }
-
   if (!requireEditor(req, res)) return;
-  if (req.body?.action === "regenerate") {
-  const id = req.body.id;
-
-  if (!Number.isSafeInteger(id) || id <= 0) {
-    return res.status(400).json({ error: "Invalid article ID" });
+  const { id, action = 'save' } = req.body || {};
+  if (!Number.isSafeInteger(id) || id <= 0 || !['save', 'apply', 'regenerate', 'discard'].includes(action)) {
+    return res.status(400).json({ error: 'Invalid request' });
   }
-
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
-  const openaiKey = process.env.OPENAI_API_KEY;
-
-  if (!supabaseUrl || !supabaseKey || !openaiKey) {
-    return res.status(503).json({ error: "Service unavailable" });
-  }
-
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SECRET_KEY;
+  if (!url || !key) return res.status(503).json({ error: 'Database unavailable' });
   try {
-    const article = await regenerateEditorArticle({
-      id,
-      supabaseUrl,
-      supabaseKey,
-      openaiKey
-    });
-
-    await updateArticle(supabaseUrl, supabaseKey, id, {
-  editor_regenerated_at: new Date().toISOString()
-});
-    
-    return res.status(200).json({ article });
-  } catch (error) {
-    console.error("Article regeneration failed:", error);
-    return res.status(500).json({ error: "Regeneration failed" });
-  }
-}
-
-  const { id, title, summary, article_body, ilovegame_point } = req.body || {};
-
-  if (
-    !Number.isSafeInteger(id) ||
-    id <= 0 ||
-    typeof title !== "string" ||
-    !title.trim() ||
-    title.length > 300 ||
-    typeof summary !== "string" ||
-    summary.length > 3000 ||
-    typeof article_body !== "string" ||
-    article_body.length > 50000 ||
-    typeof ilovegame_point !== "string" ||
-    ilovegame_point.length > 3000
-  ) {
-    return res.status(400).json({ error: "Invalid article data" });
-  }
-
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    return res.status(503).json({ error: "Database unavailable" });
-  }
-
-  const updates = {
-    title: title.trim(),
-    summary: summary.trim(),
-    article_body: article_body.trim(),
-    ilovegame_point: ilovegame_point.trim()
-  };
-
-  try {
-    const existingArticle = await getArticleById(
-  supabaseUrl,
-  supabaseKey,
-  id
-);
-
-if (!existingArticle) {
-  return res.status(404).json({
-    error: "Article not found"
-  });
-}
-
-    const isRegeneratedSave =
-  req.body?.regenerated === true &&
-  Boolean(existingArticle.editor_regenerated_at) &&
-  (
-    !existingArticle.editor_regenerated_saved_at ||
-    new Date(existingArticle.editor_regenerated_at).getTime() >
-      new Date(existingArticle.editor_regenerated_saved_at).getTime()
-  );
-    if (
-  isRegeneratedSave &&
-  updates.title &&
-  updates.summary &&
-  updates.article_body &&
-  updates.ilovegame_point
-) {
-  updates.editor_regenerated_saved_at =
-    new Date().toISOString();
-}
-    const response = await fetch(
-      `${supabaseUrl}/rest/v1/articles?id=eq.${id}`,
-      {
-        method: "PATCH",
-        headers: {
-          apikey: supabaseKey,
-          Authorization: `Bearer ${supabaseKey}`,
-          "Content-Type": "application/json",
-          Prefer: "return=representation"
-        },
-        body: JSON.stringify(updates)
+    const article = await getArticleById(url, key, id);
+    if (!article) return res.status(404).json({ error: 'Article not found' });
+    if (action === 'regenerate') {
+      if (!process.env.OPENAI_API_KEY) return res.status(503).json({ error: 'Service unavailable' });
+      // 生成結果は入力欄へ返すだけ。下書き保存も公開反映も行わない。
+      const generated = await regenerateEditorArticle({ id, supabaseUrl: url, supabaseKey: key, openaiKey: process.env.OPENAI_API_KEY });
+      return res.status(200).json({ article: generated });
+    }
+    if (action === 'discard') {
+      await discardArticleDraft(url, key, id);
+      return res.status(200).json({ ok: true });
+    }
+    const draft = await getArticleDraft(url, key, id);
+    if (action === 'apply') {
+      if (!draft || !hasCompleteArticleContent(draft)) {
+        return res.status(409).json({ error: '完成した下書きを保存してから反映してください' });
       }
-    );
-
-    if (!response.ok) {
-      return res.status(502).json({ error: "Failed to save article" });
+      await applyArticleDraft(url, key, id);
+      return res.status(200).json({ ok: true });
     }
-
-    const articles = await response.json();
-
-    if (!Array.isArray(articles) || articles.length === 0) {
-      return res.status(404).json({ error: "Article not found" });
-    }
-
-    return res.status(200).json({
-      ok: true,
-      article: articles[0]
+    const content = readDraftContent(req.body);
+    if (!content) return res.status(400).json({ error: 'Invalid draft data' });
+    const saved = await saveArticleDraft(url, key, id, {
+      ...content,
+      regenerated: req.body.regenerated === true || draft?.regenerated === true
     });
-  } catch {
-    return res.status(502).json({ error: "Database request failed" });
+    return res.status(200).json({ ok: true, draft: saved });
+  } catch (error) {
+    console.error('Editor draft operation failed:', error);
+    return res.status(502).json({ error: '下書きの操作に失敗しました。再読み込みして保存状態を確認してください' });
   }
 }
