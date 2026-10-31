@@ -45,3 +45,9 @@
 .settings-secondary { min-height:44px; padding:10px 14px; margin:12px 0 16px; background:#fff; color:#a95012; border:1px solid #d8c5b2; border-radius:10px; font:inherit; font-size:14px; cursor:pointer; }
 .publication-summary { display:block; padding:14px 0; font-size:14px; color:#6c4b32; line-height:1.8; }
 .settings-main textarea:focus-visible { outline:3px solid #a95012; outline-offset:3px; }
+
+.rule-group + .rule-group { margin-top:24px; padding-top:24px; border-top:1px solid #e8d7c5; }
+.rule-group h3 { display:flex; align-items:baseline; flex-wrap:wrap; gap:6px 12px; margin:0 0 12px; color:#a95012; font-size:17px; }
+.rule-group h3 span { color:#71675e; font-size:13px; font-weight:400; }
+.rule-group .setting-field:first-of-type { border-top:0; }
+.settings-section > .settings-preview-link { margin-bottom:0; background:#fff8f0; }

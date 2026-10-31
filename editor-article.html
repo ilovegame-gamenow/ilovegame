@@ -75,7 +75,6 @@
         document.title =
           `${article.title} | I LOVE GAME♪ 編集室`;
 
-        await GameDate.ready;
         app.innerHTML = GameArticle.render({ ...article, ...editable }) + `
   <section class="editor-management" aria-label="記事管理情報">
     

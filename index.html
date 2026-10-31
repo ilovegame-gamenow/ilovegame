@@ -55,7 +55,6 @@ async function loadLiveNews(){
   fetch(`/api/news?page=${requestedPage}`),
   fetch("/api/featured-news")
 ]);
-await GameDate.ready;
 const [result, featuredResult] = await Promise.all([
   r.ok ? r.json() : Promise.reject(new Error("記事を取得できませんでした")),
   featuredResponse.ok ? featuredResponse.json() : Promise.reject(new Error("注目記事を取得できませんでした"))

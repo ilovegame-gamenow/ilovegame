@@ -18,10 +18,10 @@ test('news settings validate bounds, editorial text, and publication thresholds 
  assert.ok(validateSettings(defaults));
  for (const patch of [
   {publish_threshold:50,no_article_threshold:50}, {breaking_threshold:101},
-  {breaking_max_age_hours:0}, {pickup_max_articles:13}, {date_highlight_hours:-1},
+  {breaking_max_age_hours:0}, {pickup_max_articles:13}, {date_highlight_hours:24},
   {evaluation_guidelines:'  '}, {evaluation_guidelines:'a'.repeat(6001)}, {evaluation_guidelines:['rule']}
  ]) assert.equal(validateSettings({...defaults,...patch}),null);
- assert.ok(validateSettings({...defaults,date_highlight_hours:0,pickup_threshold:0}));
+ assert.ok(validateSettings({...defaults,pickup_threshold:0}));
 });
 test('publication thresholds follow saved settings at exact boundaries', () => {
  const config=toNewsConfig({...defaults,publish_threshold:65,no_article_threshold:30});
@@ -48,17 +48,15 @@ test('featured selection uses saved score, age, count and excludes breaking dupl
 test('public configuration never exposes editorial guidelines or private thresholds', async () => {
  await mockFetch(async()=>new Response(JSON.stringify([defaults])),async()=>{
   const res=response();await siteConfig({},res);
-  assert.equal(res.code,200);assert.deepEqual(Object.keys(res.body).sort(),['dateHighlightHours','maxPickupArticles','pickupThreshold']);
+  assert.equal(res.code,200);assert.deepEqual(Object.keys(res.body).sort(),['maxPickupArticles','pickupThreshold']);
  });
 });
-test('date highlight uses configured duration, supports zero, and rejects future dates', async () => {
- const context=vm.createContext({document:{createElement:()=>({}),head:{appendChild(){}}},fetch:async()=>new Response('{"dateHighlightHours":6}'),console});
+test('date highlight remains fixed at 24 hours without a settings request', () => {
+ const context=vm.createContext({document:{createElement:()=>({}),head:{appendChild(){}}},fetch:()=>{throw Error('Unexpected settings request');},console});
  vm.runInContext(readFileSync(new URL('../date-utils.js',import.meta.url),'utf8'),context);
- await vm.runInContext('GameDate.ready',context);
- assert.equal(vm.runInContext('GameDate.color(new Date(Date.now()-5*3600000))',context),'#ff7a2f');
- assert.equal(vm.runInContext('GameDate.color(new Date(Date.now()-7*3600000))',context),'#8a817a');
+ assert.equal(vm.runInContext('GameDate.color(new Date(Date.now()-23*3600000))',context),'#ff7a2f');
+ assert.equal(vm.runInContext('GameDate.color(new Date(Date.now()-25*3600000))',context),'#8a817a');
  assert.equal(vm.runInContext('GameDate.color(new Date(Date.now()+3600000))',context),'#8a817a');
- assert.equal(vm.runInContext('GameDate.highlightHours=0; GameDate.color(new Date())',context),'#8a817a');
 });
 test('queue uses saved editorial guidelines and publication policy only for pending work', async () => {
  const patches=[];let scoringCalls=0;

@@ -72,7 +72,7 @@
     }
   }
   try {
-    await Promise.all([read('/api/editor-news?auth=check'), GameDate.ready]);
+    await read('/api/editor-news?auth=check');
     fillSelectors(); defaults(); byId('previewFields').disabled = false;
     message.textContent = 'サンプル記事で表示しています。';
     sources.forEach(source => source.addEventListener('change', async () => {

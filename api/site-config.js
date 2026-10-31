@@ -7,8 +7,7 @@ export default async function handler(req, res) {
     const settings = await getSiteSettings(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY);
     return res.status(200).json({
       pickupThreshold: settings.pickup_threshold,
-      maxPickupArticles: settings.pickup_max_articles,
-      dateHighlightHours: settings.date_highlight_hours
+      maxPickupArticles: settings.pickup_max_articles
     });
   } catch {
     return res.status(503).json({ error:'Display settings unavailable' });
