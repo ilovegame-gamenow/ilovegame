@@ -1,7 +1,7 @@
 import { requireEditor } from '../lib/editor-auth.js';
 import { regenerateEditorArticle } from '../lib/editor-regenerator.js';
 import { getArticleById } from '../lib/article-repository.js';
-import { getArticleDraft, saveArticleDraft, applyArticleDraft, discardArticleDraft } from '../lib/article-draft-repository.js';
+import { getArticleDraft, saveArticleDraft, applyArticleDraft, discardArticleDraft, recoverArticleDraft } from '../lib/article-draft-repository.js';
 import { readDraftContent } from '../lib/article-draft-content.js';
 import { hasCompleteArticleContent } from '../lib/article-publication.js';
 
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   }
   if (!requireEditor(req, res)) return;
   const { id, action = 'save' } = req.body || {};
-  if (!Number.isSafeInteger(id) || id <= 0 || !['save', 'apply', 'regenerate', 'discard'].includes(action)) {
+  if (!Number.isSafeInteger(id) || id <= 0 || !['save', 'apply', 'regenerate', 'discard', 'recover'].includes(action)) {
     return res.status(400).json({ error: 'Invalid request' });
   }
   const url = process.env.SUPABASE_URL;
@@ -42,6 +42,22 @@ export default async function handler(req, res) {
     }
     const content = readDraftContent(req.body);
     if (!content) return res.status(400).json({ error: 'Invalid draft data' });
+    if (action === 'recover') {
+      const expected = req.body.expectedDraftUpdatedAt;
+      const base = readDraftContent(req.body.baseContent);
+      if (!base || !(expected === null || (typeof expected === 'string' && expected.length <= 40 && Number.isFinite(Date.parse(expected))))) {
+        return res.status(400).json({ error:'Invalid recovery baseline' });
+      }
+      const current = draft || article;
+      if ((draft?.updated_at ?? null) !== expected || Object.keys(base).some(field => base[field] !== (current[field] || ''))) {
+        return res.status(409).json({ error:'保存済み内容が変わっているため、自動保存できません' });
+      }
+      const saved = await recoverArticleDraft(url, key, id, {
+        ...content, regenerated:req.body.regenerated === true || draft?.regenerated === true
+      }, expected);
+      if (!saved) return res.status(409).json({ error:'他の保存と競合したため、自動保存できません' });
+      return res.status(200).json({ ok:true, draft:saved });
+    }
     const saved = await saveArticleDraft(url, key, id, {
       ...content,
       regenerated: req.body.regenerated === true || draft?.regenerated === true

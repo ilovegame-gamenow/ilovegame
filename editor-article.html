@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/header.css">
   <link rel="stylesheet" href="/article.css">
   <link rel="stylesheet" href="/editor-confirm.css">
+  <link rel="stylesheet" href="/editor-recovery.css">
 </head>
 <body data-page="editor">
   <header></header>
@@ -24,6 +25,7 @@
   <script src="/editor-confirm.js"></script>
   <script src="/editor-regenerate.js"></script>
   <script src="/editor-session.js"></script>
+  <script src="/editor-recovery.js"></script>
   <script>
     GameEditorSession.start();
 
@@ -55,7 +57,7 @@
         );
 
         if (response.status === 401) {
-          location.replace("/editor.html");
+          GameEditorSession.expire();
           return;
         }
 
@@ -65,7 +67,10 @@
 
         const data = await response.json();
         const article = data.article;
-        const draft = data.draft;
+        let draft = data.draft;
+        const restored = await GameEditorRecovery.restore(article, draft);
+        if (restored?.interrupted) return;
+        if (restored?.savedDraft) draft = restored.savedDraft;
         const editable = draft || article;
 
         if (!article) {
@@ -75,7 +80,10 @@
         document.title =
           `${article.title} | I LOVE GAME♪ 編集室`;
 
-        app.innerHTML = GameArticle.render({ ...article, ...editable }) + `
+        app.innerHTML = `<aside id="recoveryNoticeBox" class="editor-recovery-notice" ${restored ? "" : "hidden"}>
+          <p id="recoveryNotice" role="status">${esc(restored?.message || "")}</p>
+          <a id="recoveryLogin" href="/editor.html" target="_blank" rel="noopener" hidden>別タブでログインする</a>
+        </aside>` + GameArticle.render({ ...article, ...editable }) + `
   <section class="editor-management" aria-label="記事管理情報">
     
 <div class="editor-management-header">
@@ -162,6 +170,14 @@
         const editForm = document.getElementById("articleEditForm");
         let regenerated = draft?.regenerated === true;
         let busy = false;
+        let sessionEnding = false;
+        const recoveryNotice = document.getElementById("recoveryNotice");
+        const recovery = GameEditorRecovery.attach({
+          id:Number(article.id), form:editForm, baseline:editable, draftUpdatedAt:draft?.updated_at,
+          getRegenerated:()=>regenerated, notice:recoveryNotice, loginLink:document.getElementById("recoveryLogin"),
+          requiresReview:restored?.requiresReview===true,
+          onExpired:()=>{sessionEnding=true;}
+        });
         const fields = ["title", "summary", "article_body", "ilovegame_point"];
         const isDirty = () => fields.some(name => editForm.elements.namedItem(name).value !== (editable[name] || ""));
         function setBusy(value) {
@@ -169,7 +185,7 @@
           editForm.querySelectorAll("button, textarea").forEach(control => control.disabled = value);
         }
         window.addEventListener("beforeunload", event => {
-          if (!editForm.hidden && (busy || isDirty())) { event.preventDefault(); event.returnValue = ""; }
+          if (!sessionEnding && !editForm.hidden && (busy || isDirty())) { event.preventDefault(); event.returnValue = ""; }
         });
 
         editButton.addEventListener("click", () => {
@@ -195,6 +211,7 @@ document.getElementById("articleViewActions").hidden = true;
             return;
           }
 
+          recovery.clear();
           regenerated = draft?.regenerated === true;
           
 editForm.hidden = true;
@@ -220,6 +237,7 @@ document.getElementById("articleViewActions").hidden = false;
             }
 
             regenerated = true;
+            recovery.snapshot();
             alert("AIで記事を再生成しました。内容を確認して下書き保存してください。公開版へは未反映です。");
           } catch (error) {
             console.error("記事再生成エラー:", error);
@@ -249,8 +267,9 @@ document.getElementById("articleViewActions").hidden = false;
             const success = await GameEditorSave.save(data);
             if (!success) return;
 
-            alert("下書きを保存しました。公開版へは未反映です。");
             editForm.hidden = true;
+            recovery.clear();
+            alert("下書きを保存しました。公開版へは未反映です。");
             location.reload();
           } catch (error) {
             console.error("記事保存エラー:", error);
@@ -273,6 +292,7 @@ document.getElementById("articleViewActions").hidden = false;
           controls.forEach(control => control.disabled = true);
           try {
             if (!await GameEditorSave.save({ id: Number(article.id), action })) return;
+            recovery.clear();
             location.reload();
           } catch (error) {
             alert(error.message);
@@ -345,6 +365,13 @@ if (statusText) {
             alert("変更に失敗しました。");
             updateButtons();
           }
+        }
+
+        if (restored?.item) {
+          editButton.click();
+          for (const name of fields) editForm.elements.namedItem(name).value = restored.item.content[name];
+          regenerated = restored.item.regenerated === true || draft?.regenerated === true;
+          recovery.snapshot(restored.item.reason);
         }
 
         publishButton.addEventListener("click", () => changeStatus("published"));

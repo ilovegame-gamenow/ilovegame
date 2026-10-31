@@ -30,7 +30,7 @@ async function sessionTest(run) {
   return res;
  };
  const document={hidden:false,addEventListener(type,fn){if(!events.has(type))events.set(type,[]);events.get(type).push(fn);}};
- const context=vm.createContext({document,Date,console:{warn(){}},location:{replace:url=>redirects.push(url)},window:{},
+ const context=vm.createContext({document,Date,console:{warn(){}},location:{replace:url=>redirects.push(url)},window:new EventTarget(),Event,
   setTimeout:(fn,delay)=>{const id=++nextId;timers.set(id,{fn,at:now+delay,interval:0});return id;},
   clearTimeout:id=>timers.delete(id),
   setInterval:(fn,delay)=>{const id=++nextId;timers.set(id,{fn,at:now+delay,interval:delay});return id;},

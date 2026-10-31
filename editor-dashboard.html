@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/news-card.css">
   <link rel="stylesheet" href="/pagination.css">
   <link rel="stylesheet" href="/editor-filters.css">
+  <link rel="stylesheet" href="/editor-recovery.css">
   <style>
     * { box-sizing: border-box; }
     body {
@@ -262,6 +263,7 @@
   <header></header>
   <main>
     
+<section id="pendingRecovery" class="editor-recovery-notice" hidden aria-label="中断した記事編集"></section>
 <section class="editor-source-panel" aria-labelledby="sourceFilterHeading">
   <h2 id="sourceFilterHeading">メーカーで絞り込み</h2>
   <p id="sourceCountNote" class="filter-note">メーカー別の件数を読み込み中…</p>
@@ -308,6 +310,7 @@
   <script src="/header.js"></script>
   <script src="/editor-status.js"></script>
   <script src="/editor-session.js"></script>
+  <script src="/editor-recovery.js"></script>
   <script>
     
 GameEditorSession.start();
@@ -381,6 +384,7 @@ let listRequest = null;
         totalArticles = data.total ?? 0;
         articleCounts = data.counts || { pending: 0, published: 0, rejected: 0 };
         render();
+        GameEditorRecovery.renderPending(document.getElementById("pendingRecovery"));
         
 const savedScrollY = sessionStorage.getItem("editorScrollY");
 

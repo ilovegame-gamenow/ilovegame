@@ -8,6 +8,15 @@ window.GameEditorSession = (() => {
   let renewingEditorSession = false;
   let checkingEditorAuth = false;
   let started = false;
+  let ending = false;
+
+  function expire() {
+    if (ending) return;
+    ending = true;
+    const event = new Event("editor-session-expired", { cancelable:true });
+    if (!window.dispatchEvent(event)) { ending = false; return; }
+    location.replace("/editor.html");
+  }
 
   async function renewEditorSession() {
     if (renewingEditorSession || document.hidden) return false;
@@ -25,7 +34,7 @@ window.GameEditorSession = (() => {
       });
 
       if (response.status === 401) {
-        location.replace("/editor.html");
+        expire();
         return false;
       }
 
@@ -71,7 +80,7 @@ window.GameEditorSession = (() => {
       });
 
       if (response.status === 401) {
-        location.replace("/editor.html");
+        expire();
       }
     } catch (error) {
       console.warn("ログイン状態の確認に失敗:", error);
@@ -106,5 +115,5 @@ window.GameEditorSession = (() => {
     checkEditorAuth();
   }
 
-  return { start };
+  return { start, expire };
 })();
