@@ -39,3 +39,7 @@
 
 .retry-articles { min-height:48px; margin:0 0 18px; background:#fff; border:1px solid #c6530c; color:#a5430a; font-weight:700; }
 .retry-articles[hidden] { display:none; }
+
+.game-meta a.game-source-link { color:#77706a; font:inherit; font-weight:400; text-decoration:underline; text-decoration-color:#c8b7a8; text-underline-offset:3px; border-radius:2px; }
+.game-meta a.game-source-link:hover { color:#a95012; text-decoration-color:currentColor; }
+.game-meta a.game-source-link:focus-visible { outline:2px solid #c6530c; outline-offset:3px; }

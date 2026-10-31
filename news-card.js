@@ -52,7 +52,7 @@
       ${imageUrl
         ? `<img class="thumb" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(a.title)}" loading="lazy">`
         : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
-      ${GameDate.renderMeta(a.source_name, updateTime)}
+      ${GameDate.renderMeta(a.source_name, updateTime, { sourceLink: options.clickable === false ? options.sourceLink : null })}
       <h3>${escapeHtml(a.title || "")}</h3>
       <p>${escapeHtml(a.summary || "")}</p>
       <div class="platforms">${badges}</div>

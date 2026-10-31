@@ -30,7 +30,7 @@ const GameDate = {
   }
 };
 // 情報元と掲載日時の共通表示
-GameDate.renderMeta = function (sourceName, dateValue) {
+GameDate.renderMeta = function (sourceName, dateValue, { sourceLink } = {}) {
   const escapeHtml = value =>
     String(value ?? "").replace(/[&<>"']/g, char => ({
       "&": "&amp;",
@@ -44,9 +44,13 @@ GameDate.renderMeta = function (sourceName, dateValue) {
   const date = this.format(dateValue);
   const color = this.color(dateValue);
 
+  const sourceMarkup = sourceLink
+    ? `<a class="game-meta-source game-source-link" href="${escapeHtml(sourceLink.href)}" data-source="${escapeHtml(sourceLink.id)}" aria-label="${escapeHtml(`${sourceName}の記事に絞り込む`)}">${source}</a>`
+    : `<span class="game-meta-source">${source}</span>`;
+
   return `
     <div class="game-meta">
-      ${source ? `<span class="game-meta-source">${source}</span>` : ""}
+      ${source ? sourceMarkup : ""}
       ${source && date ? `<span class="game-meta-separator">｜</span>` : ""}
       ${date ? `<span class="game-date" style="color:${color}">${escapeHtml(date)} UP</span>` : ""}
     </div>
