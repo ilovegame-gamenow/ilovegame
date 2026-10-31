@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>設定 | I LOVE GAME♪ 編集室</title>
+  <link rel="stylesheet" href="/header.css">
+  <link rel="stylesheet" href="/article.css">
+  <link rel="stylesheet" href="/editor-settings.css">
+</head>
+<body data-page="editor">
+  <header></header>
+  <main class="settings-main">
+    <a class="back" href="/editor-dashboard.html">← 編集室に戻る</a>
+    <div class="settings-heading">
+      <h1>編集室の設定</h1>
+      <p>記事の表示と、ニュースの収集を調整できます。</p>
+    </div>
+    <p id="settingsMessage" role="status" aria-live="polite">設定を読み込み中…</p>
+    <form id="settingsForm">
+      <fieldset id="settingsFields" disabled style="border:0;padding:0;margin:0">
+        <section class="settings-section" aria-labelledby="displayHeading">
+          <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="displayHeading">一覧の表示</h2><p>1ページに表示する記事数</p></div><span class="setting-range">1〜100件</span></div>
+          <div class="setting-field">
+            <div class="field-description"><label for="public_page_size">公開サイト</label><p id="publicHelp">読者が見る記事一覧</p></div>
+            <div class="number-field"><input id="public_page_size" name="public_page_size" type="number" min="1" max="100" step="1" aria-describedby="publicHelp" required><span>件</span></div>
+          </div>
+          <div class="setting-field">
+            <div class="field-description"><label for="editor_page_size">編集室</label><p id="editorHelp">記事を管理する一覧</p></div>
+            <div class="number-field"><input id="editor_page_size" name="editor_page_size" type="number" min="1" max="100" step="1" aria-describedby="editorHelp" required><span>件</span></div>
+          </div>
+          <p class="section-note">保存後、一覧を読み込み直すと反映されます。</p>
+        </section>
+        <section class="settings-section" aria-labelledby="collectionHeading">
+          <div class="section-heading"><span class="section-mark" aria-hidden="true">↻</span><div><h2 id="collectionHeading">ニュースの収集</h2><p>1回に確認する最大記事数</p></div><span class="setting-range">0〜100件</span></div>
+          <div class="setting-field">
+            <label for="nintendo_limit">Nintendo</label>
+            <div class="number-field"><input id="nintendo_limit" name="nintendo_limit" type="number" min="0" max="100" step="1" aria-describedby="collectionHelp" required><span>件</span></div>
+          </div>
+          <div class="setting-field">
+            <label for="playstation_limit">PlayStation</label>
+            <div class="number-field"><input id="playstation_limit" name="playstation_limit" type="number" min="0" max="100" step="1" aria-describedby="collectionHelp" required><span>件</span></div>
+          </div>
+          <p class="section-note" id="collectionHelp">次回の収集から適用。0件で収集を一時停止します。<br>保存済みの記事はそのまま残ります。</p>
+        </section>
+        <div class="settings-actions">
+        <button id="saveSettings" type="submit">設定を保存</button>
+        <p id="saveResult" role="status" aria-live="polite" hidden></p>
+        </div>
+      </fieldset>
+    </form>
+  </main>
+  <script src="/header.js"></script>
+  <script src="/editor-session.js"></script>
+  <script src="/editor-settings.js"></script>
+</body>
+</html>

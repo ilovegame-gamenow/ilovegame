@@ -194,7 +194,12 @@ if(pickupTitle) pickupTitle.style.display = pickupRows.length ? "" : "none";
 
     const perPage = result.limit || 20;
     const totalPages = Math.max(1, Math.ceil(result.total / perPage));
-    const currentPage = requestedPage;
+    const currentPage = result.page || requestedPage;
+    if (currentPage !== requestedPage) {
+      const correctedUrl = new URL(location.href);
+      correctedUrl.searchParams.set("page", String(currentPage));
+      history.replaceState(null, "", correctedUrl);
+    }
     const pageRows = rows;
     
 latest.innerHTML = pageRows
