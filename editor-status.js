@@ -24,6 +24,7 @@ window.GameEditorStatus = (() => {
       throw new Error("掲載状態の変更に失敗しました");
     }
 
+    window.GameEditorNavigation?.markChanged();
     return true;
   }
 

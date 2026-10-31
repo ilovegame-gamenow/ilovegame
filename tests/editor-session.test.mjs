@@ -152,3 +152,14 @@ test('existing three-hour cookie is shortened once; subsequent checks do not ext
   const check=await s.dispatch('GET','check');assert.equal(check.body.remainingSeconds,50*60);assert.equal(check.headers['set-cookie'],undefined);
  });
 });
+
+
+test('history restoration checks expired authentication immediately without fetching article data',async()=>{
+ await sessionTest(async s=>{
+  await s.start();s.suspend(HOUR+SECOND);
+  const restored=new Event('pageshow');Object.defineProperty(restored,'persisted',{value:true});
+  s.context.window.dispatchEvent(restored);
+  for(let i=0;i<8;i++)await Promise.resolve();
+  assert.deepEqual(s.redirects,['/editor.html']);
+ });
+});

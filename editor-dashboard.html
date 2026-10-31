@@ -239,6 +239,7 @@
   <script src="/news-card.js"></script>
   <script src="/pagination.js"></script>
   <script src="/news-list.js"></script>
+  <script src="/editor-navigation.js"></script>
   <script src="/header.js"></script>
   <script src="/editor-status.js"></script>
   <script src="/editor-session.js"></script>
@@ -283,7 +284,9 @@ let listRequest = null;
       rejected: "非掲載"
     };
 
+    const listFreshness = GameEditorNavigation.createListState();
     async function loadArticles() {
+      const snapshot = listFreshness.capture();
       const version = ++loadVersion;
       listRequest?.abort();
       listRequest = new AbortController();
@@ -310,12 +313,14 @@ let listRequest = null;
         totalArticles = data.total ?? 0;
         articleCounts = data.counts || { pending: 0, published: 0, rejected: 0 };
         render();
+        listFreshness.loaded(snapshot);
         GameEditorRecovery.renderPending(document.getElementById("pendingRecovery"));
         
-const savedScrollY = sessionStorage.getItem("editorScrollY");
+let savedScrollY = null;
+try { savedScrollY = sessionStorage.getItem("editorScrollY"); } catch {}
 
 if (savedScrollY !== null) {
-  sessionStorage.removeItem("editorScrollY");
+  try { sessionStorage.removeItem("editorScrollY"); } catch {}
 
   const scrollY = Number(savedScrollY);
   if (Number.isFinite(scrollY) && scrollY >= 0) {
@@ -407,14 +412,7 @@ if (cardElement) {
 
 cardElement.addEventListener("click", event => {
   if (event.target.closest("a, button, input, textarea, select")) return;
-  sessionStorage.setItem("editorScrollY", String(window.scrollY));
-  const returnUrl = location.pathname + location.search;
-  const params = new URLSearchParams({
-    id: String(article.id),
-    return: returnUrl
-  });
-
-  location.href = `/editor-article.html?${params.toString()}`;
+  GameEditorNavigation.openArticle(article.id);
 });
   
 cardElement.addEventListener("keydown", event => {
@@ -470,12 +468,7 @@ edit.textContent = "編集";
         }
 
 edit.addEventListener("click", () => {
-  sessionStorage.setItem("editorScrollY", String(window.scrollY));
-  const params = new URLSearchParams({
-    id: String(article.id),
-    return: location.pathname + location.search
-  });
-  location.href = `/editor-article.html?${params.toString()}`;
+  GameEditorNavigation.openArticle(article.id);
 });
 
         publish.addEventListener("click", () =>
@@ -614,6 +607,16 @@ updateFilterButtons();
   }
 });
     
+    window.addEventListener("pageshow", event => {
+      if (!event.persisted) return;
+      GameEditorRecovery.renderPending(document.getElementById("pendingRecovery"));
+      if (listFreshness.needsReload()) {
+        loadArticles();
+      } else {
+        // Safariが保持したDOMとスクロール位置をそのまま利用する。
+        try { sessionStorage.removeItem("editorScrollY"); } catch {}
+      }
+    });
     loadArticles();
   </script>
 </body>

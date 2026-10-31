@@ -21,6 +21,7 @@ window.GameEditorSave = (() => {
       throw new Error(data.error || "下書きの操作に失敗しました");
     }
 
+    window.GameEditorNavigation?.markChanged();
     return true;
   }
 

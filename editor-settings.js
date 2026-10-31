@@ -27,6 +27,7 @@
     if (response.status === 401) { location.replace('/editor.html'); return null; }
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || '設定を保存できませんでした');
+    if (options.method === 'POST') window.GameEditorNavigation?.markChanged();
     return result;
   }
   function updatePolicySummary() {

@@ -16,6 +16,7 @@
     <div class="error">記事を読み込んでいます…</div>
   </main>
 
+  <script src="/editor-navigation.js"></script>
   <script src="/header.js"></script>
   <script src="/date-utils.js"></script>
   <script src="/image-utils.js"></script>
@@ -27,6 +28,7 @@
   <script src="/editor-session.js"></script>
   <script src="/editor-recovery.js"></script>
   <script>
+    GameEditorNavigation.prepareBack();
     GameEditorSession.start();
 
     const app = document.getElementById("app");
@@ -146,7 +148,7 @@
 </form>
 
   </section>
-  <a class="back" id="editorBackLink" href="/editor-dashboard.html">
+  <a class="back" data-editor-back id="editorBackLink" href="/editor-dashboard.html">
     ← 編集室に戻る
   </a>
 
@@ -382,7 +384,7 @@ if (statusText) {
           <div class="error">
             <h2>記事を表示できませんでした</h2>
             <p>${esc(error.message)}</p>
-            <a href="/editor-dashboard.html">
+            <a data-editor-back href="/editor-dashboard.html">
               ← 編集室に戻る
             </a>
           </div>

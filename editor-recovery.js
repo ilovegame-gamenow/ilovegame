@@ -47,6 +47,7 @@ window.GameEditorRecovery = (() => {
       const data=await response.json();
       if (response.status===409) return {...result,requiresReview:true,message:result.message+' 他の保存内容と競合したため、自動保存していません。内容を確認して下書き保存してください。'};
       if (!response.ok) throw new Error('Recovery save failed');
+      window.GameEditorNavigation?.markChanged();
       clear(item.id,item.token);
       return {...result,savedDraft:data.draft,message:`${reason}編集内容を復元し、下書きとして自動保存しました。公開版へは未反映です。`};
     } catch {
