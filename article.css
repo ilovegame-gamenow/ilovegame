@@ -274,10 +274,10 @@ body[data-page="editor"] #applyDraftButton {
   cursor: pointer;
 }
 
-/* 反映操作は編集ボタンとサイズを揃え、間隔と配色で区別する。 */
+/* 反映はオレンジの塗り、破棄は赤の枠で役割を区別する。 */
 body[data-page="editor"] #applyDraftButton {
-  background: #a95012;
-  border-color: #a95012;
+  background: #c6530c;
+  border-color: #c6530c;
 }
 
 body[data-page="editor"] #applyDraftButton[hidden] {
@@ -406,10 +406,10 @@ body[data-page="editor"] #discardDraftButton {
   width: 100%;
   min-height: 52px;
   padding: 15px 20px;
-  border: 1px solid #e7d8ca;
+  border: 2px solid #b83a42;
   border-radius: 12px;
-  background: #fff;
-  color: #666;
+  background: #fff1f2;
+  color: #a52330;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -421,6 +421,6 @@ body[data-page="editor"] #discardDraftButton:disabled {
 }
 
 body[data-page="editor"] #discardDraftButton:focus-visible {
-  outline: 3px solid #a95012;
+  outline: 3px solid #a52330;
   outline-offset: 3px;
 }
