@@ -278,10 +278,10 @@ document.getElementById("articleViewActions").hidden = false;
         }
 
         document.getElementById("applyDraftButton").addEventListener("click", () =>
-          runDraftAction("apply", "下書きの内容を公開版へ反映しますか？掲載状態は変わりません。")
+          runDraftAction("apply", "下書きを公開版へ反映しますか？\n\n記事の掲載状態は変わりません。")
         );
         document.getElementById("discardDraftButton").addEventListener("click", () =>
-          runDraftAction("discard", "下書きを破棄して、公開版の内容に戻しますか？この操作は取り消せません。公開版は変更されません。")
+          runDraftAction("discard", "下書きを破棄しますか？\n\nこの操作は取り消せません。\n公開版の記事は変更されません。")
         );
 
         const publishButton = document.getElementById("publishButton");
