@@ -36,3 +36,6 @@
   .source-filter { flex:1 1 auto; }
   .dashboard-toolbar h1 { font-size:22px; }
 }
+
+.retry-articles { min-height:48px; margin:0 0 18px; background:#fff; border:1px solid #c6530c; color:#a5430a; font-weight:700; }
+.retry-articles[hidden] { display:none; }
