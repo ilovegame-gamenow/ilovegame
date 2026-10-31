@@ -10,7 +10,8 @@
       location.replace('/editor.html');
     } catch (error) { message.textContent = error.message; }
   });
-  const source = byId('previewSource');
+  const sources = [...document.querySelectorAll('input[name="previewSource"]')];
+  let currentSource = 'sample';
   const selectors = [byId('breakingSelect'), ...document.querySelectorAll('.pickup-select')];
   const saved = [];
   let nextPage = 1;
@@ -26,7 +27,7 @@
     thumbnail_url: new URL('/preview-sample.svg', location.origin).href,
     site_published_at: new Date(Date.now() - age * 3600000).toISOString(), platforms: ['Switch 2', 'PS5']
   }));
-  const candidates = () => source.value === 'sample' ? sample : saved;
+  const candidates = () => currentSource === 'sample' ? sample : saved;
   async function read(url) {
     const response = await fetch(url, { credentials:'same-origin', cache:'no-store' });
     if (response.status === 401) { location.replace('/editor.html'); throw new Error('ログインが必要です'); }
@@ -63,25 +64,33 @@
       for (const article of data.articles) if (!saved.some(a=>a.id===article.id)) saved.push(article);
       nextPage = data.page + 1;
       totalPages = Math.max(1, Math.ceil(data.total / data.limit));
-      message.textContent = saved.length ? '掲載済みの記事を選んで表示できます。' : '掲載済みの記事がありません。サンプル記事で確認できます。';
+      if (currentSource === 'saved') message.textContent = saved.length ? '掲載済みの記事を選んで表示できます。' : '掲載済みの記事がありません。サンプル記事で確認できます。';
       fillSelectors();
     } finally {
       byId('loadMore').disabled = false;
-      byId('loadMore').hidden = source.value !== 'saved' || nextPage > totalPages;
+      byId('loadMore').hidden = currentSource !== 'saved' || nextPage > totalPages;
     }
   }
   try {
     await Promise.all([read('/api/editor-news?auth=check'), GameDate.ready]);
     fillSelectors(); defaults(); byId('previewFields').disabled = false;
     message.textContent = 'サンプル記事で表示しています。';
-    source.addEventListener('change', async () => {
+    sources.forEach(source => source.addEventListener('change', async () => {
+      const previous = currentSource;
+      currentSource = source.value;
+      sources.forEach(input => { input.disabled = true; });
+      message.textContent = currentSource === 'saved' ? '掲載済みの記事を読み込み中…' : 'サンプル記事で表示しています。';
       try {
-        if (source.value === 'saved' && !saved.length) await loadSaved();
+        if (currentSource === 'saved' && !saved.length) await loadSaved();
         fillSelectors(); defaults();
-        byId('loadMore').hidden = source.value !== 'saved' || nextPage > totalPages;
-        if (source.value === 'sample') message.textContent = 'サンプル記事で表示しています。';
-      } catch (error) { message.textContent = error.message; }
-    });
+        byId('loadMore').hidden = currentSource !== 'saved' || nextPage > totalPages;
+        if (currentSource === 'saved') message.textContent = saved.length ? '掲載済みの記事で表示しています。下の選択欄から記事を変更できます。' : '掲載済みの記事がありません。サンプルで試してください。';
+      } catch (error) {
+        currentSource = previous;
+        sources.forEach(input => { input.checked = input.value === previous; });
+        message.textContent = error.message;
+      } finally { sources.forEach(input => { input.disabled = false; }); }
+    }));
     byId('loadMore').addEventListener('click', () => loadSaved().catch(error=>{message.textContent=error.message;}));
     selectors.forEach(select => select.addEventListener('change', render));
     byId('showImages').addEventListener('change', render);

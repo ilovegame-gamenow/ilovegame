@@ -18,18 +18,34 @@
       <p>表示確認専用です。選んだ記事は、点数や日時の条件に関係なくこの画面だけに表示します。公開記事・掲載状態は変更しません。</p>
       <p id="previewMessage" role="status">読み込み中…</p>
       <fieldset id="previewFields" disabled>
-        <div class="preview-toolbar">
-          <label>使う記事 <select id="previewSource"><option value="sample">サンプル記事</option><option value="saved">掲載済み記事</option></select></label>
-          <button id="loadMore" type="button" hidden>候補を追加読み込み</button>
-          <button id="showEmpty" type="button">対象なしを確認</button>
-          <button id="showDefault" type="button">記事を表示</button>
-          <label><input id="showImages" type="checkbox" checked> 画像を表示</label>
+        <div class="preview-step">
+          <h2 id="sourceHeading"><span>1</span> 表示に使う記事の種類を選ぶ</h2>
+          <div class="preview-source-options" role="group" aria-labelledby="sourceHeading">
+            <label class="preview-source-option">
+              <input type="radio" name="previewSource" value="sample" checked>
+              <span><strong>サンプルで試す</strong><small>用意された見本の記事で、すぐに表示を確認</small></span>
+            </label>
+            <label class="preview-source-option">
+              <input type="radio" name="previewSource" value="saved">
+              <span><strong>掲載済みの記事で試す</strong><small>公開中の記事を使って、実際の画像や文章を確認</small></span>
+            </label>
+          </div>
         </div>
+        <div class="preview-step">
+          <h2><span>2</span> 各枠に表示する記事を選ぶ</h2>
+          <p>下の選択欄をタップして記事を選ぶと、その下のプレビューがすぐに切り替わります。</p>
+          <button id="loadMore" type="button" hidden>選べる記事をもっと読み込む</button>
         <div class="preview-selection">
           <label>BREAKING <select id="breakingSelect"></select></label>
           <label>PICK UP 1 <select class="pickup-select"></select></label>
           <label>PICK UP 2 <select class="pickup-select"></select></label>
           <label>PICK UP 3 <select class="pickup-select"></select></label>
+        </div>
+        </div>
+        <div class="preview-toolbar" aria-label="表示パターンの確認">
+          <label><input id="showImages" type="checkbox" checked> 画像を表示する</label>
+          <button id="showEmpty" type="button">記事がない状態を見る</button>
+          <button id="showDefault" type="button">記事がある状態に戻す</button>
         </div>
       </fieldset>
       <p class="preview-note">下は公開トップと共通の表示です。記事リンクは無効です。端末の幅に合わせたレイアウトも確認できます。</p>
