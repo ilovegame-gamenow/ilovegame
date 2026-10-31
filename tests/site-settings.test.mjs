@@ -1,13 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validateSettings } from '../lib/site-settings.js';
+import { validateSettings, settingRules } from '../lib/site-settings.js';
 import editorSettings from '../api/editor-settings.js';
 import editorNews from '../api/editor-news.js';
 import news from '../api/news.js';
 import collect from '../api/collect-game-news.js';
 import { newsSources } from '../lib/news-sources.js';
 import { createEditorToken } from '../lib/editor-auth.js';
-const settings = { editor_page_size: 7, public_page_size: 10, nintendo_limit: 20, playstation_limit: 0 };
+const defaults = Object.fromEntries(Object.entries(settingRules).map(([k,v])=>[k,v.defaultValue]));
+const settings = { ...defaults, editor_page_size: 7, public_page_size: 10, nintendo_limit: 20, playstation_limit: 0 };
 process.env.EDITOR_SECRET = 'settings-test';
 process.env.SUPABASE_URL = 'https://db.invalid';
 process.env.SUPABASE_SECRET_KEY = 'secret-test';

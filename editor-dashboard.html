@@ -348,6 +348,7 @@ let articleCounts = { pending: 0, published: 0, rejected: 0 };
 
         if (!response.ok) throw new Error("取得失敗");
 
+        await GameDate.ready;
         const data = await response.json();
         pageSize = data.limit;
         if (currentPage !== data.page) {

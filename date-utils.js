@@ -1,5 +1,6 @@
 // I LOVE GAME♪ 共通日時表示ルール
 const GameDate = {
+  highlightHours: 24,
   format(value) {
     if (!value) return "";
 
@@ -24,7 +25,7 @@ const GameDate = {
 
     const elapsed = Date.now() - date.getTime();
 
-    return elapsed >= 0 && elapsed <= 24 * 60 * 60 * 1000
+    return elapsed >= 0 && this.highlightHours > 0 && elapsed <= this.highlightHours * 60 * 60 * 1000
       ? "#ff7a2f"
       : "#8a817a";
   }
@@ -80,3 +81,12 @@ dateStyle.textContent = `
   }
 `;
 document.head.appendChild(dateStyle);
+
+// One request per page. Callers await ready before rendering article dates.
+GameDate.ready = fetch('/api/site-config', { cache:'no-store' })
+  .then(response => { if (!response.ok) throw new Error('Display settings unavailable'); return response.json(); })
+  .then(config => {
+    if (!Number.isSafeInteger(config.dateHighlightHours) || config.dateHighlightHours < 0 || config.dateHighlightHours > 8760) throw new Error('Invalid highlight duration');
+    GameDate.highlightHours = config.dateHighlightHours;
+  })
+  .catch(error => { console.warn('日時表示の設定を取得できませんでした。初期値を使用します。', error); });

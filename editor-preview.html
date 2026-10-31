@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>表示確認 | I LOVE GAME♪ 編集室</title>
+  <link rel="stylesheet" href="/header.css">
+  <link rel="stylesheet" href="/site-home.css">
+  <link rel="stylesheet" href="/news-card.css">
+  <link rel="stylesheet" href="/editor-preview.css">
+</head>
+<body data-page="editor">
+  <header></header>
+  <main>
+    <section class="preview-controls" aria-labelledby="previewHeading">
+      <a href="/editor-settings.html">← 設定に戻る</a>
+      <h1 id="previewHeading">トップページの表示確認</h1>
+      <p>表示確認専用です。選んだ記事は、点数や日時の条件に関係なくこの画面だけに表示します。公開記事・掲載状態は変更しません。</p>
+      <p id="previewMessage" role="status">読み込み中…</p>
+      <fieldset id="previewFields" disabled>
+        <div class="preview-toolbar">
+          <label>使う記事 <select id="previewSource"><option value="sample">サンプル記事</option><option value="saved">掲載済み記事</option></select></label>
+          <button id="loadMore" type="button" hidden>候補を追加読み込み</button>
+          <button id="showEmpty" type="button">対象なしを確認</button>
+          <button id="showDefault" type="button">記事を表示</button>
+          <label><input id="showImages" type="checkbox" checked> 画像を表示</label>
+        </div>
+        <div class="preview-selection">
+          <label>BREAKING <select id="breakingSelect"></select></label>
+          <label>PICK UP 1 <select class="pickup-select"></select></label>
+          <label>PICK UP 2 <select class="pickup-select"></select></label>
+          <label>PICK UP 3 <select class="pickup-select"></select></label>
+        </div>
+      </fieldset>
+      <p class="preview-note">下は公開トップと共通の表示です。記事リンクは無効です。端末の幅に合わせたレイアウトも確認できます。</p>
+    </section>
+    <p id="emptyNotice" class="preview-empty" hidden>対象なし：BREAKINGとPICK UPは非表示になります。</p>
+    <section id="breaking" class="breaking" hidden></section>
+    <div class="section-title" id="latest"><h2>🔥 NEWS</h2><span>最新ゲームニュース</span></div>
+    <section id="previewNews" class="grid"></section>
+    <div class="section-title" id="pickup-heading"><h2>🎮 PICK UP</h2><span>注目ニュース</span></div>
+    <section id="pickup" class="pickup"></section>
+  </main>
+  <script src="/header.js"></script>
+  <script src="/editor-session.js"></script>
+  <script src="/date-utils.js"></script>
+  <script src="/image-utils.js"></script>
+  <script src="/news-card.js"></script>
+  <script src="/featured-news.js"></script>
+  <script src="/editor-preview.js"></script>
+</body>
+</html>

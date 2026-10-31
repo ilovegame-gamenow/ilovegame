@@ -1,0 +1,80 @@
+*{box-sizing:border-box}
+:root{
+  --orange:#ff7a2f;
+  --orange2:#ff9a55;
+  --cream:#fff8f0;
+  --ink:#24201d;
+  --muted:#77706a;
+  --line:#eee2d7;
+  --white:#fff;
+}
+body{
+  margin:0;color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  background:var(--cream);
+}
+
+main{max-width:1100px;margin:0 auto;padding:28px 20px 65px}
+
+.breaking[hidden] {
+  display: none;
+}
+
+  .breaking{
+  background:var(--white);border:2px solid var(--orange);border-radius:22px;
+  padding:23px 25px;margin-bottom:30px;position:relative;
+  box-shadow:7px 7px 0 #ffd9c2;
+}
+.breaking:after{
+  content:"";position:absolute;right:20px;top:-12px;width:25px;height:25px;
+  background:var(--orange);border-radius:8px;transform:rotate(14deg);
+}
+.breaking-label{font-weight:1000;color:var(--orange);font-size:13px;margin-bottom:8px}
+.breaking h1{font-size:28px;margin:0 0 8px;line-height:1.35}
+  .breaking #breaking-image {
+  display: block;
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+.breaking #breaking-image[hidden] {
+  display: none;
+}
+.meta{font-size:12px;color:var(--muted)}
+.section-title{
+  display:flex;align-items:end;justify-content:space-between;
+  margin:30px 0 12px;border-bottom:2px solid var(--line);padding-bottom:9px;
+}
+.section-title h2{margin:0;font-size:21px;font-weight:1000}
+.section-title span{font-size:11px;color:var(--muted);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.pickup .time{font-size:11px;color:var(--orange);font-weight:900;margin-bottom:9px}
+.tag{
+  display:inline-block;font-size:10px;font-weight:800;color:#8a4b28;
+  background:#fff0e5;border:1px solid #ffd5bd;border-radius:999px;padding:4px 8px;
+}
+.pickup{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:14px}
+.pickup .card:first-child{min-height:210px;background:#fff3e8;border-color:#ffc8a5}
+.pickup .card:first-child h3{font-size:21px}
+.pickup .card:first-child .time{font-size:13px;letter-spacing:.08em}
+footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12px}
+.footer-logo{font-size:20px;font-weight:1000;margin-bottom:5px}
+.footer-logo span{color:var(--orange2)}
+@media(max-width:800px){
+  .grid{grid-template-columns:1fr 1fr}.pickup{grid-template-columns:1fr 1fr}
+  .pickup .card:first-child{grid-column:1/-1}
+}
+
+@media(max-width:600px){
+  .grid,.pickup{grid-template-columns:1fr}
+  .breaking h1{font-size:22px}
+}
+
+/* --- I LOVE GAME♪ live-news additions --- */
+.card .thumb{background:linear-gradient(135deg,#ffe2cc,#fff3e8)}
+
+[hidden] { display:none !important; }
+.breaking-link { display:block; color:inherit; text-decoration:none; }

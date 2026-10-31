@@ -14,9 +14,10 @@
     <a class="back" href="/editor-dashboard.html">← 編集室に戻る</a>
     <div class="settings-heading">
       <h1>編集室の設定</h1>
-      <p>記事の表示と、ニュースの収集を調整できます。</p>
+      <p>記事の表示、ニュース収集、AIの編集方針を調整できます。</p>
     </div>
     <p id="settingsMessage" role="status" aria-live="polite">設定を読み込み中…</p>
+    <a class="settings-preview-link" href="/editor-preview.html">BREAKING・PICK UPの表示を確認 →</a>
     <form id="settingsForm">
       <fieldset id="settingsFields" disabled style="border:0;padding:0;margin:0">
         <section class="settings-section" aria-labelledby="displayHeading">
@@ -43,8 +44,56 @@
           </div>
           <p class="section-note" id="collectionHelp">次回の収集から適用。0件で収集を一時停止します。<br>保存済みの記事はそのまま残ります。</p>
         </section>
+        <section class="settings-section" aria-labelledby="featuredHeading">
+          <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="featuredHeading">BREAKING・PICK UP</h2><p>掲載済み記事から選ぶ表示条件</p></div></div>
+          <div class="setting-field">
+            <div class="field-description"><label for="breaking_threshold">BREAKINGの最低評価</label><p id="breaking_thresholdHelp">この点数以上の記事を1件表示</p></div>
+            <div class="number-field"><input id="breaking_threshold" name="breaking_threshold" type="number" min="0" max="100" step="1" aria-describedby="breaking_thresholdHelp" required><span>点</span></div>
+          </div>
+          <div class="setting-field">
+            <div class="field-description"><label for="breaking_max_age_hours">BREAKINGの対象期間</label><p id="breaking_max_age_hoursHelp">サイト掲載からの経過時間</p></div>
+            <div class="number-field"><input id="breaking_max_age_hours" name="breaking_max_age_hours" type="number" min="1" max="720" step="1" aria-describedby="breaking_max_age_hoursHelp" required><span>時間</span></div>
+          </div>
+          <div class="setting-field">
+            <div class="field-description"><label for="pickup_threshold">PICK UPの最低評価</label></div>
+            <div class="number-field"><input id="pickup_threshold" name="pickup_threshold" type="number" min="0" max="100" step="1"  required><span>点</span></div>
+          </div>
+          <div class="setting-field">
+            <div class="field-description"><label for="pickup_max_articles">PICK UPの最大表示件数</label></div>
+            <div class="number-field"><input id="pickup_max_articles" name="pickup_max_articles" type="number" min="1" max="12" step="1"  required><span>件</span></div>
+          </div>
+          <p class="section-note">BREAKINGは評価点・対象期間の両方を満たす記事が対象です。PICK UPにはBREAKINGと同じ記事を重複表示しません。保存後、公開トップを読み込み直すと反映されます。</p>
+        </section>
+        <section class="settings-section" aria-labelledby="highlightHeading">
+          <div class="section-heading"><span class="section-mark" aria-hidden="true">◷</span><div><h2 id="highlightHeading">日時の強調表示</h2><p>新しい記事の日時をオレンジ色にする時間</p></div></div>
+          <div class="setting-field">
+            <div class="field-description"><label for="date_highlight_hours">オレンジ色にする期間</label><p id="date_highlight_hoursHelp">サイト掲載から。0時間で強調なし</p></div>
+            <div class="number-field"><input id="date_highlight_hours" name="date_highlight_hours" type="number" min="0" max="8760" step="1" aria-describedby="date_highlight_hoursHelp" required><span>時間</span></div>
+          </div>
+          <p class="section-note">公開サイトと編集室の一覧・記事詳細に共通で適用します。</p>
+        </section>
+        <section class="settings-section" aria-labelledby="publicationHeading">
+          <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="publicationHeading">NEWSの自動掲載基準</h2><p>AI評価後の処理を決めるしきい値</p></div></div>
+          <div class="setting-field">
+            <div class="field-description"><label for="publish_threshold">自動掲載する最低評価</label></div>
+            <div class="number-field"><input id="publish_threshold" name="publish_threshold" type="number" min="1" max="100" step="1"  required><span>点</span></div>
+          </div>
+          <div class="setting-field">
+            <div class="field-description"><label for="no_article_threshold">記事を生成しない最高評価</label></div>
+            <div class="number-field"><input id="no_article_threshold" name="no_article_threshold" type="number" min="0" max="99" step="1"  required><span>点</span></div>
+          </div>
+          <output id="publicationSummary" class="publication-summary" aria-live="polite"></output>
+          <p class="section-note">次回のAI評価から適用します。既存の記事の点数・掲載状態は変えません。NEWS一覧には手動で掲載した記事も表示されます。生成しない点数は、自動掲載の点数より小さくしてください。</p>
+        </section>
+        <section class="settings-section" aria-labelledby="evaluationHeading">
+          <div class="section-heading"><span class="section-mark" aria-hidden="true">✎</span><div><h2 id="evaluationHeading">AIの評価基準</h2><p>ニュースの採点で重視する編集方針</p></div></div>
+          <label class="evaluation-label" for="evaluation_guidelines">編集方針（1行に1項目・最大6,000文字）</label>
+          <textarea id="evaluation_guidelines" name="evaluation_guidelines" rows="12" maxlength="6000" aria-describedby="evaluationHelp" required></textarea>
+          <button type="button" id="resetGuidelines" class="settings-secondary">初期の評価方針に戻す</button>
+          <p id="evaluationHelp" class="section-note">事実に基づき0〜100点で採点する基本ルールは共通です。この方針は次回のAI評価から使います。既存記事の再評価や記事本文の書き換えは行いません。初期の方針に戻した場合も「設定を保存」で確定します。</p>
+        </section>
         <div class="settings-actions">
-        <button id="saveSettings" type="submit">設定を保存</button>
+        <button id="saveSettings" type="button">設定を保存</button>
         <p id="saveResult" role="status" aria-live="polite" hidden></p>
         </div>
       </fieldset>

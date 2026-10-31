@@ -62,6 +62,7 @@
         document.title =
           `${article.title} | I LOVE GAME♪`;
   
+await GameDate.ready;
 app.innerHTML = GameArticle.render(article) + `
   <a class="back" href="#" onclick="if(history.length>1){history.back();}else{location.href='/';}return false;">← 一覧に戻る</a>
 `;

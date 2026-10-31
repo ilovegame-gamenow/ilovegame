@@ -37,3 +37,11 @@
   .setting-range { font-size:12px; padding:4px 8px; }
   .number-field input { width:76px; }
 }
+
+.settings-preview-link { display:block; margin:20px 0; padding:16px; border:1px solid #e8d7c5; border-radius:12px; background:#fff; color:#a95012; font-weight:700; text-decoration:none; line-height:1.7; }
+
+.evaluation-label { display:block; font-size:14px; font-weight:700; margin-bottom:10px; }
+#evaluation_guidelines { box-sizing:border-box; display:block; width:100%; resize:vertical; min-height:240px; padding:14px; border:1px solid #d8c5b2; border-radius:10px; font:inherit; font-size:15px; line-height:1.8; background:#fffdfa; color:#302a25; }
+.settings-secondary { min-height:44px; padding:10px 14px; margin:12px 0 16px; background:#fff; color:#a95012; border:1px solid #d8c5b2; border-radius:10px; font:inherit; font-size:14px; cursor:pointer; }
+.publication-summary { display:block; padding:14px 0; font-size:14px; color:#6c4b32; line-height:1.8; }
+.settings-main textarea:focus-visible { outline:3px solid #a95012; outline-offset:3px; }
