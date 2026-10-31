@@ -95,10 +95,14 @@
 
 <p id="draftNotice">${draft ? "保存済みの下書きを表示しています。公開版へは未反映です。" : "公開版の記事を表示しています。"}</p>
 <div id="articleViewActions">
-  <button type="button" id="applyDraftButton" ${draft ? "" : "hidden"}>公開版へ反映</button>
+  <button type="button" id="applyDraftButton" ${draft ? "" : "hidden"}>下書きを反映</button>
   <button type="button" id="editArticleButton">
     記事を編集する
   </button>
+
+  <div class="editor-draft-discard" ${draft ? "" : "hidden"}>
+    <button type="button" id="discardDraftButton">下書きを破棄</button>
+  </div>
 
   <div class="editor-publication">
     <p class="editor-section-label">掲載状態の変更</p>
@@ -254,18 +258,31 @@ document.getElementById("articleViewActions").hidden = false;
           }
         });
 
-        document.getElementById("applyDraftButton").addEventListener("click", async event => {
-          if (!confirm("保存済みの下書きを公開版へ反映しますか？掲載状態は変わりません。")) return;
-          const button = event.currentTarget;
-          button.disabled = true;
+        // 反映・破棄の通信中は操作をまとめて無効化し、競合する操作を防ぐ。
+        let draftActionBusy = false;
+        async function runDraftAction(action, message) {
+          if (draftActionBusy || !confirm(message)) return;
+          draftActionBusy = true;
+          const controls = [...document.querySelectorAll("#articleViewActions button")];
+          const disabledStates = controls.map(control => control.disabled);
+          controls.forEach(control => control.disabled = true);
           try {
-            if (!await GameEditorSave.save({ id: Number(article.id), action: "apply" })) return;
+            if (!await GameEditorSave.save({ id: Number(article.id), action })) return;
             location.reload();
           } catch (error) {
             alert(error.message);
-            button.disabled = false;
+          } finally {
+            draftActionBusy = false;
+            controls.forEach((control, index) => control.disabled = disabledStates[index]);
           }
-        });
+        }
+
+        document.getElementById("applyDraftButton").addEventListener("click", () =>
+          runDraftAction("apply", "下書きの内容を公開版へ反映しますか？掲載状態は変わりません。")
+        );
+        document.getElementById("discardDraftButton").addEventListener("click", () =>
+          runDraftAction("discard", "下書きを破棄して、公開版の内容に戻しますか？この操作は取り消せません。公開版は変更されません。")
+        );
 
         const publishButton = document.getElementById("publishButton");
         const rejectButton = document.getElementById("rejectButton");

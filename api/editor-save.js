@@ -1,7 +1,7 @@
 import { requireEditor } from '../lib/editor-auth.js';
 import { regenerateEditorArticle } from '../lib/editor-regenerator.js';
 import { getArticleById } from '../lib/article-repository.js';
-import { getArticleDraft, saveArticleDraft, applyArticleDraft } from '../lib/article-draft-repository.js';
+import { getArticleDraft, saveArticleDraft, applyArticleDraft, discardArticleDraft } from '../lib/article-draft-repository.js';
 import { readDraftContent } from '../lib/article-draft-content.js';
 import { hasCompleteArticleContent } from '../lib/article-publication.js';
 
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   }
   if (!requireEditor(req, res)) return;
   const { id, action = 'save' } = req.body || {};
-  if (!Number.isSafeInteger(id) || id <= 0 || !['save', 'apply', 'regenerate'].includes(action)) {
+  if (!Number.isSafeInteger(id) || id <= 0 || !['save', 'apply', 'regenerate', 'discard'].includes(action)) {
     return res.status(400).json({ error: 'Invalid request' });
   }
   const url = process.env.SUPABASE_URL;
@@ -27,6 +27,10 @@ export default async function handler(req, res) {
       // 生成結果は入力欄へ返すだけ。下書き保存も公開反映も行わない。
       const generated = await regenerateEditorArticle({ id, supabaseUrl: url, supabaseKey: key, openaiKey: process.env.OPENAI_API_KEY });
       return res.status(200).json({ article: generated });
+    }
+    if (action === 'discard') {
+      await discardArticleDraft(url, key, id);
+      return res.status(200).json({ ok: true });
     }
     const draft = await getArticleDraft(url, key, id);
     if (action === 'apply') {

@@ -71,3 +71,20 @@ test('AI regeneration returns text without writing either drafts or articles', a
   assert.deepEqual(res.body.article, content);
   assert.ok(calls.filter(c => c.url.includes('/rest/v1/')).every(c => !c.method));
 });
+
+test('discard deletes only the specified draft and never updates the public article', async () => {
+  const { res, calls } = await run({ id: 1, action: 'discard' }, [[article], null]);
+  assert.equal(res.code, 200);
+  assert.equal(calls.length, 2);
+  assert.ok(calls[1].url.endsWith('/article_drafts?article_id=eq.1'));
+  assert.equal(calls[1].method, 'DELETE');
+  assert.equal(calls[1].headers.Prefer, 'return=minimal');
+  assert.ok(calls.every(c => c.method !== 'PATCH'));
+});
+test('discard requires authentication and an existing valid article', async () => {
+  assert.equal((await run({ id: 1, action: 'discard' }, [], false)).res.code, 401);
+  assert.equal((await run({ id: -1, action: 'discard' }, [])).res.code, 400);
+  const { res, calls } = await run({ id: 1, action: 'discard' }, [[]]);
+  assert.equal(res.code, 404);
+  assert.equal(calls.length, 1);
+});
