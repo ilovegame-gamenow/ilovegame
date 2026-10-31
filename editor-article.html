@@ -95,12 +95,12 @@
 
 <p id="draftNotice">${draft ? "保存済みの下書きを表示しています。公開版へは未反映です。" : "公開版の記事を表示しています。"}</p>
 <div id="articleViewActions">
-  <button type="button" id="applyDraftButton" ${draft ? "" : "hidden"}>下書きを反映</button>
   <button type="button" id="editArticleButton">
     記事を編集する
   </button>
 
-  <div class="editor-draft-discard" ${draft ? "" : "hidden"}>
+  <div class="editor-draft-actions" aria-label="下書きの操作" ${draft ? "" : "hidden"}>
+    <button type="button" id="applyDraftButton">下書きを反映</button>
     <button type="button" id="discardDraftButton">下書きを破棄</button>
   </div>
 

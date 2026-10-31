@@ -276,7 +276,6 @@ body[data-page="editor"] #applyDraftButton {
 
 /* 反映操作は編集ボタンとサイズを揃え、間隔と配色で区別する。 */
 body[data-page="editor"] #applyDraftButton {
-  margin-bottom: 12px;
   background: #a95012;
   border-color: #a95012;
 }
@@ -391,16 +390,24 @@ body[data-page="editor"] .editor-status-badge[data-status="rejected"] {
 }
 
 
-/* 下書きの破棄は反映操作から離し、控えめなボタンにする。 */
-body[data-page="editor"] .editor-draft-discard {
-  margin-top: 20px;
+/* 編集の下に、下書きの反映・破棄を同じサイズで並べる。 */
+body[data-page="editor"] .editor-draft-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+body[data-page="editor"] .editor-draft-actions[hidden] {
+  display: none;
 }
 
 body[data-page="editor"] #discardDraftButton {
-  min-height: 48px;
-  padding: 12px 18px;
+  width: 100%;
+  min-height: 52px;
+  padding: 15px 20px;
   border: 1px solid #e7d8ca;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fff;
   color: #666;
   font: inherit;
