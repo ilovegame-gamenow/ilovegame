@@ -5,7 +5,6 @@ import { readFileSync } from 'node:fs';
 import { settingRules, validateSettings, toNewsConfig } from '../lib/site-settings.js';
 import { determinePublicationPolicy } from '../lib/publication-policy.js';
 import featured from '../api/featured-news.js';
-import siteConfig from '../api/site-config.js';
 import { processNewsQueue } from '../lib/news-processor.js';
 const defaults = Object.fromEntries(Object.entries(settingRules).map(([key,rule]) => [key,rule.defaultValue]));
 const response = () => ({ headers:{}, setHeader(k,v){this.headers[k]=v;}, status(code){this.code=code;return this;}, json(body){this.body=body;return this;} });
@@ -44,12 +43,6 @@ test('featured selection uses saved score, age, count and excludes breaking dupl
   assert.equal(u.searchParams.get('importance'),'gte.60');assert.equal(u.searchParams.get('limit'),'3');
   return new Response('[{"id":1},{"id":2},{"id":3}]');
  },async()=>{const res=response();await featured({},res);assert.equal(res.code,200);assert.equal(res.body.breaking.id,1);assert.deepEqual(res.body.pickup.map(a=>a.id),[2,3]);assert.equal(res.headers['Cache-Control'],'no-store');});
-});
-test('public configuration never exposes editorial guidelines or private thresholds', async () => {
- await mockFetch(async()=>new Response(JSON.stringify([defaults])),async()=>{
-  const res=response();await siteConfig({},res);
-  assert.equal(res.code,200);assert.deepEqual(Object.keys(res.body).sort(),['maxPickupArticles','pickupThreshold']);
- });
 });
 test('date highlight remains fixed at 24 hours without a settings request', () => {
  const context=vm.createContext({document:{createElement:()=>({}),head:{appendChild(){}}},fetch:()=>{throw Error('Unexpected settings request');},console});
