@@ -12,7 +12,7 @@ window.GameEditorRegenerate = (() => {
     });
 
     if (response.status === 401) {
-      location.replace("/editor.html");
+      window.GameEditorSession.expire();
       return null;
     }
 
