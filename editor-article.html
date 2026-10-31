@@ -6,6 +6,7 @@
   <title>記事プレビュー | I LOVE GAME♪ 編集室</title>
   <link rel="stylesheet" href="/header.css">
   <link rel="stylesheet" href="/article.css">
+  <link rel="stylesheet" href="/editor-confirm.css">
 </head>
 <body data-page="editor">
   <header></header>
@@ -20,6 +21,7 @@
   <script src="/article-renderer.js"></script>
   <script src="/editor-status.js"></script>
   <script src="/editor-save.js"></script>
+  <script src="/editor-confirm.js"></script>
   <script src="/editor-regenerate.js"></script>
   <script src="/editor-session.js"></script>
   <script>
@@ -261,7 +263,10 @@ document.getElementById("articleViewActions").hidden = false;
         // 反映・破棄の通信中は操作をまとめて無効化し、競合する操作を防ぐ。
         let draftActionBusy = false;
         async function runDraftAction(action, message) {
-          if (draftActionBusy || !confirm(message)) return;
+          if (draftActionBusy) return;
+          draftActionBusy = true;
+          const accepted = await GameEditorConfirm.show(message);
+          if (!accepted) { draftActionBusy = false; return; }
           draftActionBusy = true;
           const controls = [...document.querySelectorAll("#articleViewActions button")];
           const disabledStates = controls.map(control => control.disabled);
@@ -278,10 +283,19 @@ document.getElementById("articleViewActions").hidden = false;
         }
 
         document.getElementById("applyDraftButton").addEventListener("click", () =>
-          runDraftAction("apply", "下書きを公開版へ反映しますか？\n\n記事の掲載状態は変わりません。")
+          runDraftAction("apply", {
+            title: "下書きを反映しますか？",
+            description: "下書きの内容で公開版を更新します。\n記事の掲載状態は変わりません。",
+            confirmLabel: "反映する"
+          })
         );
         document.getElementById("discardDraftButton").addEventListener("click", () =>
-          runDraftAction("discard", "下書きを破棄しますか？\n\nこの操作は取り消せません。\n公開版の記事は変更されません。")
+          runDraftAction("discard", {
+            title: "下書きを破棄しますか？",
+            description: "この操作は取り消せません。\n公開版の記事は変更されません。",
+            confirmLabel: "破棄する",
+            destructive: true
+          })
         );
 
         const publishButton = document.getElementById("publishButton");
