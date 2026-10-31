@@ -31,9 +31,13 @@
     for (const input of form.querySelectorAll('input[name]')) input.value = settings[input.name];
     original = values();
   }
+  // Prevent implicit submission while editing; keep keyboard activation of the save button.
+  form.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && event.target.matches('input')) event.preventDefault();
+  });
   form.addEventListener('submit', async event => {
     event.preventDefault();
-    if (busy || !form.reportValidity()) return;
+    if (document.activeElement?.matches('input') || busy || !form.reportValidity()) return;
     const data = values();
     busy = true; fields.disabled = true; button.textContent = '保存中…';
     button.dataset.saved = 'false'; saveResult.hidden = true;
