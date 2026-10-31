@@ -104,7 +104,7 @@
     // ログイン済みなら編集室へ移動
     async function checkSession() {
       try {
-        const response = await fetch("/api/editor-news", {
+        const response = await fetch("/api/editor-news?auth=check", {
           credentials: "same-origin",
           cache: "no-store"
         });

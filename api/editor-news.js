@@ -78,13 +78,15 @@ export default async function handler(req, res) {
   let settings;
   try {
     settings = await getSiteSettings(supabaseUrl, supabaseKey);
-  } catch {
+  } catch (error) {
+    console.error("Editor news settings read failed:", error);
     return res.status(503).json({ error: "Settings unavailable" });
   }
   try {
     const result = await getEditorNews({ supabaseUrl, supabaseKey, ...filters, limit:settings.editor_page_size });
     return res.status(200).json(result);
-  } catch {
+  } catch (error) {
+    console.error("Editor news list read failed:", error);
     return res.status(502).json({ error: "Database request failed" });
   }
 }
