@@ -1,3 +1,4 @@
+import { getArticleDraft } from "../lib/article-draft-repository.js";
 import { requireEditor } from "../lib/editor-auth.js";
 
 export default async function handler(req, res) {
@@ -75,7 +76,8 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({
-      article: articles[0]
+      article: articles[0],
+      draft: await getArticleDraft(supabaseUrl, supabaseKey, Number(id))
     });
   } catch {
     return res.status(502).json({

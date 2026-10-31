@@ -17,7 +17,8 @@ window.GameEditorSave = (() => {
     }
 
     if (!response.ok) {
-      throw new Error("記事の保存に失敗しました");
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || "下書きの操作に失敗しました");
     }
 
     return true;
