@@ -1,6 +1,7 @@
-import { newsConfig } from "../lib/news-config.js";
+import { getSiteSettings, toNewsConfig } from "../lib/site-settings.js";
 
 export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "no-store");
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY;
@@ -11,6 +12,7 @@ export default async function handler(req, res) {
       });
     }
     
+    const newsConfig = toNewsConfig(await getSiteSettings(supabaseUrl, process.env.SUPABASE_SECRET_KEY));
     const fields = "id,title,summary,source_name,thumbnail_url,importance,site_published_at,created_at,published_at";
 
     const headers = {
@@ -67,7 +69,7 @@ const breakingUrl =
       .filter(article => !breaking || article.id !== breaking.id)
       .slice(0, newsConfig.maxPickupArticles);
 
-    res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
+
 
     return res.status(200).json({ breaking, pickup });
 

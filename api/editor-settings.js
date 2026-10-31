@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     if (req.headers.origin !== `https://${req.headers.host}` || !req.headers.host) {
       return res.status(403).json({ error: 'Forbidden' });
     }
-    if (!validateSettings(req.body)) return res.status(400).json({ error: '設定値の範囲を確認してください' });
+    if (!validateSettings(req.body)) return res.status(400).json({ error: '設定値の範囲・しきい値の大小関係・評価方針を確認してください' });
   }
   try {
     const url = process.env.SUPABASE_URL;
