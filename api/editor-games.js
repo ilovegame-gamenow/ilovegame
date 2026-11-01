@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   if (!url || !key) return res.status(503).json({ error:'作品データベースに接続できません。' });
   const {resource,...query}=req.query || {};
   if(resource==='discoveries') return handleDiscoveries({...req,query},res,{url,key});
-  if(['steam-media','showcase'].includes(resource))return handleSourcePreviews({...req,query},res,{url,key},resource);
+  if(['steam-media','showcase','bluesky-preview'].includes(resource))return handleSourcePreviews({...req,query},res,{url,key},resource);
   if(resource==='research') return handleResearch({...req,query},res,{url,key});
   if(resource!==undefined) return res.status(400).json({error:'Invalid resource'});
   try {
