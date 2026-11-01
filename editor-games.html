@@ -10,29 +10,28 @@
 </head>
 <body data-page="editor">
   <header></header>
-  <main class="catalog-main">
+  <main class="catalog-main catalog-workspace">
     <a class="back" id="catalogBack" href="/editor-dashboard.html">← 編集室に戻る</a>
     <h1>作品管理</h1>
-    <a class="back" href="/editor-discoveries.html">発見候補を確認する →</a>
-    <p class="catalog-intro">ゲーム作品の情報をひとつにまとめ、ニュースや発売情報につなげます。</p>
-    <a class="back" href="#createHeading">＋ 新しい作品を登録</a>
+    <p class="catalog-intro" id="catalogIntro">同じゲームの記事や資料を、ひとつの作品にまとめる場所です。機種が違っても、同じ作品はひとつにまとめます。</p>
+    <nav class="catalog-shortcuts" aria-label="作品管理の操作"><button type="button" id="openGameCreate">＋ 作品を追加</button><a href="/editor-discoveries.html">見つけた候補から選ぶ →</a></nav>
     <p id="catalogMessage" role="status" aria-live="polite">作品情報を読み込んでいます…</p>
     <section class="catalog-panel" id="articleContext" hidden>
-      <h2>この記事の関連作品</h2>
+      <h2>この記事に選んだ作品</h2>
       <p id="contextTitle"></p>
-      <p class="catalog-note">関連づけ・解除はその場で保存されます。</p>
+      <p class="catalog-note">作品を選ぶと、その場で記事に関連づけます。「外す」はこの記事との関連だけを解除します。</p>
       <ul class="catalog-list" id="linkedGames"></ul>
     </section>
     <section class="catalog-panel" aria-labelledby="searchHeading">
-      <h2 id="searchHeading">登録済みの作品</h2>
+      <h2 id="searchHeading">まず、作品名で探す</h2>
       <form id="gameSearch" role="search">
         <label for="gameQuery">作品名・原題で検索</label>
         <div class="catalog-search-row">
-          <input id="gameQuery" name="q" maxlength="100" type="search" placeholder="作品名を入力" disabled>
+          <input id="gameQuery" name="q" maxlength="100" type="search" placeholder="例：プチプラネット" disabled>
           <button type="submit" disabled>検索</button>
         </div>
       </form>
-      <p id="gamesEmpty" hidden>登録済みの作品はありません。</p>
+      <div id="gamesEmpty" hidden><p id="gamesEmptyText">登録済みの作品はありません。</p><button type="button" id="createMissingGame">この作品を新しく登録</button></div>
       <ul class="catalog-list" id="gamesList"></ul>
       <nav class="catalog-paging" aria-label="作品一覧のページ送り">
         <button type="button" id="previousGames" disabled>前へ</button>
@@ -40,21 +39,22 @@
         <button type="button" id="nextGames" disabled>次へ</button>
       </nav>
     </section>
-    <section class="catalog-panel" aria-labelledby="createHeading">
-      <h2 id="createHeading">新しい作品を登録</h2>
-      <p class="catalog-note">先に登録済みの作品を検索してください。同名でも別作品の場合があります。</p>
-      <p class="catalog-note">登録した作品と出典は、確認待ちとして保存されます。</p>
+    <details class="catalog-panel catalog-create" id="createPanel">
+      <summary id="createHeading">新しい作品を登録</summary>
+      <p class="catalog-note">検索して見つからなかった作品を追加します。ここで登録してもサイトには公開されません。</p>
       <form id="gameCreate">
         <fieldset id="gameFields" disabled>
           <legend class="visually-hidden">新しい作品の情報</legend>
           <label for="gameTitle">作品名 <span>必須</span></label>
           <input id="gameTitle" name="title" maxlength="300" required>
+          <label for="gameSourceUrl">出典URL <span>必須</span></label>
+          <input id="gameSourceUrl" name="source_url" type="url" maxlength="2000" placeholder="https://…" required>
+          <p class="catalog-note" id="gameSourceHint">作品を確認できる公式サイト・ストア・記事のURLを入力してください。</p>
+          <details class="catalog-optional" id="gameOptional"><summary>紹介文・原題などを追加（任意）</summary>
           <label for="gameOriginalTitle">原題・別言語のタイトル</label>
           <input id="gameOriginalTitle" name="original_title" maxlength="300">
           <label for="gameDescription">作品の紹介・確認メモ</label>
           <textarea id="gameDescription" name="description" maxlength="5000" rows="4"></textarea>
-          <label for="gameSourceUrl">出典URL <span>必須</span></label>
-          <input id="gameSourceUrl" name="source_url" type="url" maxlength="2000" placeholder="https://…" required>
           <label for="gameSourceType">出典の種類</label>
           <select id="gameSourceType" name="source_type">
             <option value="official">公式サイト</option>
@@ -62,12 +62,13 @@
             <option value="media">メディア</option>
             <option value="community">コミュニティ</option>
           </select>
-          <p class="catalog-note" id="createNote">登録後、一覧から記事に関連づけられます。</p>
+          </details>
+          <p class="catalog-note" id="createNote">作品名と出典だけでも登録できます。詳しい情報は後から集めていきます。</p>
           <button class="catalog-primary" type="submit" id="createGame">作品を登録</button>
           <button type="button" id="clearGame">入力をクリア</button>
         </fieldset>
       </form>
-    </section>
+    </details>
   </main>
   <script src="/header.js"></script>
   <script src="/editor-navigation.js"></script>
@@ -75,6 +76,7 @@
   <script src="/editor-catalog-client.js"></script>
   <script src="/date-utils.js"></script>
   <script src="/editor-social-evidence.js"></script>
+  <script src="/editor-game-workflow.js"></script>
   <script src="/editor-games.js"></script>
 </body>
 </html>

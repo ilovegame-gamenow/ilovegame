@@ -34,3 +34,12 @@
 .catalog-main :is(input,textarea,select,button,a):focus-visible { outline:3px solid #b85b17; outline-offset:3px; }
 [hidden] { display:none !important; }
 @media(max-width:520px) { .catalog-panel { padding:18px; } .catalog-main h1 { font-size:26px; } .editor-header-label { display:none; } }
+/* Catalog workspace only: keep other editor screens unchanged. */
+.catalog-workspace .catalog-shortcuts {display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:20px 0;}
+.catalog-workspace summary {cursor:pointer;font-weight:700;color:#8b461b;line-height:1.8;}
+.catalog-workspace .catalog-create>summary {font-size:21px;}
+.catalog-workspace .catalog-create[open]>summary {margin-bottom:16px;}
+.catalog-workspace .catalog-optional {margin:22px 0;padding:16px;background:#fffaf4;border-radius:12px;}
+.catalog-workspace .catalog-list details {margin-top:16px;font-size:14px;}
+.catalog-workspace .catalog-list [data-game-action="link"] {background:#c6530c;color:#fff;}
+.catalog-workspace #gamesEmpty {padding:18px;background:#fff8ed;border-radius:12px;line-height:1.8;}
