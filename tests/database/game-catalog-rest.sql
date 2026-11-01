@@ -6,3 +6,6 @@ grant anon, authenticated, service_role to catalog_rest_authenticator;
 grant usage on schema public to anon, authenticated, service_role;
 grant select on public.articles to service_role;
 insert into public.articles(id,title) values (7001,'REST integration article'),(7002,'Second REST integration article');
+
+-- Keep SQL quota fixtures outside the REST test's current JST day.
+update public.game_research_runs set started_at=now()-interval '2 days' where started_at is not null;
