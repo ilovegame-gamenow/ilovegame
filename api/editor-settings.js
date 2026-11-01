@@ -1,4 +1,4 @@
-import { requireEditor } from '../lib/editor-auth.js';
+import { requireEditor, requireEditorOrigin } from '../lib/editor-auth.js';
 import { getSiteSettings, saveSiteSettings, validateSettings, settingRules } from '../lib/site-settings.js';
 
 export default async function handler(req, res) {
@@ -9,9 +9,7 @@ export default async function handler(req, res) {
   }
   if (!requireEditor(req, res)) return;
   if (req.method === 'POST') {
-    if (req.headers.origin !== `https://${req.headers.host}` || !req.headers.host) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
+    if (!requireEditorOrigin(req, res)) return;
     if (!validateSettings(req.body)) return res.status(400).json({ error: '設定値の範囲・しきい値の大小関係・評価方針を確認してください' });
   }
   try {

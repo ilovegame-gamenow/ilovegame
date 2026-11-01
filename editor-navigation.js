@@ -16,9 +16,9 @@ window.GameEditorNavigation = (() => {
     const params = new URLSearchParams({ id:String(id), return:location.pathname + location.search });
     location.href = `/editor-article.html?${params}`;
   }
-  function prepareBack() {
+  function prepareBack({ targetPath=dashboardPath, selector='a[data-editor-back]' } = {}) {
     const target = new URLSearchParams(location.search).get('return');
-    if (!target || !(target === dashboardPath || target.startsWith(dashboardPath + '?'))) return;
+    if (!target || !(target === targetPath || target.startsWith(targetPath + '?'))) return;
     const expected = new URL(target, location.origin);
     // 直接表示・別タブ表示では、通常のリンクを使う。再読み込み後は履歴上の印を維持する。
     const navigation = performance.getEntriesByType('navigation')[0];
@@ -26,7 +26,7 @@ window.GameEditorNavigation = (() => {
       history.replaceState({...history.state, editorReturn:target}, '');
     }
     document.addEventListener('click', event => {
-      const link = event.target.closest('a[data-editor-back]');
+      const link = event.target.closest(selector);
       if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target || link.hasAttribute('download')) return;
       if (link.href !== expected.href || history.state?.editorReturn !== target || history.length <= 1) return;
       event.preventDefault();
