@@ -72,7 +72,7 @@
 .source-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:12px 0 18px; }
 .source-card { min-width:0; background:#fff; border:1px solid #eaded2; border-radius:15px; padding:20px; }
 .source-card-heading { display:flex; align-items:start; justify-content:space-between; gap:10px; }
-.source-card h4 { margin:0; font-size:18px; line-height:1.5; }
+.source-card h4,.source-card h5 { margin:0; font-size:18px; line-height:1.5; }
 .source-card p { margin:12px 0; color:#655c53; font-size:13px; line-height:1.9; }
 .source-card small { display:block; color:#81766b; font-size:12px; line-height:1.8; }
 .source-card a { display:inline-block; margin:12px 0 0; color:#a44b14; font-size:13px; line-height:1.7; text-underline-offset:3px; }
@@ -87,3 +87,6 @@
 .planned-sources summary { cursor:pointer; color:#6d543e; font-size:15px; font-weight:700; }
 .planned-sources .section-intro { margin-top:12px; }
 @media(max-width:680px) { .source-grid { grid-template-columns:1fr; } .source-card { padding:18px; } .source-overview > div { padding:12px; } .source-overview span { font-size:11px; } }
+
+.source-category + .source-category { border-top:1px solid #eaded2; margin-top:22px; padding-top:18px; }
+.source-category-heading { margin:18px 0 12px; color:#6d543e; font-size:16px; }

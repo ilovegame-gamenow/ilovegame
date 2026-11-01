@@ -48,9 +48,10 @@
     for(const [group,label] of [['news','公式ニュース'],['discovery','作品の発見'],['planned','追加候補']]){
       const box=node('div');box.append(node('strong',String(sources.filter(source=>source.group===group).length)),node('span',label));summary.append(box);
     }
+    const plannedGroups=new Map();
     for(const source of sources){
       const card=node('article',undefined,'source-card');
-      const heading=node('div',undefined,'source-card-heading');heading.append(node('h4',source.name));
+      const heading=node('div',undefined,'source-card-heading');heading.append(node(source.group==='planned'?'h5':'h4',source.name));
       const badge=node('span',source.statusLabel,'source-status');badge.dataset.state=source.status;heading.append(badge);card.append(heading);
       card.append(node('p',source.description),node('small',source.format),node('small',source.mode));
       const link=node('a','公式ページを開く ↗');link.href=source.website;link.target='_blank';link.rel='noopener noreferrer';card.append(link);
@@ -61,7 +62,14 @@
       }
       if(source.settingKey&&!source.collectorEnabled)card.append(node('p','実行側で停止中です。件数を保存しても収集は開始されません。'));
       if(source.action){const action=node('a',source.action.label+' →','source-action');action.href=source.action.href;card.append(action);}
-      groups[source.group].append(card);
+      if(source.group==='planned'){
+        if(!plannedGroups.has(source.category)){
+          const section=node('section',undefined,'source-category');section.setAttribute('aria-label',source.categoryLabel);
+          section.append(node('h4',`${source.categoryLabel}（${sources.filter(item=>item.group==='planned'&&item.category===source.category).length}）`,'source-category-heading'));
+          const grid=node('div',undefined,'source-grid');section.append(grid);groups.planned.append(section);plannedGroups.set(source.category,grid);
+        }
+        plannedGroups.get(source.category).append(card);
+      }else groups[source.group].append(card);
     }
   }
   function fill(settings) {
