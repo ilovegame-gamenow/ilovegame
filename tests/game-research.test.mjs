@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import handler from '../api/editor-games.js';
 import { createEditorToken } from '../lib/editor-auth.js';
 import { parseSteamFeed,parseSteamGame,collectSteamDiscoveries } from '../lib/steam-discovery-source.js';
-import { buildResearchRequest,validateResearchOutput,MAX_OUTPUT_TOKENS } from '../lib/game-research-ai.js';
+import { buildResearchRequest,validateResearchOutput,MAX_OUTPUT_TOKENS,analyzeResearchSources } from '../lib/game-research-ai.js';
 process.env.EDITOR_SECRET='research-test';process.env.SUPABASE_URL='https://db.invalid';process.env.SUPABASE_SECRET_KEY='server-test';
 process.env.OPENAI_API_KEY='fake-ai-key';process.env.GAME_CATALOG_ENABLED='true';process.env.GAME_DISCOVERIES_ENABLED='true';process.env.GAME_RESEARCH_ENABLED='true';
 const id='20000000-0000-0000-0000-000000000001';
@@ -81,4 +81,14 @@ test('invalid AI evidence marks the claimed run failed, with no candidate writes
   assert.ok(url.endsWith('/fail_game_research'));return new Response(null,{status:204});
  },async()=>{const out=response();await handler(req('POST',{id,action:'execute',confirm_cost:true}),out);assert.equal(out.code,502);});
  assert.equal(calls.filter(url=>url.includes('openai.com')).length,1);assert.ok(!calls.some(url=>url.endsWith('/complete_game_research')));
+});
+
+test('incomplete AI results expose only safe diagnostics and never retry',async()=>{
+ let calls=0;
+ await mock(async()=>{calls++;return Response.json({status:'incomplete',incomplete_details:{reason:'max_output_tokens'},usage:{input_tokens:100,output_tokens:3000},error:{message:'private provider text'}});},async()=>{
+  await assert.rejects(()=>analyzeResearchSources([source],'fake-key'),error=>{
+   assert.deepEqual(error.researchDiagnostic,{code:'provider_incomplete',max_output_tokens:true,usage:{input_tokens:100,output_tokens:3000}});
+   assert.ok(!JSON.stringify(error.researchDiagnostic).includes('private'));return true;
+  });
+ });assert.equal(calls,1);
 });
