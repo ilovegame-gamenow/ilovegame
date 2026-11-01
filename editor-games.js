@@ -13,13 +13,7 @@
   const storageKey = 'ilovegame.catalog.create';
   const names = ['title','original_title','description','source_url','source_type'];
   let page=1, hasMore=false, ready=false, busy=false, ending=false;
-  function createId() {
-    if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
-    const bytes=crypto.getRandomValues(new Uint8Array(16));
-    bytes[6]=(bytes[6]&15)|64; bytes[8]=(bytes[8]&63)|128;
-    const hex=[...bytes].map(value=>value.toString(16).padStart(2,'0')).join('');
-    return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
-  }
+  const {createId,node}=GameCatalogClient;
   let games=[], linkedGames=[], requestId=createId(), sent=false;
   const values = () => Object.fromEntries(names.map(name => [name,form.elements.namedItem(name).value]));
   function notify(text, error=false) { message.textContent=text; message.dataset.error=String(error); }
@@ -36,19 +30,7 @@
     next.disabled=busy || !ready || !hasMore;
     document.querySelectorAll('[data-game-action]').forEach(button => button.disabled=busy || !ready);
   }
-  async function request(path, options={}) {
-    const response = await fetch(path,{ credentials:'same-origin', cache:'no-store', ...options });
-    if (response.status===401) { stash(); ending=true; GameEditorSession.expire(); return null; }
-    const data=await response.json();
-    if (!response.ok) throw new Error(data.error || '作品情報を取得できませんでした。');
-    return data;
-  }
-  function node(tag,text,className) {
-    const result=document.createElement(tag);
-    if (text!==undefined) result.textContent=text;
-    if (className) result.className=className;
-    return result;
-  }
+  const request=(path,options={})=>GameCatalogClient.request(path,options,()=>{stash();ending=true;});
   function card(game, action) {
     const li=node('li');
     li.append(node('h3',game.title));

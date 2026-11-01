@@ -118,5 +118,43 @@ try {
   assert.equal(second.games.length,2);assert.equal(second.hasMore,false);
   assert.equal(new Set([...first.games,...second.games].map(row=>row.id)).size,22);
   console.log('PASS: real server pagination without duplicate or missing works');
+  process.env.GAME_DISCOVERIES_ENABLED='true';
+  const discoveryQuery={resource:'discoveries'};
+  const discovery={...game,id:randomUUID(),title:`Discovered ${randomUUID()}`,reason:'An unusual game mechanic',source_url:'https://example.org/new-discovery'};
+  const ingest=input=>call('POST',{action:'register',candidate:input},discoveryQuery);
+  let discoveryResponse=await ingest(discovery);
+  assert.equal(discoveryResponse.code,200,JSON.stringify(discoveryResponse.body));
+  assert.equal(discoveryResponse.body.candidate.status,'pending');
+  assert.equal(discoveryResponse.body.candidate.discovered_by,'manual');
+  const duplicates=await Promise.all([ingest(discovery),ingest({...discovery,id:randomUUID()})]);
+  assert.ok(duplicates.every(r=>r.code===200&&r.body.candidate.id===discovery.id));
+  assert.equal((await rows(`/game_discoveries?id=eq.${discovery.id}`)).length,1);
+  assert.equal((await rows(`/games?id=eq.${discovery.id}`)).length,0);
+  const review=(id,action,game_id)=>call('POST',{id,action,...(game_id?{game_id}:{})},discoveryQuery);
+  assert.equal((await review(discovery.id,'hold')).code,200);
+  discoveryResponse=await call('GET',null,{...discoveryQuery,status:'held'});
+  assert.ok(discoveryResponse.body.candidates.some(c=>c.id===discovery.id));
+  assert.equal((await review(discovery.id,'reopen')).code,200);
+  const adopted=await Promise.all([review(discovery.id,'adopt_new'),review(discovery.id,'adopt_new')]);
+  assert.ok(adopted.every(r=>r.code===200&&r.body.candidate.adopted_game_id===discovery.id));
+  assert.equal((await rows(`/games?id=eq.${discovery.id}`)).length,1);
+  assert.equal((await rows(`/game_sources?game_id=eq.${discovery.id}`)).length,1);
+  assert.equal((await review(discovery.id,'hold')).code,409);
+  assert.equal((await review(discovery.id,'adopt_existing',game.id)).code,409);
+  const secondCandidate={...discovery,id:randomUUID(),source_url:'https://example.org/new-discovery-2',description:'Must not replace known work'};
+  assert.equal((await ingest(secondCandidate)).code,200);
+  discoveryResponse=await call('GET',null,discoveryQuery);
+  const pending=discoveryResponse.body.candidates.find(c=>c.id===secondCandidate.id);
+  assert.ok(pending.matches.some(m=>m.id===discovery.id&&m.match_type==='title'));
+  assert.equal((await review(secondCandidate.id,'adopt_existing',discovery.id)).code,200);
+  assert.equal((await rows(`/games?id=eq.${discovery.id}`))[0].description,discovery.description);
+  assert.equal((await rows(`/game_sources?game_id=eq.${discovery.id}`)).length,2);
+  assert.equal((await rows(`/article_games?game_id=eq.${discovery.id}`)).length,0);
+  for(const token of [null,jwt('authenticated')]) {
+    assert.ok([401,403].includes((await raw('/game_discoveries?limit=1',token)).status));
+    assert.ok([401,403].includes((await raw('/rpc/list_game_discoveries',token,{method:'POST',body:JSON.stringify({p_status:'pending',p_offset:0})})).status));
+    assert.ok([401,403].includes((await raw('/rpc/review_game_discovery',token,{method:'POST',body:JSON.stringify({p_id:discovery.id,p_action:'adopt_new',p_game_id:null})})).status));
+  }
+  console.log('PASS: real discovery ingestion, deduplication, hold/reopen, concurrent adoption, matching and browser access denial');
   console.log('All catalog REST integration checks passed. Disposable test data stays in the CI DB.');
 }finally{await new Promise(resolve=>gateway.close(resolve));}

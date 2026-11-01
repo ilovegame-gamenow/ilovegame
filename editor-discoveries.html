@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>発見候補 | I LOVE GAME♪ 編集室</title>
+  <link rel="stylesheet" href="/header.css"><link rel="stylesheet" href="/article.css">
+  <link rel="stylesheet" href="/editor-games.css"><link rel="stylesheet" href="/editor-discoveries.css">
+</head>
+<body data-page="editor">
+<header></header>
+<main class="catalog-main">
+  <a class="back" href="/editor-dashboard.html">← 編集室に戻る</a>
+  <h1>発見候補</h1>
+  <p class="catalog-intro">気になるゲームの出典や面白そうな点を確認し、作品台帳へ採用します。</p>
+  <p class="catalog-note">現在は手動で追加した候補を扱えます。AIによる収集はまだ始めていません。</p>
+  <a class="back" href="/editor-games.html">作品台帳を見る →</a>
+  <p id="catalogMessage" role="status" aria-live="polite">候補を読み込んでいます…</p>
+  <section class="catalog-panel" aria-label="候補の一覧">
+    <div class="discovery-tabs" aria-label="候補の状態">
+      <button type="button" data-state="pending" aria-pressed="true" disabled>未確認</button>
+      <button type="button" data-state="held" aria-pressed="false" disabled>保留</button>
+      <button type="button" data-state="adopted" aria-pressed="false" disabled>採用済み</button>
+    </div>
+    <p id="candidatesEmpty" hidden>この状態の候補はありません。</p>
+    <ul class="catalog-list" id="candidateList"></ul>
+    <nav class="catalog-paging" aria-label="候補のページ送り">
+      <button type="button" id="previousCandidates" disabled>前へ</button><span id="candidatePage">1ページ</span><button type="button" id="nextCandidates" disabled>次へ</button>
+    </nav>
+  </section>
+  <details class="catalog-panel">
+    <summary>候補を手動で追加</summary>
+    <p class="catalog-note">追加しただけでは作品台帳には登録されません。出典を確認してから採用してください。</p>
+    <form id="discoveryCreate"><fieldset id="discoveryFields" disabled>
+      <legend class="visually-hidden">新しい候補の情報</legend>
+      <label for="candidateTitle">作品名 <span>必須</span></label><input id="candidateTitle" name="title" maxlength="300" required>
+      <label for="candidateOriginal">原題・別言語のタイトル</label><input id="candidateOriginal" name="original_title" maxlength="300">
+      <label for="candidateDescription">出典で確認できた作品の概要</label><textarea id="candidateDescription" name="description" maxlength="5000" rows="3"></textarea>
+      <label for="candidateReason">どこが面白そう？ <span>必須</span></label><textarea id="candidateReason" name="reason" maxlength="2000" rows="3" required></textarea>
+      <label for="candidateUrl">出典URL <span>必須</span></label><input id="candidateUrl" name="source_url" type="url" maxlength="2000" required placeholder="https://…">
+      <label for="candidateType">出典の種類</label><select id="candidateType" name="source_type"><option value="official">公式サイト</option><option value="store">ゲームストア</option><option value="media">メディア</option><option value="community">コミュニティ</option></select>
+      <button class="catalog-primary" type="submit">候補を追加</button><button type="button" id="clearCandidate">入力をクリア</button>
+    </fieldset></form>
+  </details>
+</main>
+<script src="/header.js"></script><script src="/editor-session.js"></script><script src="/editor-catalog-client.js"></script><script src="/editor-discoveries.js"></script>
+</body></html>
