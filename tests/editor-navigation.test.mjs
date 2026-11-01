@@ -53,11 +53,11 @@ test('unavailable storage falls back to refresh without breaking article navigat
  assert.match(h.context.location.href,/editor-article.html\?id=7&return=/);
 });
 test('both save and status helpers invalidate only after a successful mutation',async()=>{
- for(const [file,api,args] of [['editor-save.js','GameEditorSave',{id:1,action:'apply'}],['editor-status.js','GameEditorStatus',1]]) {
+ for(const [file,api,args] of [['editor-draft-client.js','GameEditorSave',{id:1,action:'apply'}],['editor-status.js','GameEditorStatus',1]]) {
   let changes=0,status=200,expired=0;
   const context=vm.createContext({window:{GameEditorNavigation:{markChanged(){changes++;}},GameEditorSession:{expire(){expired++;}}},fetch:async()=>({ok:status===200,status,json:async()=>({})})});
   vm.runInContext(readFileSync(new URL(`../${file}`,import.meta.url),'utf8'),context);
-  const run=()=>file==='editor-save.js'?context.window[api].save(args):context.window[api].update(args,'published');
+  const run=()=>file==='editor-draft-client.js'?context.window[api].save(args):context.window[api].update(args,'published');
   assert.equal(await run(),true);assert.equal(changes,1);
   status=503;await assert.rejects(run());assert.equal(changes,1);
   status=401;assert.equal(await run(),false);assert.equal(expired,1);assert.equal(changes,1);
