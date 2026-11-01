@@ -39,6 +39,12 @@
     if (game.description) li.append(node('p',game.description));
     // IDs distinguish namesakes without treating a title as a unique identifier.
     li.append(node('small',`作品ID：${game.id}`,'catalog-id'));
+    const sources=node('button','保存した資料を見る');sources.type='button';
+    const evidence=node('div');evidence.hidden=true;li.append(sources,evidence);
+    sources.addEventListener('click',async()=>{if(busy)return;sources.disabled=true;evidence.hidden=false;
+      try{const data=await request(`/api/editor-games?resource=social-evidence&game_id=${game.id}`);if(data)GameSocialEvidence.render(evidence,data.sources);}
+      catch(error){evidence.textContent=error.message;}finally{sources.disabled=false;}
+    });
     if (action) {
       const button=node('button',action==='unlink'?'関連を解除':'この記事に関連づける');
       button.type='button'; button.dataset.gameAction=action; button.dataset.gameId=game.id;
