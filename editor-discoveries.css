@@ -4,3 +4,10 @@
 .discovery-match { padding:14px; background:#fff7ed; border-radius:10px; margin:12px 0; }
 .catalog-main summary { cursor:pointer; font-weight:700; font-size:20px; }
 .catalog-list a { color:#ad4c0c; overflow-wrap:anywhere; }
+
+.discovery-media { margin:14px 0; padding:14px; background:#fff8ef; border:1px solid #eaded2; border-radius:12px; }
+.catalog-main .discovery-media summary { font-size:16px; }
+.discovery-gallery { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.discovery-gallery a { display:block; min-width:0; }
+.discovery-gallery img { display:block; width:100%; aspect-ratio:16/9; object-fit:contain; background:#222; border-radius:8px; }
+@media(max-width:600px) { .discovery-gallery { grid-template-columns:1fr; } }
