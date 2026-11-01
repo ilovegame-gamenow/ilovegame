@@ -60,3 +60,7 @@ Vercelの既存OPENAI_API_KEYをサーバーから使用し、ブラウザーへ
 - https://developers.openai.com/api/docs/models/gpt-5-mini
 - https://developers.openai.com/api/docs/guides/structured-outputs
 - https://store.steampowered.com/search/?filter=comingsoon
+
+## 初回本番確認（2026-11-01）
+
+対象3作品の取得・保存は成功。承認された有料呼び出し1回は結果を確定できずfailedとなり、候補・作品・記事への書き込みはありませんでした。再試行はしていません。初期実装のログではAI応答不完全・根拠検証失敗・DB保存失敗を識別できなかったため、run ID、処理段階、限定した失敗コードとトークン数のみをサーバーログへ記録するよう補強しました。秘密情報、出典本文、プロバイダーの自由文エラーはログに記録しません。原因確定と実際の出力品質の確認は、別途承認された再テストで行います。
