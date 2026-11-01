@@ -8,6 +8,7 @@
         register.addEventListener('click',async()=>{
           if(busy)return;busy=true;controls();message.textContent='記事を登録しています…';message.dataset.error='false';
           try{const result=await request('/api/editor-save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'create_from_media',source_url:item.url})});if(!result)return;
+            register.textContent='登録済みの記事を編集';message.textContent=result.article.created?'未公開の記事を登録しました。':'登録済みの記事を開きます。';
             GameEditorNavigation.markChanged();location.href=`/editor-article.html?${new URLSearchParams({id:String(result.article.id),edit:'1',return:'/editor-media.html'})}`;
           }catch(error){message.textContent=error.message;message.dataset.error='true';}finally{busy=false;controls();}
         });row.append(register);list.append(row);}
