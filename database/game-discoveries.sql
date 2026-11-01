@@ -63,12 +63,14 @@ begin
     select d.created_at,d.id,to_jsonb(d)||jsonb_build_object('matches',(
       select coalesce(jsonb_agg(to_jsonb(m)),'[]'::jsonb) from (
         select g.id,g.title,g.original_title,
-          case when exists(select 1 from public.game_sources s where s.game_id=g.id and s.url=d.source_url) then 'source' else 'title' end as match_type
-        from public.games g where g.status<>'archived' and (
-          lower(btrim(g.title))=lower(btrim(d.title)) or
-          (d.original_title<>'' and lower(btrim(coalesce(g.original_title,'')))=lower(btrim(d.original_title))) or
-          exists(select 1 from public.game_sources s where s.game_id=g.id and s.url=d.source_url))
-        order by g.id limit 10
+          case when matching.same_source then 'source' else 'title' end as match_type
+        from public.games g cross join lateral (
+          select exists(select 1 from public.game_sources s where s.game_id=g.id and s.url=d.source_url) as same_source,
+            lower(btrim(g.title))=lower(btrim(d.title)) as same_title,
+            (d.original_title<>'' and lower(btrim(coalesce(g.original_title,'')))=lower(btrim(d.original_title))) as same_original
+        ) matching
+        where g.status<>'archived' and (matching.same_source or matching.same_title or matching.same_original)
+        order by matching.same_source desc,matching.same_title desc,g.id limit 10
       ) m
     )) as row_data
     from public.game_discoveries d where d.status=p_status order by d.created_at desc,d.id desc limit 21 offset p_offset

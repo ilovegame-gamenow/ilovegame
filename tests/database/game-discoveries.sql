@@ -27,9 +27,11 @@ end $$;
 select public.review_game_discovery('10000000-0000-0000-0000-000000000001','adopt_new',null);
 select public.review_game_discovery('10000000-0000-0000-0000-000000000001','adopt_new',null);
 select pg_temp.rejects($q$select public.review_game_discovery('10000000-0000-0000-0000-000000000001','hold',null)$q$,'23505');
-select public.register_game_discovery('10000000-0000-0000-0000-000000000003','Candidate title','','Another summary','Another point','https://example.org/second-source','media');
+insert into public.games(id,title,original_title)
+select ('00000000-0000-0000-0000-'||lpad(i::text,12,'0'))::uuid,'Other title '||i,'Original candidate' from generate_series(100,111) i;
+select public.register_game_discovery('10000000-0000-0000-0000-000000000003','Candidate title','Original candidate','Another summary','Another point','https://example.org/second-source','media');
 do $$ begin
- if not exists(select 1 from jsonb_array_elements(public.list_game_discoveries('pending',0)) d where jsonb_array_length(d->'matches')>=1) then raise exception 'Missing duplicate suggestions';end if;
+ if not exists(select 1 from jsonb_array_elements(public.list_game_discoveries('pending',0)) d where d->'matches'->0->>'id'='10000000-0000-0000-0000-000000000001') then raise exception 'Exact title was displaced by weaker matches';end if;
 end $$;
 select public.review_game_discovery('10000000-0000-0000-0000-000000000003','adopt_existing','10000000-0000-0000-0000-000000000001');
 do $$ begin
