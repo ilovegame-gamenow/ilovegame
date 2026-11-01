@@ -1,0 +1,6 @@
+.discovery-tabs { display:flex; gap:8px; flex-wrap:wrap; }
+.discovery-tabs [aria-pressed="true"] { background:#c6530c; border-color:#c6530c; color:white; }
+.discovery-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+.discovery-match { padding:14px; background:#fff7ed; border-radius:10px; margin:12px 0; }
+.catalog-main summary { cursor:pointer; font-weight:700; font-size:20px; }
+.catalog-list a { color:#ad4c0c; overflow-wrap:anywhere; }

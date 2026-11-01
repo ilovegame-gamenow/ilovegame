@@ -1,6 +1,7 @@
 import { requireEditor, requireEditorOrigin } from '../lib/editor-auth.js';
 import { readGameInput, readGameQuery, isGameId, isArticleId } from '../lib/game-catalog-input.js';
 import { CatalogError, searchGames, createGame, getArticleGames, changeArticleGame } from '../lib/game-catalog-repository.js';
+import { handleDiscoveries } from '../lib/editor-discoveries-handler.js';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control','no-store');
@@ -13,6 +14,9 @@ export default async function handler(req, res) {
   if (process.env.GAME_CATALOG_ENABLED !== 'true') return res.status(503).json({ error:'作品管理は現在準備中です。記事管理は引き続き利用できます。' });
   const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SECRET_KEY;
   if (!url || !key) return res.status(503).json({ error:'作品データベースに接続できません。' });
+  const {resource,...query}=req.query || {};
+  if(resource==='discoveries') return handleDiscoveries({...req,query},res,{url,key});
+  if(resource!==undefined) return res.status(400).json({error:'Invalid resource'});
   try {
     if (req.method === 'GET') {
       const query = readGameQuery(req.query);

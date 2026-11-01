@@ -169,3 +169,5 @@ do $$ begin
   if not exists(select 1 from public.games where id='00000000-0000-0000-0000-000000000053') then raise exception 'Unlink deleted work'; end if;
 end $$;
 select 'Game catalog editor checks passed' as result;
+
+\ir game-discoveries.sql
