@@ -2,12 +2,12 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import handler from '../api/editor-games.js';
 import { createEditorToken } from '../lib/editor-auth.js';
 import { parseSteamFeed,parseSteamGame,collectSteamDiscoveries } from '../lib/steam-discovery-source.js';
-import { buildResearchRequest,validateResearchOutput,MAX_OUTPUT_TOKENS,analyzeResearchSources } from '../lib/game-research-ai.js';
+import { buildResearchRequest,validateResearchOutput,MAX_OUTPUT_TOKENS,analyzeResearchSources,researchPassages,materializeResearchEvidence } from '../lib/game-research-ai.js';
 process.env.EDITOR_SECRET='research-test';process.env.SUPABASE_URL='https://db.invalid';process.env.SUPABASE_SECRET_KEY='server-test';
 process.env.OPENAI_API_KEY='fake-ai-key';process.env.GAME_CATALOG_ENABLED='true';process.env.GAME_DISCOVERIES_ENABLED='true';process.env.GAME_RESEARCH_ENABLED='true';
 const id='20000000-0000-0000-0000-000000000001';
 const source={appid:12345,candidate_id:'20000000-0000-0000-0000-000000000011',title:'Source game',url:'https://store.steampowered.com/app/12345/',description:'Cooperative puzzles with changing terrain and voice communication between two players.'};
-const item={appid:12345,selected:true,description:'地形が変化する協力パズル。',reason:'音声で伝え合いながら協力する仕組み。',evidence:'Cooperative puzzles'};
+const item={appid:12345,selected:true,description:'地形が変化する協力パズル。',reason:'音声で伝え合いながら協力する仕組み。',evidence:source.description};
 const headers={cookie:`ilovegame_editor=${createEditorToken(process.env.EDITOR_SECRET)}`,host:'site.invalid',origin:'https://site.invalid'};
 const req=(method,body,query={})=>({method,body,headers,query:{resource:'research',...query}});
 const response=()=>({setHeader(){},status(code){this.code=code;return this;},json(body){this.body=body;return this;}});
@@ -61,7 +61,7 @@ test('paid execution claims once, validates evidence and atomically saves the re
   calls.push(url);
   if(url.includes('/game_research_runs?'))return Response.json([run]);
   if(url.endsWith('/claim_game_research')){run.status='running';return Response.json(run);}
-  if(url==='https://api.openai.com/v1/responses')return Response.json({id:'response-test',status:'completed',model:'gpt-5-mini',output_text:JSON.stringify({items:[item]}),usage:{input_tokens:50,output_tokens:50}});
+  if(url==='https://api.openai.com/v1/responses')return Response.json({id:'response-test',status:'completed',model:'gpt-5-mini',output_text:JSON.stringify({items:[{...item,evidence_index:0}]}),usage:{input_tokens:50,output_tokens:50}});
   assert.ok(url.endsWith('/complete_game_research'));assert.equal(JSON.parse(options.body).p_result.items[0].evidence,item.evidence);return Response.json({...run,status:'completed'});
  },async()=>{const out=response();await handler(req('POST',{id,action:'execute',confirm_cost:true}),out);assert.equal(out.code,200);assert.equal(out.body.run.status,'completed');});
  assert.equal(calls.filter(url=>url.includes('openai.com')).length,1);
@@ -77,7 +77,7 @@ test('invalid AI evidence marks the claimed run failed, with no candidate writes
  await mock(async(url)=>{
   calls.push(url);if(url.includes('/game_research_runs?'))return Response.json([{id,status:'prepared',sources:[source]}]);
   if(url.endsWith('/claim_game_research'))return Response.json({id,status:'running',sources:[source]});
-  if(url.includes('openai.com'))return Response.json({status:'completed',output_text:JSON.stringify({items:[{...item,evidence:'invented'}]})});
+  if(url.includes('openai.com'))return Response.json({status:'completed',output_text:JSON.stringify({items:[{...item,evidence_index:9999}]})});
   assert.ok(url.endsWith('/fail_game_research'));return new Response(null,{status:204});
  },async()=>{const out=response();await handler(req('POST',{id,action:'execute',confirm_cost:true}),out);assert.equal(out.code,502);});
  assert.equal(calls.filter(url=>url.includes('openai.com')).length,1);assert.ok(!calls.some(url=>url.endsWith('/complete_game_research')));
@@ -91,4 +91,16 @@ test('incomplete AI results expose only safe diagnostics and never retry',async(
    assert.ok(!JSON.stringify(error.researchDiagnostic).includes('private'));return true;
   });
  });assert.equal(calls,1);
+});
+
+test('evidence indices preserve exact multilingual text and reject foreign or invented references',()=>{
+ const text='「声」で協力！ Café — puzzle. '+ '𠮷'.repeat(500);
+ const sources=[{...source,description:text}];
+ const passages=researchPassages(text);
+ assert.ok(passages.length>2);assert.ok(passages.every(p=>p.length<=500&&text.includes(p)));
+ const normalized=materializeResearchEvidence({items:[{...item,evidence_index:1,evidence:'AI text must not be trusted'}]},sources);
+ assert.equal(normalized.items[0].evidence,passages[1]);
+ assert.deepEqual(validateResearchOutput(normalized,sources),normalized.items);
+ for(const index of [-1,9999,0.5,'0'])assert.throws(()=>materializeResearchEvidence({items:[{...item,evidence_index:index}]},sources));
+ assert.equal(materializeResearchEvidence({items:[{...item,selected:false,evidence_index:-1}]},sources).items[0].evidence,'');
 });
