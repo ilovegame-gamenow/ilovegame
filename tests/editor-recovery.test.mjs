@@ -61,7 +61,7 @@ test('storage failure blocks redirect and gives a separate-tab login path',()=>{
 });
 test('save API expiry captures current input before redirecting',async()=>{
  const b=browser({fetch:async()=>new Response('{}',{status:401})});b.edit();
- vm.runInContext(readFileSync(new URL('../editor-save.js',import.meta.url),'utf8'),b.context);
+ vm.runInContext(readFileSync(new URL('../editor-draft-client.js',import.meta.url),'utf8'),b.context);
  assert.equal(await b.window.GameEditorSave.save({id:7,...changed}),false);
  assert.equal(b.api.read(7).reason,'expired');assert.deepEqual(b.redirects,['/editor.html']);
 });
