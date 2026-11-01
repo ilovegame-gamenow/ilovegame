@@ -1,3 +1,4 @@
+import {createMediaArticle,findArticleBySource} from '../../lib/article-draft-repository.js';
 // A real PostgREST/PostgreSQL test. No fetch mocks, hosted credentials or dependencies.
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -173,5 +174,14 @@ try {
     assert.ok([401,403].includes((await raw('/rpc/claim_game_research',token,{method:'POST',body:JSON.stringify({p_id:runId})})).status));
   }
   console.log('PASS: real research snapshot, exclusive claim, atomic AI-candidate completion and role denial (no OpenAI calls)');
+  const mediaItem={title:'Manual media headline',url:'https://game.watch.impress.co.jp/docs/news/99999999.html',published_at:new Date().toISOString()};
+  const registered=await Promise.all(Array.from({length:4},()=>createMediaArticle(process.env.SUPABASE_URL,serviceToken,mediaItem,'GAME Watch')));
+  assert.equal(new Set(registered.map(x=>x.id)).size,1);assert.equal(registered.filter(x=>x.created).length,1);
+  const savedMedia=await rows(`/articles?id=eq.${registered[0].id}`);
+  assert.equal(savedMedia.length,1);assert.equal(savedMedia[0].status,'pending');assert.equal(savedMedia[0].manually_reviewed,true);assert.equal(savedMedia[0].article_body,'');assert.equal(savedMedia[0].published_at,null);
+  assert.equal((await findArticleBySource(process.env.SUPABASE_URL,serviceToken,mediaItem.url)).id,registered[0].id);
+  const repeated=await createMediaArticle(process.env.SUPABASE_URL,serviceToken,{...mediaItem,title:'Must not overwrite'},'Other');
+  assert.equal(repeated.created,false);assert.equal((await rows(`/articles?id=eq.${repeated.id}`))[0].title,'Manual media headline');
+  console.log('PASS: concurrent media article registration deduplicates source URLs without overwriting stored content');
   console.log('All catalog REST integration checks passed. Disposable test data stays in the CI DB.');
 }finally{await new Promise(resolve=>gateway.close(resolve));}
