@@ -1,3 +1,4 @@
+import { handleSocialEvidence } from '../lib/social-evidence.js';
 import { handleSourcePreviews } from '../lib/editor-source-previews-handler.js';
 import { requireEditor, requireEditorOrigin } from '../lib/editor-auth.js';
 import { readGameInput, readGameQuery, isGameId, isArticleId } from '../lib/game-catalog-input.js';
@@ -17,6 +18,7 @@ export default async function handler(req, res) {
   const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SECRET_KEY;
   if (!url || !key) return res.status(503).json({ error:'作品データベースに接続できません。' });
   const {resource,...query}=req.query || {};
+  if(resource==='social-evidence') return handleSocialEvidence({...req,query},res,{url,key});
   if(resource==='discoveries') return handleDiscoveries({...req,query},res,{url,key});
   if(['steam-media','showcase','bluesky-preview'].includes(resource))return handleSourcePreviews({...req,query},res,{url,key},resource);
   if(resource==='research') return handleResearch({...req,query},res,{url,key});

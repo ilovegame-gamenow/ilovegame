@@ -11,9 +11,18 @@
 <p class="catalog-note">対象は公式サイトで案内されているAmong Us Storyのアカウントです。再投稿や返信は除きます。表示する数字は投稿への反応で、ゲームの品質や世間全体の評価ではありません。</p>
 <p id="catalogMessage" role="status" aria-live="polite">ボタンを押すと、その時点の公開情報を取得します。</p>
 <button id="loadSocial" type="button">Blueskyの公式投稿を取得</button>
+<section class="catalog-panel" aria-label="資料を保存する作品">
+<h2>保存する作品を選ぶ</h2>
+<form id="socialGameSearch" role="search"><label for="socialGameQuery">登録済みの作品名・原題</label>
+<div class="catalog-search-row"><input id="socialGameQuery" maxlength="100" type="search"><button type="submit">作品を検索</button></div></form>
+<p id="socialGameStatus" role="status">元投稿で対象作品を確認してから選んでください。</p>
+<ul id="socialGames" class="catalog-list"></ul>
+<button id="socialPrevious" type="button" disabled>前へ</button><button id="socialNext" type="button" disabled>次へ</button>
+<p id="selectedSocialGame">作品はまだ選択されていません。</p>
+</section>
 <section class="catalog-panel" aria-label="取得した公式資料">
 <h2>今回の確認</h2><p id="socialSummary">まだ取得していません。</p><p id="socialObserved" class="catalog-note"></p>
-<p class="catalog-note">作品との紐づけは未登録です。元投稿で対象作品と内容を確認してください。この画面では記事・作品の作成や情報の保存を行いません。</p>
+<p class="catalog-note">元投稿で作品との対応を確認し、選択した作品に資料を保存します。反応数は確認時点の記録で、作品の評価点にはしません。記事の公開は行いません。</p>
 <ul id="socialPosts" class="catalog-list"></ul>
 </section>
 <a class="back" href="/editor-games.html">作品台帳を確認する →</a>
