@@ -25,6 +25,27 @@ jobs:
           node-version: '24'
       - run: node --test tests/*.test.mjs
 
+  game-catalog-database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: catalog_test_only
+          POSTGRES_DB: catalog_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: psql -h localhost -U postgres -d catalog_test -X -v ON_ERROR_STOP=1 -f tests/database/game-catalog.sql
+        env:
+          PGPASSWORD: catalog_test_only
+
   live-sources:
     if: github.event_name == 'workflow_dispatch' && inputs.live_sources
     runs-on: ubuntu-latest
