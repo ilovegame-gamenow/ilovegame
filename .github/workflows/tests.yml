@@ -45,6 +45,28 @@ jobs:
       - run: psql -h localhost -U postgres -d catalog_test -X -v ON_ERROR_STOP=1 -f tests/database/game-catalog.sql
         env:
           PGPASSWORD: catalog_test_only
+      - run: psql -h localhost -U postgres -d catalog_test -X -v ON_ERROR_STOP=1 -f tests/database/game-catalog-rest.sql
+        env:
+          PGPASSWORD: catalog_test_only
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Start isolated PostgREST
+        run: >-
+          docker run --detach --rm --name catalog-postgrest --network host
+          -e PGRST_DB_URI=postgres://catalog_rest_authenticator:catalog_local_test_only@127.0.0.1:5432/catalog_test
+          -e PGRST_DB_SCHEMAS=public
+          -e PGRST_DB_ANON_ROLE=anon
+          -e PGRST_JWT_SECRET=catalog-ci-only-jwt-secret-at-least-32-characters
+          ghcr.io/supabase/postgrest:v14.18
+      - name: Verify editor API against real REST and database
+        run: node tests/integration/game-catalog-rest.mjs
+      - name: PostgREST diagnostics
+        if: failure()
+        run: docker logs catalog-postgrest
+      - name: Stop PostgREST
+        if: always()
+        run: docker rm --force catalog-postgrest || true
 
   live-sources:
     if: github.event_name == 'workflow_dispatch' && inputs.live_sources

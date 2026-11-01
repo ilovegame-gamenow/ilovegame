@@ -144,3 +144,17 @@ RPCはSECURITY INVOKER、search_path空、PUBLIC/anon/authenticatedのEXECUTEを
 PGliteで成功。PostgreSQL 17の検証は同じCIのDBジョブで行う。
 ブラウザーでは本番から独立したメモリ内の検証データで、検索、関連づけ、解除、新規登録、HTMLを含む作品名の安全な表示、ページ送り、未有効時の案内を確認した。
 この画面検証は実Supabase REST接続の検証ではない。隔離したDB環境でのAPI接続確認は有効化前に必要。
+
+## 第3段階：REST接続の継続検証
+
+分離済みのSupabase開発ブランチは存在しなかったため、有料環境は新設せず、CIの隔離DBにPostgRESTを接続する検証を追加。
+`tests/integration/game-catalog-rest.mjs` はfetchを差し替えず、実際の編集室APIハンドラー→作品repository→HTTP→PostgREST→PostgreSQLを通す。
+Supabaseゲートウェイの `/rest/v1` 接頭辞のみローカルプロキシで再現する。
+
+検証内容：RPCの実応答形式、作品＋出典登録、同時再試行、同名／原題／記号検索、FKを使った関連情報の取得、同時関連づけ、範囲を限定した解除、記事本文の維持、ページ送り、匿名・authenticatedのアクセス拒否。
+接続先はローカルHTTPのみに制限し、本番URLや本番キーは使用しない。固定のJWT鍵・DBパスワードは使い捨てCI専用のテスト値。
+テストデータはCIのDBにだけ残り、ジョブ終了時に破棄される。
+
+この検証はSupabaseホスト環境のゲートウェイ・キー設定・プロジェクト固有設定を含まない。
+実Supabaseへの最終確認は、承認後に追加DDLを適用し、匿名アクセス拒否・サーバーRPC疎通を確認する。
+本番の既存記事にテスト用の関連づけは作らない。
