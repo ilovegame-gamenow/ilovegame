@@ -61,10 +61,11 @@ test('paid execution claims once, validates evidence and atomically saves the re
   calls.push(url);
   if(url.includes('/game_research_runs?'))return Response.json([run]);
   if(url.endsWith('/claim_game_research')){run.status='running';return Response.json(run);}
+  if(url==='https://api.openai.com/v1/responses'&&JSON.parse(options.body).text.format.name==='steam_fact_check')return Response.json({status:'completed',output_text:JSON.stringify({checks:[{appid:12345,description:'supported',reason:'supported',note:''}]}),usage:{input_tokens:50,output_tokens:50}});
   if(url==='https://api.openai.com/v1/responses')return Response.json({id:'response-test',status:'completed',model:'gpt-5-mini',output_text:JSON.stringify({items:[{...item,evidence_index:0}]}),usage:{input_tokens:50,output_tokens:50}});
   assert.ok(url.endsWith('/complete_game_research'));assert.equal(JSON.parse(options.body).p_result.items[0].evidence,item.evidence);return Response.json({...run,status:'completed'});
  },async()=>{const out=response();await handler(req('POST',{id,action:'execute',confirm_cost:true}),out);assert.equal(out.code,200);assert.equal(out.body.run.status,'completed');});
- assert.equal(calls.filter(url=>url.includes('openai.com')).length,1);
+ assert.equal(calls.filter(url=>url.includes('openai.com')).length,2);
  assert.ok(calls.findIndex(url=>url.endsWith('/claim_game_research'))<calls.findIndex(url=>url.includes('openai.com')));
 });
 test('a duplicate claim cannot call AI or mark another running attempt as failed',async()=>{

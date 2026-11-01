@@ -18,9 +18,15 @@
       const a=node('a','Steamの出典を開く');a.href=source.url;a.target='_blank';a.rel='noopener noreferrer';li.append(a);list.append(li);
     }
     const result=document.getElementById('researchResult');result.textContent='';
+    const checks=document.getElementById('researchChecks');checks.replaceChildren();
     if(run?.status==='completed'){
       const count=run.analysis.items.filter(i=>i.selected).length;
       result.textContent=`${count}作品を発見候補の登録対象として処理しました。既に登録されていた場合はその候補を維持します。`;
+      for(const check of run.analysis.verification?.checks||[]){
+        const title=run.sources.find(source=>source.appid===check.appid)?.title||String(check.appid);
+        const supported=check.description==='supported'&&check.reason==='supported';
+        checks.append(node('li',`${title}：${supported?'AI点検で裏付けを確認（採用前に出典確認が必要）':'裏付け不足のため候補登録を見送り'}${check.note?' ／ '+check.note:''}`));
+      }
       if(run.analysis.usage?.input_tokens!==undefined)result.textContent+=` 使用量：入力${run.analysis.usage.input_tokens}／出力${run.analysis.usage.output_tokens}トークン。`;
     }
     if(run?.status==='failed')result.textContent=run.error_message;
@@ -30,7 +36,7 @@
   async function load(){const result=await request(`${endpoint}&id=${id}`);if(result){run=result.run;config=result.config;render();}}
   async function action(kind){
     if(busy||!config)return;
-    if(kind==='execute'&&!confirm(`表示中の最大3作品をAIで整理します。料金の目安は${config.estimatedMaxUsd.toFixed(2)}米ドル以下です。実行しますか？`))return;
+    if(kind==='execute'&&!confirm(`表示中の最大3作品をAIで整理し、続けて出典との点検を行います（最大2回のAI呼び出し）。料金の目安は${config.estimatedMaxUsd.toFixed(2)}米ドル以下です。実行しますか？`))return;
     if(kind==='prepare'&&run?.status==='running'){notify('実行中です。先に状態を読み直してください。',true);return;}
     if(kind==='prepare'&&['completed','failed'].includes(run?.status)){id=createId();run=null;}
     remember();busy=true;controls();
