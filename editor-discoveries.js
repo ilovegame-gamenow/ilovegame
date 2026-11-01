@@ -1,3 +1,4 @@
+import { appendGameMedia } from './editor-game-media.js';
 (() => {
   const {node,createId}=GameCatalogClient;
   const endpoint='/api/editor-games?resource=discoveries';
@@ -36,6 +37,7 @@
     if(candidate.original_title)li.append(node('small',candidate.original_title));
     li.append(node('small',candidate.discovered_by==='ai'?'AIが発見':'手動で追加'));
     if(candidate.research_metadata?.evidence){const details=node('details');details.append(node('summary','AIが参照した根拠'),node('p',candidate.research_metadata.evidence));li.append(details);}
+    appendGameMedia(li,candidate,request);
     if(candidate.description)li.append(node('p',candidate.description));
     li.append(node('h4','どこが面白そう？'),node('p',candidate.reason));
     try{

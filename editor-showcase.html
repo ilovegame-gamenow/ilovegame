@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>紹介イベントから探す | I LOVE GAME♪ 編集室</title>
+<link rel="stylesheet" href="/header.css"><link rel="stylesheet" href="/article.css"><link rel="stylesheet" href="/editor-games.css"><link rel="stylesheet" href="/editor-discoveries.css"></head>
+<body data-page="editor"><header></header>
+<main class="catalog-main">
+<a class="back" href="/editor-discoveries.html">← 発見候補に戻る</a>
+<h1>紹介イベントから探す</h1>
+<p class="catalog-intro">Wholesome Gamesの公式ページで紹介されている、Steamの発売予定作品を最大3作品確認します。</p>
+<p class="catalog-note">紹介元が選んだ作品です。人気や品質の評価ではありません。画面や遊びの特徴を確認し、気になる作品を候補へ追加してください。この画面ではAIを使いません。</p>
+<p><a href="https://wholesomegames.com/" target="_blank" rel="noopener noreferrer">紹介元：Wholesome Games</a></p>
+<p id="catalogMessage" role="status" aria-live="polite">準備ができたら作品を取得できます。</p>
+<button id="loadShowcase" type="button">紹介作品を取得（AI未使用）</button>
+<section class="catalog-panel" aria-label="紹介作品"><ul class="catalog-list" id="showcaseGames"></ul><p id="showcaseEmpty">まだ取得していません。</p></section>
+</main>
+<script src="/header.js"></script><script src="/editor-session.js"></script><script src="/editor-catalog-client.js"></script><script type="module" src="/editor-showcase.js"></script>
+</body></html>

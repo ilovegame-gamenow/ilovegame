@@ -1,3 +1,4 @@
+import { handleSourcePreviews } from '../lib/editor-source-previews-handler.js';
 import { requireEditor, requireEditorOrigin } from '../lib/editor-auth.js';
 import { readGameInput, readGameQuery, isGameId, isArticleId } from '../lib/game-catalog-input.js';
 import { CatalogError, searchGames, createGame, getArticleGames, changeArticleGame } from '../lib/game-catalog-repository.js';
@@ -17,6 +18,7 @@ export default async function handler(req, res) {
   if (!url || !key) return res.status(503).json({ error:'作品データベースに接続できません。' });
   const {resource,...query}=req.query || {};
   if(resource==='discoveries') return handleDiscoveries({...req,query},res,{url,key});
+  if(['steam-media','showcase'].includes(resource))return handleSourcePreviews({...req,query},res,{url,key},resource);
   if(resource==='research') return handleResearch({...req,query},res,{url,key});
   if(resource!==undefined) return res.status(400).json({error:'Invalid resource'});
   try {
