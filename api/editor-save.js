@@ -1,4 +1,5 @@
-import { requireEditor } from '../lib/editor-auth.js';
+import { handleMediaArticleRegistration } from '../lib/editor-media-article.js';
+import { requireEditor, requireEditorOrigin } from '../lib/editor-auth.js';
 import { regenerateEditorArticle } from '../lib/editor-regenerator.js';
 import { getArticleById } from '../lib/article-repository.js';
 import { getArticleDraft, saveArticleDraft, applyArticleDraft, discardArticleDraft, recoverArticleDraft } from '../lib/article-draft-repository.js';
@@ -12,6 +13,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
   if (!requireEditor(req, res)) return;
+  if(req.body?.action==='create_from_media'){
+    if(!requireEditorOrigin(req,res))return;
+    return handleMediaArticleRegistration(req,res);
+  }
   const { id, action = 'save' } = req.body || {};
   if (!Number.isSafeInteger(id) || id <= 0 || !['save', 'apply', 'regenerate', 'discard', 'recover'].includes(action)) {
     return res.status(400).json({ error: 'Invalid request' });

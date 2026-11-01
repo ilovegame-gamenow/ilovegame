@@ -28,7 +28,8 @@
   <script src="/editor-session.js"></script>
   <script src="/editor-recovery.js"></script>
   <script>
-    GameEditorNavigation.prepareBack();
+    const mediaReturn=new URLSearchParams(location.search).get('return')==='/editor-media.html';
+    GameEditorNavigation.prepareBack(mediaReturn?{targetPath:'/editor-media.html'}:{});
     GameEditorSession.start();
 
     const app = document.getElementById("app");
@@ -105,7 +106,7 @@
 </div>
 
 
-<p id="draftNotice">${draft ? "保存済みの下書きを表示しています。公開版へは未反映です。" : "公開版の記事を表示しています。"}</p>
+<p id="draftNotice">${draft ? "保存済みの下書きを表示しています。公開版へは未反映です。" : article.status==='published'?"公開版の記事を表示しています。":"未公開の記事です。内容を確認・編集してから掲載してください。"}</p>
 <p><a href="/editor-games.html?article_id=${Number(article.id)}&amp;return=${encodeURIComponent(location.pathname + location.search)}">関連作品を管理する</a></p>
 <div id="articleViewActions">
   <button type="button" id="editArticleButton">
@@ -370,6 +371,8 @@ if (statusText) {
           }
         }
 
+        if(mediaReturn){const back=document.getElementById('editorBackLink');back.href='/editor-media.html';back.textContent='← 話題一覧に戻る';}
+        if(new URLSearchParams(location.search).get('edit')==='1'&&!restored?.item){editButton.click();editForm.scrollIntoView({block:'start'});}
         if (restored?.item) {
           editButton.click();
           for (const name of fields) editForm.elements.namedItem(name).value = restored.item.content[name];
