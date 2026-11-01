@@ -106,6 +106,7 @@
 
 
 <p id="draftNotice">${draft ? "保存済みの下書きを表示しています。公開版へは未反映です。" : "公開版の記事を表示しています。"}</p>
+<p><a href="/editor-games.html?article_id=${Number(article.id)}&amp;return=${encodeURIComponent(location.pathname + location.search)}">関連作品を管理する</a></p>
 <div id="articleViewActions">
   <button type="button" id="editArticleButton">
     記事を編集する

@@ -119,3 +119,53 @@ do $$ begin
   if (select count(*) from public.games) <> 2 then raise exception 'Article deletion removed games'; end if;
 end $$;
 select 'Game catalog database checks passed' as result;
+
+-- Stage 2 editor RPCs, on the same isolated DB.
+\ir ../../database/game-catalog-editor.sql
+insert into public.articles values (2,'Unchanged editor article');
+select public.create_editor_game('00000000-0000-0000-0000-000000000050','Literal %_* title','English Title','Description','https://example.org/manual','official');
+-- Same creation request is safe to repeat.
+select public.create_editor_game('00000000-0000-0000-0000-000000000050','Literal %_* title','English Title','Description','https://example.org/manual','official');
+select pg_temp.rejects($q$select public.create_editor_game('00000000-0000-0000-0000-000000000050','Different title','','','https://example.org/manual','official')$q$, '23505');
+select pg_temp.rejects($q$select public.create_editor_game('00000000-0000-0000-0000-000000000051','Invalid source','','','javascript:alert(1)','official')$q$, '22023');
+select pg_temp.rejects($q$select public.search_editor_games('',-1)$q$, '22023');
+
+do $$
+begin
+  if (select count(*) from public.games where id='00000000-0000-0000-0000-000000000050')<>1 then raise exception 'Creation duplicated'; end if;
+  if (select count(*) from public.game_sources where game_id='00000000-0000-0000-0000-000000000050')<>1 then raise exception 'Source duplicated'; end if;
+  if exists(select 1 from public.games where id='00000000-0000-0000-0000-000000000051') then raise exception 'Invalid creation left a work'; end if;
+  if (select count(*) from public.search_editor_games('%_*',0))<>1 then raise exception 'Search treated punctuation as wildcards'; end if;
+  if (select count(*) from public.search_editor_games('ENGLISH',0))<>1 then raise exception 'Original title search failed'; end if;
+  if (select status from public.games where id='00000000-0000-0000-0000-000000000050')<>'draft' then raise exception 'Work automatically published'; end if;
+  if exists(select 1 from public.game_sources where game_id='00000000-0000-0000-0000-000000000050' and review_status<>'pending') then raise exception 'Source automatically verified'; end if;
+  if has_function_privilege('anon','public.create_editor_game(uuid,text,text,text,text,text)','EXECUTE') or
+     has_function_privilege('authenticated','public.create_editor_game(uuid,text,text,text,text,text)','EXECUTE') or
+     has_function_privilege('anon','public.search_editor_games(text,integer)','EXECUTE') or
+     has_function_privilege('authenticated','public.search_editor_games(text,integer)','EXECUTE') then raise exception 'Editor RPC accessible to browser roles'; end if;
+end $$;
+
+-- Force the second insert to fail and confirm the work insert also rolls back.
+create function pg_temp.fail_catalog_source() returns trigger language plpgsql as $$
+begin raise exception 'Simulated source insert failure' using errcode='23514'; end $$;
+create trigger fail_test_source before insert on public.game_sources for each row execute function pg_temp.fail_catalog_source();
+select pg_temp.rejects($q$select public.create_editor_game('00000000-0000-0000-0000-000000000052','Atomic test','','','https://example.org/atomic','official')$q$, '23514');
+drop trigger fail_test_source on public.game_sources;
+do $$ begin
+  if exists(select 1 from public.games where id='00000000-0000-0000-0000-000000000052') then raise exception 'Partial creation survived'; end if;
+end $$;
+
+begin;
+set local role service_role;
+select public.create_editor_game('00000000-0000-0000-0000-000000000053','Server creation','','','https://example.org/server','store');
+select count(*) from public.search_editor_games('Server',0);
+insert into public.article_games(article_id,game_id) values (2,'00000000-0000-0000-0000-000000000053') on conflict(article_id,game_id) do nothing;
+insert into public.article_games(article_id,game_id) values (2,'00000000-0000-0000-0000-000000000053') on conflict(article_id,game_id) do nothing;
+delete from public.article_games where article_id=2 and game_id='00000000-0000-0000-0000-000000000053';
+commit;
+do $$ begin
+  if (select title from public.articles where id=2)<>'Unchanged editor article' then raise exception 'Article content changed'; end if;
+  if exists(select 1 from public.article_games where article_id=2) then raise exception 'Unlink failed'; end if;
+  if not exists(select 1 from public.games where id='00000000-0000-0000-0000-000000000053') then raise exception 'Unlink deleted work'; end if;
+end $$;
+select 'Game catalog editor checks passed' as result;

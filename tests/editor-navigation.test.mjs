@@ -63,3 +63,14 @@ test('both save and status helpers invalidate only after a successful mutation',
   status=401;assert.equal(await run(),false);assert.equal(expired,1);assert.equal(changes,1);
  }
 });
+
+test('catalog returns to its original article history entry with the dashboard return intact',()=>{
+ const article='/editor-article.html?id=42&return=%2Feditor-dashboard.html%3Fpage%3D3';
+ const h=harness({referrer:`https://site.invalid${article}`});
+ h.context.location.pathname='/editor-games.html';
+ h.context.location.search=`?article_id=42&return=${encodeURIComponent(article)}`;
+ h.api.prepareBack({targetPath:'/editor-article.html',selector:'#catalogBack'});
+ let prevented=false;
+ h.events.click({button:0,target:{closest(selector){assert.equal(selector,'#catalogBack');return {href:`https://site.invalid${article}`,target:'',hasAttribute:()=>false};}},preventDefault(){prevented=true;}});
+ assert.equal(prevented,true);assert.equal(h.backs,1);
+});
