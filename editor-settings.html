@@ -14,12 +14,25 @@
     <a class="back" href="/editor-dashboard.html">← 編集室に戻る</a>
     <div class="settings-heading">
       <h1>編集室の設定</h1>
-      <p>記事の表示、ニュース収集、AIの編集方針を調整できます。</p>
+      <p>情報源と収集、記事の表示、AIの編集方針をここでまとめて管理します。</p>
     </div>
+    <nav class="settings-nav" aria-label="設定の項目"><a href="#informationSources">情報源と収集</a><a href="#displaySettings">表示・掲載</a><a href="#editorialSettings">AIの編集方針</a></nav>
     <p id="settingsMessage" role="status" aria-live="polite">設定を読み込み中…</p>
     <form id="settingsForm">
       <fieldset id="settingsFields" disabled style="border:0;padding:0;margin:0">
-        <section class="settings-section" aria-labelledby="displayHeading">
+        <section id="informationSources" class="settings-section sources-section" aria-labelledby="collectionHeading">
+          <div class="section-heading"><span class="section-mark" aria-hidden="true">↗</span><div><h2 id="collectionHeading">情報源と収集</h2><p>王道の公式情報も、新しい発見も</p></div></div>
+          <p class="section-intro">収集元の対応状況と設定を、ここに集約しています。記事の審査や作品探しは、それぞれの作業画面で行えます。</p>
+          <div id="sourceSummary" class="source-overview" aria-label="情報源の概要"></div>
+          <h3 class="source-group-heading">公式ニュース <span>1回に確認する最大記事数</span></h3>
+          <div id="newsSourceSettings" class="source-grid"></div>
+          <p class="section-note" id="collectionHelp">件数は0〜100件。0件で一時停止します。変更はページ下部の「設定を保存」で確定し、次回の収集から適用されます。状態表示は保存済みの設定です。</p>
+          <p class="source-history-note">実行方法：リポジトリの収集ワークフローは手動開始です。ここでの「収集対象」は定期実行や取得成功を示しません。最終実行日時・成功／失敗の履歴は、この画面ではまだ記録していません。</p>
+          <h3 class="source-group-heading">作品の発見 <span>画像と遊びの特徴を確認</span></h3>
+          <div id="discoverySourceSettings" class="source-grid"></div>
+          <details class="planned-sources"><summary>これから広げる情報源</summary><p class="section-intro">以下は追加候補です。現在の収集対象には含まれません。</p><div id="plannedSourceSettings" class="source-grid"></div></details>
+        </section>
+        <section id="displaySettings" class="settings-section" aria-labelledby="displayHeading">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="displayHeading">一覧の最大表示件数</h2><p>1ページに表示する記事数</p></div><span class="setting-range">1〜100件</span></div>
           <div class="setting-field">
             <div class="field-description"><label for="public_page_size">公開サイト</label><p id="publicHelp">読者が見る記事一覧</p></div>
@@ -30,18 +43,6 @@
             <div class="number-field"><input id="editor_page_size" name="editor_page_size" type="number" min="1" max="100" step="1" aria-describedby="editorHelp" required><span>件</span></div>
           </div>
           <p class="section-note">保存後、一覧を読み込み直すと反映されます。</p>
-        </section>
-        <section class="settings-section" aria-labelledby="collectionHeading">
-          <div class="section-heading"><span class="section-mark" aria-hidden="true"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M12 3v11m-4-4 4 4 4-4"/><path d="M4 14v6h16v-6"/></svg></span><div><h2 id="collectionHeading">ニュースの収集</h2><p>1回に確認する最大記事数</p></div><span class="setting-range">0〜100件</span></div>
-          <div class="setting-field">
-            <label for="nintendo_limit">Nintendo</label>
-            <div class="number-field"><input id="nintendo_limit" name="nintendo_limit" type="number" min="0" max="100" step="1" aria-describedby="collectionHelp" required><span>件</span></div>
-          </div>
-          <div class="setting-field">
-            <label for="playstation_limit">PlayStation</label>
-            <div class="number-field"><input id="playstation_limit" name="playstation_limit" type="number" min="0" max="100" step="1" aria-describedby="collectionHelp" required><span>件</span></div>
-          </div>
-          <p class="section-note" id="collectionHelp">次回の収集から適用。0件で収集を一時停止します。<br>保存済みの記事はそのまま残ります。</p>
         </section>
         <section class="settings-section" aria-labelledby="publicationRulesHeading">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="publicationRulesHeading">記事の掲載・表示ルール</h2><p>AI評価に応じた掲載と、掲載済み記事の見せ方</p></div></div>
@@ -84,7 +85,7 @@
           </div>
           <a class="settings-preview-link" href="/editor-preview.html">BREAKING・PICK UPの表示を確認 →</a>
         </section>
-        <section class="settings-section" aria-labelledby="evaluationHeading">
+        <section id="editorialSettings" class="settings-section" aria-labelledby="evaluationHeading">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">✎</span><div><h2 id="evaluationHeading">AIの評価基準</h2><p>ニュースの採点で重視する編集方針</p></div></div>
           <label class="evaluation-label" for="evaluation_guidelines">編集方針（1行に1項目・最大6,000文字）</label>
           <textarea id="evaluation_guidelines" name="evaluation_guidelines" rows="12" maxlength="6000" aria-describedby="evaluationHelp" required></textarea>
@@ -101,6 +102,7 @@
   <script src="/editor-navigation.js"></script>
   <script src="/header.js"></script>
   <script src="/editor-session.js"></script>
+  <script src="/editor-catalog-client.js"></script>
   <script src="/editor-settings.js"></script>
 </body>
 </html>

@@ -35,7 +35,7 @@ test('settings save updates only the singleton settings record', async () => {
   assert.equal(options.method,'PATCH');
   assert.equal(JSON.parse(options.body).playstation_limit,0);
   return new Response(JSON.stringify([settings]));
- },async()=>{const res=response();await editorSettings({method:'POST',headers,body:settings},res);assert.equal(res.code,200);});
+ },async()=>{const res=response();await editorSettings({method:'POST',headers,body:settings},res);assert.equal(res.code,200);assert.ok(res.body.sources.some(source=>source.id==='nintendo'));assert.equal(res.body.sources.find(source=>source.id==='playstation').status,'paused');});
 });
 test('public pagination uses configured size and corrects a page beyond the new last page', async () => {
  const calls=[];
