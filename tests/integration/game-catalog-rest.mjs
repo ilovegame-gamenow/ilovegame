@@ -156,5 +156,22 @@ try {
     assert.ok([401,403].includes((await raw('/rpc/review_game_discovery',token,{method:'POST',body:JSON.stringify({p_id:discovery.id,p_action:'adopt_new',p_game_id:null})})).status));
   }
   console.log('PASS: real discovery ingestion, deduplication, hold/reopen, concurrent adoption, matching and browser access denial');
+  process.env.GAME_RESEARCH_ENABLED='true';
+  const runId=randomUUID(),candidateId=randomUUID();
+  const snapshots=[{appid:7654321,candidate_id:candidateId,title:'REST research snapshot',url:'https://store.steampowered.com/app/7654321/',description:'Cooperative puzzles with changing terrain and voice communication between two players.'}];
+  let research=await raw('/rpc/prepare_game_research',serviceToken,{method:'POST',body:JSON.stringify({p_id:runId,p_sources:snapshots})});
+  assert.equal(research.status,200);assert.equal((await research.json()).status,'prepared');
+  const overview=await call('GET',null,{resource:'research',id:runId});assert.equal(overview.code,200);assert.equal(overview.body.run.sources[0].appid,7654321);
+  const claims=await Promise.all([0,1].map(()=>raw('/rpc/claim_game_research',serviceToken,{method:'POST',body:JSON.stringify({p_id:runId})})));
+  assert.deepEqual(claims.map(r=>r.status).sort(),[200,409]);
+  research=await raw('/rpc/complete_game_research',serviceToken,{method:'POST',body:JSON.stringify({p_id:runId,p_result:{items:[{appid:7654321,selected:true,description:'協力パズルの紹介。',reason:'音声で協力する仕組み。',evidence:'Cooperative puzzles'}],usage:{input_tokens:100,output_tokens:50},model:'gpt-5-mini'}})});
+  assert.equal(research.status,200);assert.equal((await research.json()).status,'completed');
+  const recorded=await rows(`/game_discoveries?id=eq.${candidateId}`);assert.equal(recorded[0].discovered_by,'ai');assert.equal(recorded[0].research_metadata.run_id,runId);
+  assert.equal((await rows(`/games?id=eq.${candidateId}`)).length,0);
+  for(const token of [null,jwt('authenticated')]) {
+    assert.ok([401,403].includes((await raw('/game_research_runs?limit=1',token)).status));
+    assert.ok([401,403].includes((await raw('/rpc/claim_game_research',token,{method:'POST',body:JSON.stringify({p_id:runId})})).status));
+  }
+  console.log('PASS: real research snapshot, exclusive claim, atomic AI-candidate completion and role denial (no OpenAI calls)');
   console.log('All catalog REST integration checks passed. Disposable test data stays in the CI DB.');
 }finally{await new Promise(resolve=>gateway.close(resolve));}

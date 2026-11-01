@@ -171,3 +171,4 @@ end $$;
 select 'Game catalog editor checks passed' as result;
 
 \ir game-discoveries.sql
+\ir game-research.sql
