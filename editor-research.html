@@ -9,7 +9,7 @@
 <a class="back" href="/editor-discoveries.html">← 発見候補に戻る</a>
 <h1>Steamでゲームを探す</h1>
 <p class="catalog-intro">Steamの「近日登場」から、まだ候補・作品台帳にないゲームを最大3作品確認します。</p>
-<p class="catalog-note">まず対象の説明文を取得します。対象と費用を確認してから、AIで作品の特徴を整理し、発見候補へ送ります。</p>
+<p class="catalog-note">まず対象の説明文を取得します。対象と費用を確認してから、AIで作品の特徴を整理し、別のAI処理で出典と照合してから発見候補へ送ります。</p>
 <p id="catalogMessage" role="status" aria-live="polite">調査の準備状況を確認しています…</p>
 <section class="catalog-panel" aria-label="調査の操作">
 <h2>少数の作品で試す</h2>
@@ -19,11 +19,11 @@
 <button type="button" id="executeResearch" class="catalog-primary" disabled>AIで候補を作成</button>
 <button type="button" id="refreshResearch" disabled>状態を再読み込み</button>
 </div>
-<p class="catalog-note">準備した対象の実行期限は30分です。同じ調査の再実行はできません。実行中に通信が途切れた場合は、状態を読み直してください。</p>
+<p class="catalog-note">準備した対象の実行期限は30分です。1回の調査でAIを最大2回呼び出します（文章作成と事実点検）。点検後も採用前に出典を確認してください。同じ調査の再実行はできません。実行中に通信が途切れた場合は、状態を読み直してください。</p>
 </section>
 <section class="catalog-panel" aria-labelledby="researchHeading">
 <h2 id="researchHeading">今回の調査</h2><p id="researchStatus">まだ対象を取得していません。</p>
-<ul class="catalog-list" id="researchSources"></ul><p id="researchResult"></p>
+<ul class="catalog-list" id="researchSources"></ul><p id="researchResult"></p><ul id="researchChecks" class="catalog-list"></ul>
 <a href="/editor-discoveries.html">発見候補を確認する →</a>
 </section>
 </main>
