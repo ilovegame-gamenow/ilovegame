@@ -37,6 +37,36 @@ test('settings save updates only the singleton settings record', async () => {
   return new Response(JSON.stringify([settings]));
  },async()=>{const res=response();await editorSettings({method:'POST',headers,body:settings},res);assert.equal(res.code,200);assert.ok(res.body.sources.some(source=>source.id==='nintendo'));assert.equal(res.body.sources.find(source=>source.id==='playstation').status,'paused');});
 });
+test('simplified settings save preserves collector values by omitting them from PATCH', async () => {
+ const {nintendo_limit,playstation_limit,...visible}=settings;
+ const saved={...settings,nintendo_limit:13,playstation_limit:0};
+ await mockFetch(async(url,options)=>{
+  assert.ok(url.includes('/site_settings?id=eq.1'));
+  assert.equal(options.method,'PATCH');
+  const patch=JSON.parse(options.body);
+  assert.equal(Object.hasOwn(patch,'nintendo_limit'),false);
+  assert.equal(Object.hasOwn(patch,'playstation_limit'),false);
+  assert.equal(patch.publish_threshold,visible.publish_threshold);
+  return new Response(JSON.stringify([saved]));
+ },async()=>{
+  const res=response();await editorSettings({method:'POST',headers,body:visible},res);
+  assert.equal(res.code,200);
+  assert.equal(res.body.settings.nintendo_limit,13);
+  assert.equal(res.body.settings.playstation_limit,0);
+ });
+});
+test('simplified settings still require all editorial fields and validate supplied collector limits', async () => {
+ const {nintendo_limit,playstation_limit,...visible}=settings;
+ const invalid=[{...visible,publish_threshold:undefined},{...visible,nintendo_limit:null},{...visible,playstation_limit:101},{...visible,no_article_threshold:visible.publish_threshold},{...visible,extra:1}];
+ await mockFetch(()=>{throw Error('unexpected fetch');},async()=>{
+  for(const body of invalid){
+   const res=response();await editorSettings({method:'POST',headers,body},res);
+   assert.equal(res.code,400);
+  }
+ });
+ // Database reads still require a complete settings row.
+ assert.equal(validateSettings(visible),null);
+});
 test('public pagination uses configured size and corrects a page beyond the new last page', async () => {
  const calls=[];
  await mockFetch(async(url,options)=>{
