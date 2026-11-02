@@ -10,7 +10,7 @@ if(new URLSearchParams(location.search).get('demo')!=='1'){
  const notice=node('p','構成確認用の見本です。公式発表を確認した2作品を紹介しています。公開済みの記事・今週の全作品一覧ではありません。','roundup-notice');
  const back=node('a','← トップページの見本に戻る','back');back.href='/?demo=1';app.replaceChildren(back,notice);
  const shell=node('div');shell.innerHTML=GameArticle.render({...roundupPreview.article,thumbnail_url:''});app.append(shell);
- const body=shell.querySelector('.body');body.classList.add('roundup-body');
+ const body=shell.querySelector('.body');body.classList.add('roundup-body');body.replaceChildren();
  const intro=node('p','今週の発売予定から、遊びの仕組みが気になる2作品をご紹介。発売日順に、ゲーム画面と公式トレーラーを見ていきましょう。');body.append(intro);
  const toc=node('nav',undefined,'roundup-toc');toc.setAttribute('aria-label','紹介するゲーム');
  const games=[...roundupPreview.games].sort((a,b)=>a.date.localeCompare(b.date));
