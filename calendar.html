@@ -5,13 +5,16 @@
 <link rel="stylesheet" href="/header.css"><link rel="stylesheet" href="/calendar.css"></head>
 <body><header></header><main class="calendar-main">
 <a class="home-link" href="/">← ゲームニュースへ</a>
-<section class="calendar-hero"><div><p class="eyebrow">YOUR NEXT GAME</p><h1>次の楽しみを、<br>カレンダーに。</h1><p>新作ゲームの発売予定を、ひと月ずつ。</p></div><div class="hero-date" aria-hidden="true"><span>RELEASE</span><strong id="heroMonth">—</strong><span>CALENDAR ♪</span></div></section>
+<section class="calendar-hero"><div><p class="eyebrow">YOUR NEXT GAME</p><h1>発売日カレンダー</h1><p>次に遊ぶゲームを、発売日から見つけよう。</p></div><div class="hero-date" aria-hidden="true"><span>RELEASE</span><strong id="heroMonth">—</strong><span>CALENDAR ♪</span></div></section>
 <p id="demoNotice" class="notice" hidden>表示サンプルです。作品名・発売日はすべて架空のデータで、本番の登録内容ではありません。</p>
+<div class="calendar-filters"><label>機種<select id="platformFilter"><option value="">すべての機種</option></select></label><label>発売地域<select id="regionFilter"><option value="JP">日本</option><option value="WW">全世界（日本発売未確認）</option></select></label></div>
+<p id="regionNotice" class="calendar-note" hidden>全世界向けの発表です。日本での発売や日本語対応を確認した情報ではありません。</p>
+<section class="weekly-section" aria-labelledby="weekHeading"><div class="list-heading"><h2 id="weekHeading">今週発売のゲーム</h2><span id="weekRange"></span></div><p class="week-note">月曜〜日曜・日本時間。選択した機種・地域の作品を表示します。</p><p id="weekMessage" role="status" aria-live="polite">今週の発売情報を読み込んでいます…</p><button id="retryWeek" class="text-button" type="button" hidden>今週の情報をもう一度読み込む</button><div id="weekList"></div></section>
 <section class="calendar-panel" aria-labelledby="monthHeading">
 <div class="calendar-toolbar"><div class="month-navigation"><button id="previousMonth" type="button" aria-label="前の月">←</button><h2 id="monthHeading">発売予定</h2><button id="nextMonth" type="button" aria-label="次の月">→</button><button id="currentMonth" type="button">今月</button></div>
-<div class="calendar-filters"><label>機種<select id="platformFilter"><option value="">すべての機種</option></select></label><label>発売地域<select id="regionFilter"><option value="JP">日本</option><option value="WW">全世界（日本発売未確認）</option></select></label></div></div>
+</div>
 <p id="calendarMessage" role="status" aria-live="polite">発売情報を読み込んでいます…</p><button id="retryCalendar" type="button" hidden>もう一度読み込む</button>
-<p id="regionNotice" class="calendar-note" hidden>全世界向けの発表です。日本での発売や日本語対応を確認した情報ではありません。</p>
+
 <div id="calendarGrid" class="month-grid" aria-label="発売日を選ぶ"></div>
 <button id="showAllDays" class="text-button" type="button" hidden>この月の発売日をすべて見る</button>
 </section>

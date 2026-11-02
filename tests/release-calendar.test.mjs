@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readCalendarQuery,loadCalendar} from '../lib/release-calendar.js';
-import {monthRange,shiftMonth,tokyoMonth,calendarGroups} from '../release-calendar-model.js';
+import {monthRange,shiftMonth,tokyoMonth,weekRange,formatReleaseDate,calendarGroups} from '../release-calendar-model.js';
 import news from '../api/news.js';
 const response=()=>({setHeader(){},status(code){this.code=code;return this;},json(body){this.body=body;return this;}});
 const good={id:'release',release_date:'2026-11-12',date_precision:'day',release_kind:'full',region_code:'JP',status:'announced',verified_at:'2026-11-01',game:{id:'game',title:'A',status:'published'},platform:{code:'ps5',name:'PlayStation 5'},source:{url:'https://official.invalid/game',source_type:'official',review_status:'verified',verified_at:'2026-11-01',notes:'private'}};
@@ -51,4 +51,30 @@ test('enabled public calendar responds with empty data without writing or callin
  try{await mockFetch(async(url,options)=>{assert.ok(url.startsWith('https://db.invalid/rest/v1/game_'));assert.equal(options.method,undefined);return new Response('[]');},async()=>{
   const res=response();await news({method:'GET',query:{resource:'calendar',month:'2026-11'}},res);assert.equal(res.code,200);assert.deepEqual(res.body.releases,[]);assert.equal(res.body.truncated,false);
  });}finally{for(const key of ['GAME_CATALOG_ENABLED','SUPABASE_URL','SUPABASE_SECRET_KEY']){if(old[key]===undefined)delete process.env[key];else process.env[key]=old[key];}}
+});
+
+test('current week uses Tokyo Monday to Sunday across months, leap day and year boundaries',()=>{
+ assert.deepEqual(weekRange(new Date('2026-11-01T16:00:00Z')),{start:'2026-11-02',end:'2026-11-09',last:'2026-11-08'});
+ assert.deepEqual(weekRange(new Date('2026-11-01T14:00:00Z')),{start:'2026-10-26',end:'2026-11-02',last:'2026-11-01'});
+ assert.deepEqual(weekRange(new Date('2027-01-01T00:00:00Z')),{start:'2026-12-28',end:'2027-01-04',last:'2027-01-03'});
+ assert.equal(weekRange(new Date('2024-02-29T00:00:00Z')).end,'2024-03-04');
+ assert.equal(formatReleaseDate('2026-11-03'),'11月3日');
+ assert.equal(formatReleaseDate('2027-01-01'),'1月1日');
+ assert.equal(readCalendarQuery({view:'week',month:'2026-11'}),null);
+ assert.equal(readCalendarQuery({view:'arbitrary'}),null);
+});
+test('weekly data spans month boundaries, excludes monthly precision and the following Monday',async()=>{
+ const query=readCalendarQuery({view:'week'},new Date('2026-11-01T00:00:00Z'));
+ assert.equal(query.start,'2026-10-26');assert.equal(query.end,'2026-11-02');
+ const records=[{...good,release_date:'2026-10-31'},{...good,release_date:'2026-11-01'}, {...good,release_date:'2026-11-02'}, {...good,release_date:'2026-11-01',date_precision:'month'}];
+ await mockFetch(async url=>{
+  const u=new URL(url);if(u.pathname.endsWith('game_platforms'))return new Response('[]');
+  assert.equal(u.searchParams.get('date_precision'),'eq.day');
+  assert.equal(u.searchParams.get('and'),'(release_date.gte.2026-10-26,release_date.lt.2026-11-02)');
+  return new Response(JSON.stringify(records));
+ },async()=>{
+  const result=await loadCalendar('https://db.invalid','key',query);
+  assert.deepEqual(result.releases.map(r=>r.date),['2026-10-31','2026-11-01']);
+  assert.equal(result.last,'2026-11-01');assert.equal(result.view,'week');
+ });
 });

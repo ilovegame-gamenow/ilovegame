@@ -197,6 +197,9 @@ try {
   let calendar=await loadCalendar(process.env.SUPABASE_URL,serviceToken,calendarQuery);
   const calendarRows=calendar.releases.filter(r=>r.game.id===calendarGame.id);
   assert.equal(calendarRows.length,2);assert.equal(calendarRows.find(r=>r.precision==='day').platforms.length,2);
+  const weeklyCalendar=await loadCalendar(process.env.SUPABASE_URL,serviceToken,readCalendarQuery({view:'week'},new Date('2026-11-12T00:00:00Z')));
+  const weeklyRows=weeklyCalendar.releases.filter(r=>r.game.id===calendarGame.id);
+  assert.equal(weeklyRows.length,1);assert.equal(weeklyRows[0].precision,'day');assert.equal(weeklyRows[0].platforms.length,2);
   assert.equal((await raw(`/game_sources?id=eq.${calendarSource.id}`,serviceToken,{method:'PATCH',body:JSON.stringify({review_status:'rejected',verified_at:null})})).status,204);
   calendar=await loadCalendar(process.env.SUPABASE_URL,serviceToken,calendarQuery);
   assert.equal(calendar.releases.some(r=>r.game.id===calendarGame.id),false);

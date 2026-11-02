@@ -1,3 +1,16 @@
+export function tokyoDate(now = new Date()) {
+  return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
+}
+export function formatReleaseDate(value) {
+  return `${Number(value.slice(5,7))}月${Number(value.slice(8,10))}日`;
+}
+// Current week is Monday through Sunday in Japan, independently of the displayed month.
+export function weekRange(now = new Date()) {
+  const monday=new Date(`${tokyoDate(now)}T00:00:00Z`);
+  monday.setUTCDate(monday.getUTCDate()-(monday.getUTCDay()+6)%7);
+  const date=offset=>new Date(monday.getTime()+offset*86400000).toISOString().slice(0,10);
+  return {start:date(0),end:date(7),last:date(6)};
+}
 // Shared date-only rules for the browser and server. Never parse a release as a local timestamp.
 export function tokyoMonth(now = new Date()) {
   return new Intl.DateTimeFormat('sv-SE', {timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit'}).format(now);
