@@ -17,3 +17,17 @@ export function steamImageUrl(value,appid) {
     return url.href;
   }catch{return null;}
 }
+// Embed only a validated YouTube ID; never insert a supplied URL into an iframe.
+export function youtubeVideoId(value) {
+ try{
+  const u=new URL(value);
+  if(u.protocol!=='https:'||u.username||u.password||u.port)return null;
+  let id;
+  if(u.hostname==='youtu.be'&&/^\/[A-Za-z0-9_-]{11}$/.test(u.pathname))id=u.pathname.slice(1);
+  else if(['www.youtube.com','youtube.com','www.youtube-nocookie.com'].includes(u.hostname)){
+   if(u.pathname==='/watch')id=u.searchParams.get('v');
+   else id=u.pathname.match(/^\/(?:embed|shorts)\/([A-Za-z0-9_-]{11})$/)?.[1];
+  }
+  return typeof id==='string'&&/^[A-Za-z0-9_-]{11}$/.test(id)?id:null;
+ }catch{return null;}
+}
