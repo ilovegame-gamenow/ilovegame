@@ -1,6 +1,9 @@
+import { handleCalendar } from '../lib/release-calendar.js';
 import { getSiteSettings } from "../lib/site-settings.js";
 
 export default async function handler(req, res) {
+  if (req.query?.resource === 'calendar') return handleCalendar(req,res);
+  if (req.query?.resource !== undefined) return res.status(400).json({ error: 'Invalid resource' });
   res.setHeader("Cache-Control", "no-store");
   try {
     const supabaseUrl = process.env.SUPABASE_URL;

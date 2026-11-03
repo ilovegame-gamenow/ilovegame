@@ -4,7 +4,8 @@
     { label: "速報", href: "/#breaking" },
     { label: "最新", href: "/#latest" },
     { label: "ニュース", href: "/#latest" },
-    { label: "PICK UP", href: "/#pickup" }
+    { label: "PICK UP", href: "/#pickup" },
+    { label: "発売カレンダー", href: "/calendar.html" }
   ];
 
   function renderHeader() {
@@ -15,7 +16,7 @@
     const homeUrl = isEditor ? "/editor-dashboard.html" : "/";
 
     const links = navigation.map(item =>
-      `<a href="${item.href}">${item.label}</a>`
+      `<a href="${item.href}"${item.href === "/calendar.html" ? ' class="calendar-link"' : ''}>${item.label}</a>`
     ).join("");
 
     const rightContent = isEditor

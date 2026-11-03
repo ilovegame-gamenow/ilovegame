@@ -1,3 +1,4 @@
+import {loadCalendar,readCalendarQuery} from '../../lib/release-calendar.js';
 import {createMediaArticle,findArticleBySource} from '../../lib/article-draft-repository.js';
 // A real PostgREST/PostgreSQL test. No fetch mocks, hosted credentials or dependencies.
 import assert from 'node:assert/strict';
@@ -183,5 +184,25 @@ try {
   const repeated=await createMediaArticle(process.env.SUPABASE_URL,serviceToken,{...mediaItem,title:'Must not overwrite'},'Other');
   assert.equal(repeated.created,false);assert.equal((await rows(`/articles?id=eq.${repeated.id}`))[0].title,'Manual media headline');
   console.log('PASS: concurrent media article registration deduplicates source URLs without overwriting stored content');
+  // Real embedded joins must exclude unpublished works and revoked sources.
+  const calendarGame={...game,id:randomUUID(),title:'Calendar integration',source_url:'https://example.org/calendar'};
+  await create(calendarGame);
+  const calendarSource=(await rows(`/game_sources?game_id=eq.${calendarGame.id}`))[0];
+  for(const [path,body] of [[`/games?id=eq.${calendarGame.id}`,{status:'published'}],[`/game_sources?id=eq.${calendarSource.id}`,{review_status:'verified',verified_at:new Date().toISOString()}]]) {
+    assert.equal((await raw(path,serviceToken,{method:'PATCH',body:JSON.stringify(body)})).status,204);
+  }
+  const releaseBase={game_id:calendarGame.id,source_id:calendarSource.id,region_code:'JP',release_date:'2026-11-12',date_precision:'day',verified_at:new Date().toISOString()};
+  assert.equal((await raw('/game_releases',serviceToken,{method:'POST',body:JSON.stringify([{...releaseBase,platform_code:'ps5'},{...releaseBase,platform_code:'windows'},{...releaseBase,platform_code:'switch-2',date_precision:'month',release_date:'2026-11-01'}])})).status,201);
+  const calendarQuery=readCalendarQuery({month:'2026-11'});
+  let calendar=await loadCalendar(process.env.SUPABASE_URL,serviceToken,calendarQuery);
+  const calendarRows=calendar.releases.filter(r=>r.game.id===calendarGame.id);
+  assert.equal(calendarRows.length,2);assert.equal(calendarRows.find(r=>r.precision==='day').platforms.length,2);
+  const weeklyCalendar=await loadCalendar(process.env.SUPABASE_URL,serviceToken,readCalendarQuery({view:'week'},new Date('2026-11-12T00:00:00Z')));
+  const weeklyRows=weeklyCalendar.releases.filter(r=>r.game.id===calendarGame.id);
+  assert.equal(weeklyRows.length,1);assert.equal(weeklyRows[0].precision,'day');assert.equal(weeklyRows[0].platforms.length,2);
+  assert.equal((await raw(`/game_sources?id=eq.${calendarSource.id}`,serviceToken,{method:'PATCH',body:JSON.stringify({review_status:'rejected',verified_at:null})})).status,204);
+  calendar=await loadCalendar(process.env.SUPABASE_URL,serviceToken,calendarQuery);
+  assert.equal(calendar.releases.some(r=>r.game.id===calendarGame.id),false);
+  console.log('PASS: real calendar inner joins, cross-platform grouping, month precision and source revocation');
   console.log('All catalog REST integration checks passed. Disposable test data stays in the CI DB.');
 }finally{await new Promise(resolve=>gateway.close(resolve));}

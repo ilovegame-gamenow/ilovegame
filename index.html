@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="/header.css">
 <link rel="stylesheet" href="/news-card.css">
 <link rel="stylesheet" href="/pagination.css">
+<link rel="stylesheet" href="/release-cards.css">
+<link rel="stylesheet" href="/weekly-roundup.css">
 </head>
 <body>
 <header></header>
@@ -17,6 +19,15 @@
   <img id="breaking-image" alt="" hidden>
   <h1 id="breaking-title">速報をチェック中...</h1>
   <div id="breaking-meta" class="meta"></div>
+</section>
+
+<section id="weeklyReleases" class="weekly-section" aria-labelledby="weekHeading">
+  <div class="weekly-heading"><h2 id="weekHeading">今週発売のゲーム</h2><a id="calendarLink" href="/calendar.html">発売カレンダーを見る →</a></div>
+  <p class="week-note"><span id="weekRange"></span>日本発売・月曜〜日曜</p>
+  <p id="weeklyDemo" class="weekly-demo" hidden>表示サンプルです。作品名・発売日はすべて架空のデータです。</p>
+  <p id="weekMessage" role="status" aria-live="polite">今週の発売情報を読み込んでいます…</p>
+  <button id="retryWeek" type="button" hidden>今週の情報をもう一度読み込む</button>
+  <div id="weekList"></div>
 </section>
 
 <div class="section-title" id="latest">
@@ -45,6 +56,7 @@
 <script src="/news-card.js"></script>
 <script src="/featured-news.js"></script>
 <script src="/pagination.js"></script>
+<script type="module" src="/weekly-releases.js"></script>
 <script>
 
 async function loadLiveNews(){
