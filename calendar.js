@@ -32,7 +32,7 @@ function render(){
 async function load(){
  const id=++requestId;controller?.abort();controller=new AbortController();selectedDay=null;data=null;
  $('regionFilter').value=region;
- $('monthHeading').textContent=`${month.slice(0,4)}年${Number(month.slice(5))}月`;$('heroMonth').textContent=String(Number(month.slice(5)));
+ $('monthHeading').textContent=`${month.slice(0,4)}年${Number(month.slice(5))}月`;
  $('previousMonth').disabled=!monthRange(shiftMonth(month,-1));$('nextMonth').disabled=!monthRange(shiftMonth(month,1));
  $('calendarGrid').replaceChildren();$('releaseList').replaceChildren();$('releaseCount').textContent='';$('monthOnlySection').hidden=true;$('showAllDays').hidden=true;
  $('calendarMessage').textContent='発売情報を読み込んでいます…';$('calendarMessage').dataset.error='false';$('retryCalendar').hidden=true;$('regionNotice').hidden=region!=='WW';$('demoNotice').hidden=!demo;
@@ -45,7 +45,7 @@ async function load(){
   data=result;$('platformFilter').replaceChildren(new Option('すべての機種',''),...result.platforms.map(p=>new Option(p.name,p.code)));
   if(platform&&!result.platforms.some(p=>p.code===platform))$('platformFilter').append(new Option('指定した機種',platform));
   $('platformFilter').value=platform;$('regionFilter').value=region;
-  $('calendarMessage').textContent=result.truncated?'情報が多いため一部を表示しています。機種で絞り込んでください。':'発売日が確定した作品を表示しています。日付を選ぶと、その日の作品を確認できます。';render();
+  $('calendarMessage').textContent=result.truncated?'情報が多いため一部を表示しています。機種で絞り込んでください。':'日付を選ぶと、その日の発売作品を表示します。';render();
  }catch(error){if(id!==requestId||error.name==='AbortError')return;$('calendarMessage').textContent=error.message;$('calendarMessage').dataset.error='true';$('retryCalendar').hidden=false;}
 }
 $('previousMonth').addEventListener('click',()=>{month=shiftMonth(month,-1);load();});$('nextMonth').addEventListener('click',()=>{month=shiftMonth(month,1);load();});$('currentMonth').addEventListener('click',()=>{month=tokyoMonth();load();});$('platformFilter').addEventListener('change',e=>{platform=e.target.value;load();});$('regionFilter').addEventListener('change',e=>{region=e.target.value;load();});$('retryCalendar').addEventListener('click',load);$('showAllDays').addEventListener('click',()=>{selectedDay=null;render();});load();
