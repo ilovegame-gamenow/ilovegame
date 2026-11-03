@@ -32,7 +32,7 @@ function render(){
 async function load(){
  const id=++requestId;controller?.abort();controller=new AbortController();selectedDay=null;data=null;
  $('regionFilter').value=region;
- $('monthHeading').textContent=`${month.slice(0,4)}年${Number(month.slice(5))}月`;
+ $('monthHeading').textContent=`${month.slice(0,4)}年${Number(month.slice(5))}月`;$('heroMonth').textContent=String(Number(month.slice(5)));
  $('previousMonth').disabled=!monthRange(shiftMonth(month,-1));$('nextMonth').disabled=!monthRange(shiftMonth(month,1));
  $('calendarGrid').replaceChildren();$('releaseList').replaceChildren();$('releaseCount').textContent='';$('monthOnlySection').hidden=true;$('showAllDays').hidden=true;
  $('calendarMessage').textContent='発売情報を読み込んでいます…';$('calendarMessage').dataset.error='false';$('retryCalendar').hidden=true;$('regionNotice').hidden=region!=='WW';$('demoNotice').hidden=!demo;
