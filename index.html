@@ -22,12 +22,11 @@
 </section>
 
 <section id="weeklyReleases" class="weekly-section" aria-labelledby="weekHeading">
-  <div class="weekly-heading"><h2 id="weekHeading">今週発売のゲーム</h2><a id="calendarLink" href="/calendar.html">発売カレンダーを見る →</a></div>
+  <div class="weekly-heading"><h2 id="weekHeading">今週発売のゲーム</h2></div>
   <p class="week-note"><span id="weekRange"></span>日本発売・月曜〜日曜</p>
-  <p id="weeklyDemo" class="weekly-demo" hidden>表示サンプルです。作品名・発売日はすべて架空のデータです。</p>
-  <p id="weekMessage" role="status" aria-live="polite">今週の発売情報を読み込んでいます…</p>
-  <button id="retryWeek" type="button" hidden>今週の情報をもう一度読み込む</button>
-  <div id="weekList"></div>
+  <p id="weeklyDemo" class="weekly-demo" hidden>週まとめ記事の構成見本です。</p>
+  <div id="weekList"><a id="calendarLink" class="weekly-overview" href="/calendar.html"><span id="weeklyEmpty" class="weekly-empty"><strong>今週の新作をチェック</strong><span>発売情報は確認できた作品から追加します。</span></span><span id="weekHighlights" class="weekly-highlights"></span><span class="weekly-arrow" aria-hidden="true">→</span></a></div>
+  <div class="weekly-status"><p id="weekMessage" role="status" aria-live="polite">発売情報を確認中…</p><button id="retryWeek" type="button" hidden>再読み込み</button></div>
 </section>
 
 <div class="section-title" id="latest">

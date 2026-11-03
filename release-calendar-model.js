@@ -35,3 +35,9 @@ export function calendarGroups(releases) {
   }
   return [...groups.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.game.title.localeCompare(b.game.title,'ja'));
 }
+
+// A bounded home preview; keep the full schedule on the calendar page.
+export function weeklyHighlights(releases) {
+ const seen=new Set();
+ return [...releases].filter(r=>r.precision==='day').sort((a,b)=>a.date.localeCompare(b.date)||a.game.title.localeCompare(b.game.title,'ja')).filter(r=>{if(seen.has(r.game.id))return false;seen.add(r.game.id);return true;}).slice(0,3);
+}
