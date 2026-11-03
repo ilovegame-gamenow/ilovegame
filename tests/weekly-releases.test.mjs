@@ -22,13 +22,16 @@ test('home weekly failures and retries stay independent from news and calendar q
   assert.equal(u.searchParams.get('resource'),'calendar');assert.equal(u.searchParams.get('view'),'week');assert.equal(u.searchParams.get('region'),'JP');
   assert.equal(u.searchParams.has('month'),false);assert.equal(u.searchParams.has('platform'),false);
   if(calls===1)throw Error('Weekly connection failed');
-  return new Response(JSON.stringify({platforms:[],releases:[],...weekRange()}));
+  const releases=calls===2?Array.from({length:100},(_,id)=>({game:{id},precision:'day'})):[];
+  return new Response(JSON.stringify({platforms:[],releases,...weekRange()}));
  };
  try{
   await import(`../weekly-releases.js?test=${Date.now()}`);await settle();
-  assert.equal(ids.weekMessage.textContent,'Weekly connection failed');assert.equal(ids.retryWeek.hidden,false);assert.equal(ids.latest.textContent,'Existing news remains visible');
+  assert.equal(ids.weekMessage.textContent,'発売情報を取得できませんでした。');assert.equal(ids.retryWeek.hidden,false);assert.equal(ids.latest.textContent,'Existing news remains visible');
   await ids.retryWeek.listeners.click();
-  assert.equal(calls,2);assert.equal(ids.retryWeek.hidden,true);assert.equal(ids.weekList.children.length,0);assert.match(ids.weekMessage.textContent,/まだ掲載されていません/);assert.equal(ids.latest.textContent,'Existing news remains visible');
+  assert.equal(calls,2);assert.equal(ids.retryWeek.hidden,true);assert.equal(ids.weekList.children.length,0);assert.match(ids.weekMessage.textContent,/登録済み 100作品/);assert.equal(ids.latest.textContent,'Existing news remains visible');
+  await ids.retryWeek.listeners.click();
+  assert.equal(calls,3);assert.equal(ids.weekList.children.length,0);assert.match(ids.weekMessage.textContent,/確認できた作品から追加/);
  }finally{for(const [key,value] of Object.entries(originals)){if(value===undefined)delete globalThis[key];else globalThis[key]=value;}}
 });
 test('sample week and sample month share the same dates, platforms and grouping',()=>{
