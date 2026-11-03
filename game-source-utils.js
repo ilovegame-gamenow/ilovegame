@@ -31,3 +31,10 @@ export function youtubeVideoId(value) {
   return typeof id==='string'&&/^[A-Za-z0-9_-]{11}$/.test(id)?id:null;
  }catch{return null;}
 }
+
+// Deliberate editorial marker only; do not guess videos from arbitrary prose.
+export function articleVideoUrl(article) {
+ const match=String(article.article_body??'').match(/^公式動画[：:]\s*(https:\/\/\S+)\s*$/m);
+ const id=youtubeVideoId(match?.[1]??'')??youtubeVideoId(article.source_url);
+ return id?`https://www.youtube.com/watch?v=${id}`:null;
+}

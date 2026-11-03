@@ -78,6 +78,8 @@ window.GameArticle = (() => {
           formatText(originalText, width)
         )}</div>
 
+        <div class="article-videos"></div>
+
         ${article.ilovegame_point ? `
           <div class="point">
             <div class="point-title">
@@ -111,6 +113,14 @@ window.GameArticle = (() => {
       ""
     ).trim();
 
+    const videos=container.querySelector('.article-videos');
+    if(videos){
+      Promise.all([import('./official-video.js'),import('./game-source-utils.js')]).then(([{officialVideo},{articleVideoUrl}])=>{
+        if(!videos.isConnected)return;
+        const url=articleVideoUrl(article),video=url?officialVideo(article.title,url):null;
+        videos.replaceChildren(...(video?[video]:[]));
+      }).catch(()=>{});
+    }
     let previousWidth = 0;
 
     const observer = new ResizeObserver(() => {
