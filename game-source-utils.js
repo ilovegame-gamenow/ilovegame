@@ -34,7 +34,23 @@ export function youtubeVideoId(value) {
 
 // Deliberate editorial marker only; do not guess videos from arbitrary prose.
 export function articleVideoUrl(article) {
- const match=String(article.article_body??'').match(/^公式動画[：:]\s*(https:\/\/\S+)\s*$/m);
- const id=youtubeVideoId(match?.[1]??'')??youtubeVideoId(article.source_url);
- return id?`https://www.youtube.com/watch?v=${id}`:null;
+ return articleContentSegments(article).find(part=>part.type==='video')?.url??null;
+}
+
+// Preserve editorial placement, validate every marker and deduplicate by video ID.
+export function articleContentSegments(article) {
+ const parts=[],seen=new Set();let lines=[];
+ const flush=()=>{const text=lines.join('\n').trim();if(text)parts.push({type:'text',text});lines=[];};
+ for(const line of String(article.article_body||article.summary||'').trim().split('\n')){
+  const match=line.match(/^公式動画[：:][ \t]*(https:\/\/\S+)[ \t]*$/);
+  const id=match?youtubeVideoId(match[1]):null;
+  if(!id){lines.push(line);continue;}
+  flush();
+  if(!seen.has(id)){parts.push({type:'video',url:`https://www.youtube.com/watch?v=${id}`});seen.add(id);}
+ }
+ flush();
+ // Compatibility: a video used as the primary source follows the article text.
+ const sourceId=youtubeVideoId(article.source_url);
+ if(!seen.size&&sourceId)parts.push({type:'video',url:`https://www.youtube.com/watch?v=${sourceId}`});
+ return parts;
 }

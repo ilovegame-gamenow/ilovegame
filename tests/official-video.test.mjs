@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {youtubeVideoId,articleVideoUrl} from '../game-source-utils.js';
+import {youtubeVideoId,articleVideoUrl,articleContentSegments} from '../game-source-utils.js';
 import {officialVideo} from '../official-video.js';
 import {roundupPreview} from '../weekly-roundup-preview-data.js';
 test('official video parser accepts exact YouTube hosts and rejects injected or ambiguous embed URLs',()=>{
@@ -32,4 +32,29 @@ test('ordinary article videos require an explicit editorial marker or a YouTube 
  assert.equal(articleVideoUrl({article_body:'公式動画：https://youtube.com.evil.invalid/watch?v=Tb7mUhUhNlA'}),null);
  assert.equal(articleVideoUrl({source_url:'https://youtu.be/Tb7mUhUhNlA'}),'https://www.youtube.com/watch?v=Tb7mUhUhNlA');
  assert.equal(articleVideoUrl({article_body:'通常のニュース本文'}),null);
+});
+
+test('multiple official videos preserve their places between paragraphs and deduplicate URL variants',()=>{
+ const first='https://www.youtube.com/watch?v=Tb7mUhUhNlA';
+ const second='https://www.youtube.com/watch?v=19xi1Td52T0';
+ assert.deepEqual(articleContentSegments({article_body:`冒頭。\n公式動画：${first}\n遊びの説明。\n公式動画：${second}\n公式動画：https://youtu.be/Tb7mUhUhNlA\n結び。`,source_url:first}),[
+  {type:'text',text:'冒頭。'}, {type:'video',url:first},
+  {type:'text',text:'遊びの説明。'}, {type:'video',url:second},
+  {type:'text',text:'結び。'}
+ ]);
+});
+
+test('invalid markers and ordinary links stay text; source fallback is still available',()=>{
+ const text='説明。\n公式動画：https://youtube.com.evil.invalid/watch?v=Tb7mUhUhNlA\n参考 https://youtu.be/19xi1Td52T0';
+ assert.deepEqual(articleContentSegments({article_body:text}),[{type:'text',text}]);
+ assert.deepEqual(articleContentSegments({summary:'要約。',source_url:'https://youtu.be/Tb7mUhUhNlA'}),[
+  {type:'text',text:'要約。'},{type:'video',url:'https://www.youtube.com/watch?v=Tb7mUhUhNlA'}
+ ]);
+});
+
+test('video markers have no fixed count limit and do not consume the next paragraph',()=>{
+ const markers=Array.from({length:12},(_,i)=>`公式動画：https://youtu.be/${String(i).padStart(11,'0')}`);
+ const segments=articleContentSegments({article_body:markers.join('\n\n')+'\n最後の文章。'});
+ assert.equal(segments.filter(p=>p.type==='video').length,12);
+ assert.deepEqual(segments.at(-1),{type:'text',text:'最後の文章。'});
 });

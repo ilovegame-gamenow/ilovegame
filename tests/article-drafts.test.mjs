@@ -72,8 +72,8 @@ test('AI regeneration returns text without writing either drafts or articles', a
   const generation = calls.find(c => c.url === 'https://api.openai.com/v1/responses');
   const prompt = JSON.parse(generation.body).input;
   assert.match(prompt, /ゲーム好きの友達/);
-  assert.match(prompt, /この親しみやすい口調はilovegame_pointだけ/);
-  assert.match(prompt, /サービス終了や不具合/);
+  assert.match(prompt, /本文は丁寧な「です・ます」/);
+  assert.match(prompt, /延期・不具合・サービス終了/);
   assert.ok(calls.filter(c => c.url.includes('/rest/v1/')).every(c => !c.method));
 });
 

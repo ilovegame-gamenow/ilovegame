@@ -78,8 +78,6 @@ window.GameArticle = (() => {
           formatText(originalText, width)
         )}</div>
 
-        <div class="article-videos"></div>
-
         ${article.ilovegame_point ? `
           <div class="point">
             <div class="point-title">
@@ -113,14 +111,29 @@ window.GameArticle = (() => {
       ""
     ).trim();
 
-    const videos=container.querySelector('.article-videos');
-    if(videos){
-      Promise.all([import('./official-video.js'),import('./game-source-utils.js')]).then(([{officialVideo},{articleVideoUrl}])=>{
-        if(!videos.isConnected)return;
-        const url=articleVideoUrl(article),video=url?officialVideo(article.title,url):null;
-        videos.replaceChildren(...(video?[video]:[]));
-      }).catch(()=>{});
-    }
+    let contentParts = null;
+    const draw = width => {
+      if (!contentParts) {
+        bodyElement.textContent = formatText(originalText, width);
+        return;
+      }
+      for (const part of contentParts) {
+        if (part.type === 'text') part.element.textContent = formatText(part.text, width);
+      }
+    };
+    Promise.all([import('./official-video.js'), import('./game-source-utils.js')])
+      .then(([{officialVideo}, {articleContentSegments}]) => {
+        if (!bodyElement.isConnected) return;
+        contentParts = articleContentSegments(article).map(part => {
+          const element = part.type === 'video'
+            ? officialVideo(article.title, part.url)
+            : document.createElement('div');
+          if (part.type === 'text') element.className = 'article-text';
+          return {...part, element};
+        });
+        bodyElement.replaceChildren(...contentParts.map(part => part.element));
+        draw(bodyElement.clientWidth);
+      }).catch(() => {});
     let previousWidth = 0;
 
     const observer = new ResizeObserver(() => {
@@ -128,10 +141,7 @@ window.GameArticle = (() => {
       if (width === previousWidth) return;
 
       previousWidth = width;
-      bodyElement.textContent = formatText(
-        originalText,
-        width
-      );
+      draw(width);
     });
 
     observer.observe(bodyElement);
