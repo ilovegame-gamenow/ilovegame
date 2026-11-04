@@ -28,7 +28,7 @@ async function loadWeek(){
   $('weekMessage').textContent='紹介例：2作品（全発売作品の一覧ではありません）';busy=false;return;
  }
  try{
-  const result=await requestCalendar(new URLSearchParams({view:'week',region:'JP'}));
+  const result=await requestCalendar(new URLSearchParams({view:'roundup',region:'JP'}));
   $('weekRange').textContent=`${formatReleaseDate(result.start)}〜${formatReleaseDate(result.last)}`;
   const releases=result.releases.filter(r=>r.precision==='day');
   const count=new Set(releases.map(r=>r.game.id)).size;showHighlights(releases);
