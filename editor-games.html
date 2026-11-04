@@ -16,6 +16,13 @@
     <p class="catalog-intro" id="catalogIntro">同じゲームの記事や資料を、ひとつの作品にまとめる場所です。機種が違っても、同じ作品はひとつにまとめます。</p>
     <nav class="catalog-shortcuts" aria-label="作品管理の操作"><button type="button" id="openGameCreate">＋ 作品を追加</button><a href="/editor-discoveries.html">見つけた候補から選ぶ →</a></nav>
     <p id="catalogMessage" role="status" aria-live="polite">作品情報を読み込んでいます…</p>
+    <details class="catalog-panel" id="releaseMaintenance">
+      <summary>発売日の確認・変更履歴</summary>
+      <p class="catalog-note">公式情報を再確認した結果をまとめます。機種ごとの延期や発売日変更を確認できます。</p>
+      <button id="reloadReleases" type="button">読み直す</button>
+      <p id="releaseCheckMessage" role="status" aria-live="polite"></p>
+      <div id="releaseCheckList"></div>
+    </details>
     <section class="catalog-panel" id="articleContext" hidden>
       <h2>この記事に選んだ作品</h2>
       <p id="contextTitle"></p>
@@ -78,5 +85,6 @@
   <script src="/editor-social-evidence.js"></script>
   <script src="/editor-game-workflow.js"></script>
   <script src="/editor-games.js"></script>
+  <script type="module" src="/editor-release-maintenance.js"></script>
 </body>
 </html>
