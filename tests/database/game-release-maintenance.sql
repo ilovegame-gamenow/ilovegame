@@ -73,6 +73,12 @@ begin
  if not failed then raise exception 'Revoked evidence applied'; end if;
  update public.game_sources set review_status='verified',verified_at=now() where id=r.source_id;
  perform public.resolve_game_release_check(c.id,r.updated_at,'reject');
+  c:=public.record_game_release_check(gen_random_uuid(),r.id,r.updated_at,r.source_id,'change_candidate',claim,'Date changed','Official evidence');
+  update public.game_sources set url='https://example.org/source-edited-after-check' where id=r.source_id;
+  failed:=false;
+  begin perform public.resolve_game_release_check(c.id,r.updated_at,'apply'); exception when unique_violation then failed:=true; end;
+  if not failed then raise exception 'Edited source snapshot ignored'; end if;
+  perform public.resolve_game_release_check(c.id,r.updated_at,'reject');
  c:=public.record_game_release_check(gen_random_uuid(),r.id,r.updated_at,r.source_id,'ambiguous',null,'Timezone uncertain','Do not treat UTC display as Japan');
  c:=public.record_game_release_check(gen_random_uuid(),r.id,r.updated_at,r.source_id,'unavailable',null,'Fetch failed','Could not read original');
  if (select release_date from public.game_releases where id=r.id)<>r.release_date then raise exception 'Failed fetch changed date'; end if;

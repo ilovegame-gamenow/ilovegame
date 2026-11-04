@@ -29,6 +29,7 @@ create table public.game_release_checks (
   id uuid primary key,
   release_id uuid not null references public.game_releases(id) on delete restrict,
   source_id uuid not null references public.game_sources(id) on delete restrict,
+  source_values jsonb not null,
   outcome text not null check(outcome in ('unchanged','change_candidate','ambiguous','unavailable')),
   before_values jsonb not null,
   proposed jsonb,
@@ -108,8 +109,8 @@ begin
       raise exception 'Outcome does not match schedule' using errcode='22023';
     end if;
   elsif p_proposed is not null then raise exception 'Ambiguous checks must not assert a new date' using errcode='22023'; end if;
-  insert into public.game_release_checks(id,release_id,source_id,outcome,before_values,proposed,reason,evidence,resolution)
-    values(p_id,r.id,s.id,p_outcome,to_jsonb(r),p_proposed,p_reason,p_evidence,
+  insert into public.game_release_checks(id,release_id,source_id,source_values,outcome,before_values,proposed,reason,evidence,resolution)
+    values(p_id,r.id,s.id,to_jsonb(s),p_outcome,to_jsonb(r),p_proposed,p_reason,p_evidence,
       case when p_outcome='change_candidate' then 'pending' else 'recorded' end) returning * into saved;
   return saved;
 end;
@@ -137,7 +138,8 @@ begin
     raise exception 'Release changed; recheck required' using errcode='40001';
   end if;
   select * into s from public.game_sources where id=c.source_id and game_id=r.game_id for share;
-  if not found or s.source_type not in ('official','store') or s.review_status<>'verified' or s.verified_at is null then
+  if not found or s.source_type not in ('official','store') or s.review_status<>'verified' or s.verified_at is null
+    or to_jsonb(s)<>c.source_values then
     raise exception 'Evidence no longer verified' using errcode='23505';
   end if;
   update public.game_releases set status=c.proposed->>'status',release_date=(c.proposed->>'release_date')::date,

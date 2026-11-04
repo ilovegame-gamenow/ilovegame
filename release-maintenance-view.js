@@ -14,7 +14,7 @@ export function renderReleaseMaintenance(list,data,onDecision){
       const card=node('section',undefined,'catalog-panel');
       card.append(node('h4',`${c.release.game.title}／${c.release.platform_code}・${c.release.region_code}`),
         node('p',`${releaseScheduleLabel(c.before_values)} → ${releaseScheduleLabel(c.proposed)}`),node('p',c.reason),node('p',c.evidence,'catalog-note'));
-      const link=sourceLink(c.source.url);if(link)card.append(link);
+      const link=sourceLink(c.source_values?.url??c.source.url);if(link)card.append(link);
       for(const [action,label] of [['apply','確認して反映する'],['reject','この変更は採用しない']]){
         const button=node('button',label);button.type='button';button.addEventListener('click',async()=>{
           button.disabled=true;
