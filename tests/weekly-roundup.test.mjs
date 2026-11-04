@@ -13,10 +13,11 @@ test('roundup uses the same Tokyo week across year boundaries and rejects a mont
 });
 test('weekly copy/media come only from explicit links and the public articles view',async()=>{
  const old=globalThis.fetch,calls=[];
- globalThis.fetch=async input=>{
+ globalThis.fetch=async (input,options)=>{
   const url=new URL(input);calls.push(url.pathname);
-  if(url.pathname.endsWith('/article_games'))return new Response(JSON.stringify([{game_id:id,article_id:1},{game_id:id,article_id:2},{game_id:id,article_id:3},{game_id:'unrelated',article_id:99}]));
+  if(url.pathname.endsWith('/article_games')){assert.equal(options.headers.apikey,'server-only');return new Response(JSON.stringify([{game_id:id,article_id:1},{game_id:id,article_id:2},{game_id:id,article_id:3},{game_id:'unrelated',article_id:99}]));}
   assert.ok(url.pathname.endsWith('/published_articles'));
+  assert.equal(options.headers.apikey,'public-access');
   assert.equal(url.searchParams.get('id'),'in.(1,2,3)');
   // Linked article 3 is not publicly visible, so the view excludes it.
   return new Response(JSON.stringify([
@@ -25,7 +26,7 @@ test('weekly copy/media come only from explicit links and the public articles vi
   ]));
  };
  try{
-  const result=await addWeeklyEditorial('https://db.invalid','server-only',{releases:[release,{...release,date:'2026-11-07'},{...release,game:{id:'b0da9ffc-273a-4c04-99ea-2521423724d6',title:'別作品'}}]});
+  const result=await addWeeklyEditorial('https://db.invalid','server-only',{releases:[release,{...release,date:'2026-11-07'},{...release,game:{id:'b0da9ffc-273a-4c04-99ea-2521423724d6',title:'別作品'}}]},'public-access');
   assert.equal(result.releases[0].editorial.articleId,2);
   assert.equal(result.releases[0].editorial.videos.length,2);
   assert.equal(result.releases[1].editorial.articleId,2);
@@ -75,6 +76,7 @@ test('roundup renders safe text, platform-specific dates, immediate videos, empt
 test('an editorial outage still returns verified release information with an explicit partial flag',async()=>{
  const oldFetch=globalThis.fetch,old={...process.env};
  process.env.GAME_CATALOG_ENABLED='true';process.env.SUPABASE_URL='https://db.invalid';process.env.SUPABASE_SECRET_KEY='key';
+ process.env.SUPABASE_PUBLISHABLE_KEY='public-key';
  const now=readCalendarQuery({view:'roundup'});
  globalThis.fetch=async url=>{
   if(url.includes('article_games?'))throw Error('Article link service unavailable');
@@ -83,5 +85,5 @@ test('an editorial outage still returns verified release information with an exp
  };
  const res={setHeader(){},status(code){this.code=code;return this;},json(body){this.body=body;return this;}};
  try{await handleCalendar({method:'GET',query:{resource:'calendar',view:'roundup'}},res);assert.equal(res.code,200);assert.equal(res.body.detailsUnavailable,true);assert.equal(res.body.releases.length,1);}
- finally{globalThis.fetch=oldFetch;for(const k of ['GAME_CATALOG_ENABLED','SUPABASE_URL','SUPABASE_SECRET_KEY']){if(old[k]===undefined)delete process.env[k];else process.env[k]=old[k];}}
+ finally{globalThis.fetch=oldFetch;for(const k of ['GAME_CATALOG_ENABLED','SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_PUBLISHABLE_KEY']){if(old[k]===undefined)delete process.env[k];else process.env[k]=old[k];}}
 });
