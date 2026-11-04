@@ -41,3 +41,18 @@ export function weeklyHighlights(releases) {
  const seen=new Set();
  return [...releases].filter(r=>r.precision==='day').sort((a,b)=>a.date.localeCompare(b.date)||a.game.title.localeCompare(b.game.title,'ja')).filter(r=>{if(seen.has(r.game.id))return false;seen.add(r.game.id);return true;}).slice(0,3);
 }
+
+// One editorial headline and a bounded image strip, independent of release count.
+export function weeklyOverview(releases, range) {
+ const seen=new Set();
+ const games=[...releases].filter(r=>r.precision==='day').sort((a,b)=>a.date.localeCompare(b.date)||a.game.title.localeCompare(b.game.title,'ja')).filter(r=>{
+  if(seen.has(r.game.id))return false;seen.add(r.game.id);return true;
+ });
+ const sameMonth=range.start.slice(0,7)===range.last.slice(0,7);
+ const dates=`${formatReleaseDate(range.start).replace(/日$/,'')}～${sameMonth?Number(range.last.slice(8)):formatReleaseDate(range.last).replace(/日$/,'')}日`;
+ const names=games.slice(0,2).map(r=>`『${r.game.title}』`).join('');
+ return {
+  headline:`【今週発売ゲーム】${names}${games.length>2?'ほか、':names?'、':''}${dates}発売タイトルまとめ！`,
+  images:games.filter(r=>r.image).slice(0,6),count:games.length
+ };
+}
