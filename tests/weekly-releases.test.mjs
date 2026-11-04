@@ -19,7 +19,7 @@ test('home weekly failures and retries stay independent from news and calendar q
  let calls=0;
  globalThis.fetch=async input=>{
   calls++;const u=new URL(input,'https://site.invalid');
-  assert.equal(u.searchParams.get('resource'),'calendar');assert.equal(u.searchParams.get('view'),'week');assert.equal(u.searchParams.get('region'),'JP');
+  assert.equal(u.searchParams.get('resource'),'calendar');assert.equal(u.searchParams.get('view'),'roundup');assert.equal(u.searchParams.get('region'),'JP');
   assert.equal(u.searchParams.has('month'),false);assert.equal(u.searchParams.has('platform'),false);
   if(calls===1)throw Error('Weekly connection failed');
   const releases=calls===2?Array.from({length:100},(_,id)=>({game:{id,title:`Game ${id}`},date:'2026-11-05',precision:'day',platforms:[{name:'Steam'}]})):[];
