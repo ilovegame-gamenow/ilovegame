@@ -29,7 +29,7 @@ test('home weekly failures and retries stay independent from news and calendar q
   await import(`../weekly-releases.js?test=${Date.now()}`);await settle();
   assert.equal(ids.weekMessage.textContent,'発売情報を取得できませんでした。');assert.equal(ids.retryWeek.hidden,false);assert.equal(ids.latest.textContent,'Existing news remains visible');
   await ids.retryWeek.listeners.click();
-  assert.equal(calls,2);assert.equal(ids.retryWeek.hidden,true);assert.equal(ids.weekList.children.length,0);assert.equal(ids.weekHighlights.children.length,0);assert.match(ids.weekTitle.textContent,/『Game 0』『Game 1』ほか/);assert.equal(ids.weeklyEmpty.hidden,true);assert.match(ids.weekMessage.textContent,/登録済み 100作品/);assert.equal(ids.latest.textContent,'Existing news remains visible');
+  assert.equal(calls,2);assert.equal(ids.retryWeek.hidden,true);assert.equal(ids.weekList.children.length,0);assert.equal(ids.weekHighlights.children.length,0);assert.match(ids.weekTitle.textContent,/『Game 0』や『Game 1』など/);assert.equal(ids.weeklyEmpty.hidden,true);assert.match(ids.weekMessage.textContent,/登録済み 100作品/);assert.equal(ids.latest.textContent,'Existing news remains visible');
   await ids.retryWeek.listeners.click();
   assert.equal(ids.weekHighlights.children.length,0);assert.equal(ids.weeklyEmpty.hidden,false);assert.equal(calls,3);assert.equal(ids.weekList.children.length,0);assert.match(ids.weekMessage.textContent,/確認できた作品から追加/);
  }finally{for(const [key,value] of Object.entries(originals)){if(value===undefined)delete globalThis[key];else globalThis[key]=value;}}
@@ -53,10 +53,21 @@ test('roundup headline names two actual games, uses other only for additional ga
  const game=i=>({game:{id:i,title:`作品${i}`},date:'2026-11-05',precision:'day',image:`https://image.invalid/${i}.jpg`});
  const releases=Array.from({length:10},(_,i)=>game(i));
  const overview=weeklyOverview([game(0),...releases],range);
- assert.equal(overview.headline,'【今週発売ゲーム】『作品0』『作品1』ほか、11月2～8日発売タイトルまとめ！');
+ assert.equal(overview.headline,'『作品0』や『作品1』などが登場！今週発売のゲームまとめ【11月2日～8日】');
  assert.equal(overview.count,10);assert.equal(overview.images.length,6);
- assert.equal(weeklyOverview([game(0)],range).headline,'【今週発売ゲーム】『作品0』、11月2～8日発売タイトルまとめ！');
- assert.equal(weeklyOverview([],range).headline,'【今週発売ゲーム】11月2～8日発売タイトルまとめ！');
- assert.match(weeklyOverview([game(0)],{start:'2026-11-30',last:'2026-12-06'}).headline,/11月30～12月6日/);
+ assert.equal(weeklyOverview([game(0)],range).headline,'『作品0』が登場！今週発売のゲームまとめ【11月2日～8日】');
+ assert.equal(weeklyOverview([],range).headline,'今週発売のゲームまとめ【11月2日～8日】');
+ assert.match(weeklyOverview([game(0)],{start:'2026-11-30',last:'2026-12-06'}).headline,/11月30日～12月6日/);
  assert.equal(weeklyOverview([{...game(0),precision:'month'}],range).count,0);
+});
+
+test('headline and images prioritize established series before release order or news importance',()=>{
+ const make=(id,title,date,importance)=>({game:{id,title},date,precision:'day',image:`https://image.invalid/${id}.jpg`,editorial:{importance}});
+ const input=[make('indie','新しい冒険','2026-11-02',99),make('small','小さな新作','2026-11-03',85),make('zelda','ゼルダの伝説 時のオカリナ','2026-11-05',70)];
+ const result=weeklyOverview(input,{start:'2026-11-02',last:'2026-11-08'});
+ assert.match(result.headline,/^『ゼルダの伝説 時のオカリナ』や『新しい冒険』/);
+ assert.deepEqual(result.images.map(r=>r.game.id),['zelda','indie','small']);
+ assert.equal(input[0].game.id,'indie');
+ const mention=make('mention','新作：ゼルダの伝説を語る','2026-11-01',100);
+ assert.equal(weeklyOverview([mention,input[2]],{start:'2026-11-02',last:'2026-11-08'}).images[0].game.id,'zelda');
 });
