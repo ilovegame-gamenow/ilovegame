@@ -5,6 +5,7 @@ import { readGameInput, readGameQuery, isGameId, isArticleId } from '../lib/game
 import { CatalogError, searchGames, createGame, getArticleGames, changeArticleGame } from '../lib/game-catalog-repository.js';
 import { handleDiscoveries } from '../lib/editor-discoveries-handler.js';
 import { handleResearch } from '../lib/editor-research-handler.js';
+import { handleReleaseMaintenance } from '../lib/release-maintenance.js';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control','no-store');
@@ -22,6 +23,7 @@ export default async function handler(req, res) {
   if(resource==='discoveries') return handleDiscoveries({...req,query},res,{url,key});
   if(['steam-media','showcase','bluesky-preview','media-preview'].includes(resource))return handleSourcePreviews({...req,query},res,{url,key},resource);
   if(resource==='research') return handleResearch({...req,query},res,{url,key});
+  if(resource==='release-maintenance') return handleReleaseMaintenance({...req,query},res,{url,key});
   if(resource!==undefined) return res.status(400).json({error:'Invalid resource'});
   try {
     if (req.method === 'GET') {

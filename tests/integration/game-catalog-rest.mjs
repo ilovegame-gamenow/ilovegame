@@ -200,6 +200,36 @@ try {
   const weeklyCalendar=await loadCalendar(process.env.SUPABASE_URL,serviceToken,readCalendarQuery({view:'week'},new Date('2026-11-12T00:00:00Z')));
   const weeklyRows=weeklyCalendar.releases.filter(r=>r.game.id===calendarGame.id);
   assert.equal(weeklyRows.length,1);assert.equal(weeklyRows[0].precision,'day');assert.equal(weeklyRows[0].platforms.length,2);
+  process.env.GAME_RELEASE_MAINTENANCE_ENABLED='true';
+  const maintenanceQuery={resource:'release-maintenance'};
+  const ps5Release=(await rows(`/game_releases?game_id=eq.${calendarGame.id}&platform_code=eq.ps5`))[0];
+  const checkInput={p_id:randomUUID(),p_release_id:ps5Release.id,p_expected_updated_at:ps5Release.updated_at,p_source_id:calendarSource.id,
+    p_outcome:'change_candidate',p_proposed:{status:'announced',release_date:'2026-11-19',date_precision:'day',release_label:'Confirmed postponement'},p_reason:'PS5 delay only',p_evidence:'Official announcement fixture'};
+  let checked=await raw('/rpc/record_game_release_check',serviceToken,{method:'POST',body:JSON.stringify(checkInput)});
+  assert.equal(checked.status,200,await checked.clone().text());
+  const maintenance=await call('GET',null,maintenanceQuery);
+  assert.equal(maintenance.code,200,JSON.stringify(maintenance.body));
+  assert.equal(maintenance.body.pending.find(c=>c.id===checkInput.p_id).release.game.title,calendarGame.title);
+  assert.equal(maintenance.body.recentChecks.find(c=>c.id===checkInput.p_id).outcome,'change_candidate');
+  const decisions=await Promise.all([0,1].map(()=>call('POST',{action:'apply',id:checkInput.p_id,expected_updated_at:ps5Release.updated_at},maintenanceQuery)));
+  assert.deepEqual(decisions.map(r=>r.code),[200,200]);
+  const changedRelease=(await rows(`/game_releases?id=eq.${ps5Release.id}`))[0];
+  assert.equal(changedRelease.release_date,'2026-11-19');
+  const historyRows=await rows(`/game_release_history?release_id=eq.${ps5Release.id}`);
+  assert.equal(historyRows.length,1);assert.equal(historyRows[0].before_values.release_date,'2026-11-12');
+  assert.equal((await rows(`/game_releases?game_id=eq.${calendarGame.id}&platform_code=eq.windows`))[0].release_date,'2026-11-12');
+  checked=await raw('/rpc/record_game_release_check',serviceToken,{method:'POST',body:JSON.stringify({...checkInput,p_id:randomUUID(),p_expected_updated_at:changedRelease.updated_at,p_proposed:{status:'delayed',release_date:null,date_precision:'unknown',release_label:'New date TBD'}})});
+  assert.equal(checked.status,200);const indefinite=await checked.json();
+  assert.equal((await call('POST',{action:'apply',id:indefinite.id,expected_updated_at:changedRelease.updated_at},maintenanceQuery)).code,200);
+  calendar=await loadCalendar(process.env.SUPABASE_URL,serviceToken,calendarQuery);
+  const remainingDay=calendar.releases.find(r=>r.game.id===calendarGame.id&&r.precision==='day');
+  assert.deepEqual(remainingDay.platforms.map(p=>p.code),['windows']);
+  assert.equal((await call('GET',null,maintenanceQuery)).body.history.filter(h=>h.release.game.title===calendarGame.title).length,2);
+  for(const token of [null,jwt('authenticated')]){
+    for(const table of ['game_release_history','game_release_checks'])assert.ok([401,403].includes((await raw(`/${table}?limit=1`,token)).status));
+    assert.ok([401,403].includes((await raw('/rpc/resolve_game_release_check',token,{method:'POST',body:JSON.stringify({p_id:indefinite.id,p_expected_updated_at:changedRelease.updated_at,p_decision:'apply'})})).status));
+  }
+  console.log('PASS: release checks through actual REST, joined editor overview, concurrent decisions, one audit entry and per-machine indefinite delay removal');
   assert.equal((await raw(`/game_sources?id=eq.${calendarSource.id}`,serviceToken,{method:'PATCH',body:JSON.stringify({review_status:'rejected',verified_at:null})})).status,204);
   calendar=await loadCalendar(process.env.SUPABASE_URL,serviceToken,calendarQuery);
   assert.equal(calendar.releases.some(r=>r.game.id===calendarGame.id),false);
