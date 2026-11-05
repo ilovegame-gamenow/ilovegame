@@ -5,13 +5,17 @@
  function reasons(container,data){
   container.replaceChildren();
   const entries=[...(data.contexts||[]),...(data.discoveries||[]).map(d=>({selection_reason:d.reason,evidence_url:d.source_url,observed_at:d.observed_at,game_title:d.game_title,scope:'game'}))];
-  if(!entries.length){container.append(node('p','発見理由：未記録'));return;}
+  if(!entries.length){container.append(node('p','AIのおすすめ理由はまだ記録されていません。'));return;}
   for(const entry of entries){
    const block=node('div');block.className='discovery-context-entry';
-   if(entry.scope==='game')block.append(node('strong',entry.game_title?`作品を見つけた理由：${entry.game_title}`:'作品を見つけた理由（過去の記録）'));
-   block.append(node('p',`発見経路：${channels[entry.channel]||'未記録'}`));
-   block.append(node('p',`見つけたきっかけ：${entry.trigger_reason||'未記録'}`));
-   block.append(node('p',`注目した理由：${entry.selection_reason||'未記録'}`));
+   if(entry.scope==='game')block.append(node('strong',entry.game_title?`作品のおすすめ理由：${entry.game_title}`:'作品のおすすめ理由（過去の記録）'));
+   block.append(node('p',entry.selection_reason||'AIのおすすめ理由はまだ記録されていません。'));
+   if(entry.channel||entry.trigger_reason){
+    const details=node('details');details.append(node('summary','見つけた経緯'));
+    if(entry.channel)details.append(node('p',`発見経路：${channels[entry.channel]||'未記録'}`));
+    if(entry.trigger_reason)details.append(node('p',entry.trigger_reason));
+    block.append(details);
+   }
    try{const url=new URL(entry.evidence_url);if(['https:','http:'].includes(url.protocol)&&!url.username&&!url.password){const a=node('a','判断の根拠を見る ↗');a.href=url.href;a.target='_blank';a.rel='noopener noreferrer';block.append(a);}}catch{}
    container.append(block);
   }
@@ -27,7 +31,7 @@
   const heading=node('h3','この記事のゲーム');
   const change=node('a','作品を登録・変更');change.href=`/editor-games.html?article_id=${articleId}&return=${encodeURIComponent(location.pathname+location.search)}`;
   const reload=node('button','再読み込み');reload.type='button';
-  container.replaceChildren(heading,games,change,node('h3','見つけたきっかけ・注目した理由'),reason,status,reload);
+  container.replaceChildren(heading,games,change,node('h3','AIのおすすめ理由'),node('p','編集室専用：この記事を取り上げたいと判断した理由です。'),reason,status,reload);
   async function load(){reload.disabled=true;status.textContent='読み込み中…';
    try{const data=await request(`/api/editor-games?resource=context&article_id=${articleId}`);if(!data)return;
     games.replaceChildren();

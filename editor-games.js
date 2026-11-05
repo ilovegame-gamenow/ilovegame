@@ -58,7 +58,7 @@
 
     li.append(node('small',({draft:'未公開の作品',published:'公開用',archived:'保管中'})[game.status] || '未公開の作品'));
     const details=node('details'),summary=node('summary','資料・作品の詳細');details.append(summary);
-    const why=node('details'),whyHeading=node('summary','見つけたきっかけ・注目した理由'),whyBody=node('div');why.append(whyHeading,whyBody);li.append(why);
+    const why=node('details'),whyHeading=node('summary','AIのおすすめ理由'),whyBody=node('div');why.append(whyHeading,whyBody);li.append(why);
     let whyLoaded=false;
     why.addEventListener('toggle',async()=>{if(!why.open||whyLoaded)return;whyBody.textContent='読み込み中…';try{const data=await request(`/api/editor-games?resource=context&game_id=${game.id}`);if(data){GameArticleContext.reasons(whyBody,data);whyLoaded=true;}}catch(error){whyBody.textContent=error.message;}});
     if(game.original_title)details.append(node('small',game.original_title));
