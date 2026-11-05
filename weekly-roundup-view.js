@@ -10,8 +10,10 @@ export function renderWeeklyRoundup(result, entries, toc) {
     const id = `release-${index}`, label = `${formatReleaseDate(release.date)}　${release.game.title}${release.kind === 'early_access' ? '（早期アクセス開始）' : ''}`;
     const link = node('a',label); link.href = `#${id}`; toc.append(link);
     const section = node('section',undefined,'roundup-entry'); section.id = id;
-    section.append(node('h2',`${formatReleaseDate(release.date)}${release.kind === 'early_access' ? ' 早期アクセス開始' : '発売'}`,'roundup-date'));
-    const card = releaseCard(release); card.classList.add('roundup-game');
+    section.ariaLabel = release.game.title;
+    const heading = node('h2',release.game.title,'roundup-title'); heading.id = `${id}-title`;
+    section.append(heading,node('p',`${formatReleaseDate(release.date)}${release.kind === 'early_access' ? ' 早期アクセス開始' : '発売'}`,'roundup-date'));
+    const card = releaseCard(release,{showTitle:false}); card.classList.add('roundup-game');
     if (release.image) {
       const image = node('img'); image.src = release.image; image.alt = `${release.game.title} 紹介画像`; image.loading = 'lazy';
       const figure = node('figure'); figure.append(image);

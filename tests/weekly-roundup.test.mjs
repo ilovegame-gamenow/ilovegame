@@ -61,14 +61,15 @@ test('roundup renders safe text, platform-specific dates, immediate videos, empt
  try{
   renderWeeklyRoundup({releases:[{...release,date:'2026-11-07',kind:'early_access'},{...release,image:'https://image.invalid/a.jpg',editorial:{articleId:2,summary:'<script>テキスト</script>',point:'注目♪',videos:['https://youtu.be/Tb7mUhUhNlA']}}]},entries,toc);
   assert.equal(entries.children.length,2);assert.equal(toc.children.length,2);assert.equal(toc.hidden,false);
-  const card=entries.children[0].children[1];
-  assert.equal(card.children.find(c=>c.tag==='h3').textContent,'<ゲーム>');
+  assert.equal(entries.children[0].children[0].textContent,'<ゲーム>');
+  const card=entries.children[0].children[2];
+  assert.equal(card.children.some(c=>c.tag==='h3'),false);
   const detail=card.children.find(c=>c.className==='roundup-detail');
   assert.equal(detail.children[0].textContent,'<script>テキスト</script>');
   const video=detail.children.find(c=>c.className==='official-video');assert.equal(video.children[0].children[0].tag,'iframe');
   assert.equal(detail.children.at(-1).href,'/article.html?id=2');
   const figure=card.children[0];figure.children[0].listeners.error();assert.equal(figure.hidden,true);
-  assert.match(entries.children[1].children[0].textContent,/早期アクセス/);
+  assert.match(entries.children[1].children[1].textContent,/早期アクセス/);
   renderWeeklyRoundup({releases:[]},entries,toc);assert.equal(toc.hidden,true);assert.match(entries.children[0].textContent,/まだ登録されていません/);
  }finally{if(old===undefined)delete globalThis.document;else globalThis.document=old;}
 });
