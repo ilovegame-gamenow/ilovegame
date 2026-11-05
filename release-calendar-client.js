@@ -8,7 +8,7 @@ export function releaseCard(release,{showDate=false,demo=false,showTitle=true}={
  if(release.kind==='early_access')card.append(node('span','早期アクセス開始','early-access'));
  if(showTitle)card.append(node('h3',release.game.title));const tags=node('div',undefined,'release-platforms');
  for(const p of release.platforms)tags.append(node('span',p.name,'platform-tag'));card.append(tags);
- if(!demo){const links=node('p',undefined,'source-links');release.sources.forEach((s,i)=>{const a=node('a',release.sources.length>1?`公式情報 ${i+1} ↗`:'公式サイト・ストアで確認 ↗');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';links.append(a);});card.append(links);}
+ if(!demo){const links=node('p',undefined,'source-links');if(Number.isSafeInteger(release.articleId)&&release.articleId>0){const article=node('a','紹介記事を読む');article.href=`/article.html?id=${release.articleId}`;links.append(article);}release.sources.forEach((s,i)=>{const a=node('a',release.sources.length>1?`公式情報 ${i+1} ↗`:'公式サイト・ストアで確認 ↗');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';links.append(a);});card.append(links);}
  return card;
 }
 export async function requestCalendar(query,signal){
