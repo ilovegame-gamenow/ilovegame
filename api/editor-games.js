@@ -1,3 +1,4 @@
+import { handleArticleContext } from '../lib/editor-article-context.js';
 import { handleGameFinder } from '../lib/game-finder.js';
 import { catalogRequest } from '../lib/catalog-database.js';
 import { handleSocialEvidence } from '../lib/social-evidence.js';
@@ -21,6 +22,7 @@ export default async function handler(req, res) {
   const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SECRET_KEY;
   if (!url || !key) return res.status(503).json({ error:'作品データベースに接続できません。' });
   const {resource,...query}=req.query || {};
+  if(resource==='context') return handleArticleContext({...req,query},res,{url,key});
   if(resource==='finder') return handleGameFinder({...req,query},res,{url,key});
   if(resource==='social-evidence') return handleSocialEvidence({...req,query},res,{url,key});
   if(resource==='discoveries') return handleDiscoveries({...req,query},res,{url,key});

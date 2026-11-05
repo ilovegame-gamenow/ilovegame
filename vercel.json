@@ -4,5 +4,17 @@
       "source": "/api/(.*)",
       "destination": "/api/$1"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/editor-discoveries.html",
+      "destination": "/editor-games.html#find",
+      "permanent": false
+    },
+    {
+      "source": "/editor-research.html",
+      "destination": "/editor-games.html#find",
+      "permanent": false
+    }
   ]
 }

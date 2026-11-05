@@ -22,6 +22,7 @@
   <script src="/image-utils.js"></script>
   <script src="/article-renderer.js"></script>
   <script src="/editor-status.js"></script>
+  <script src="/editor-article-context.js"></script>
   <script src="/editor-draft-client.js"></script>
   <script src="/editor-confirm.js"></script>
   <script src="/editor-regenerate.js"></script>
@@ -107,7 +108,7 @@
 
 
 <p id="draftNotice">${draft ? "保存済みの下書きを表示しています。公開版へは未反映です。" : article.status==='published'?"公開版の記事を表示しています。":"未公開の記事です。内容を確認・編集してから掲載してください。"}</p>
-<p><a href="/editor-games.html?article_id=${Number(article.id)}&amp;return=${encodeURIComponent(location.pathname + location.search)}">関連作品を管理する</a></p>
+<section id="articleGameContext" class="article-game-context" aria-label="作品と発見理由"></section>
 <div id="articleViewActions">
   <button type="button" id="editArticleButton">
     記事を編集する
@@ -156,6 +157,7 @@
 
 `;
         GameArticle.observeBody(app, { ...article, ...editable });
+        GameArticleContext.mount(document.getElementById("articleGameContext"), Number(article.id));
 
         const returnUrl = params.get("return");
         const backLink = document.getElementById("editorBackLink");
