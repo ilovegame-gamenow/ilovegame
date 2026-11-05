@@ -16,6 +16,7 @@ test('article context returns stored reasons and favorite state without content 
  const res=await run({article_id:'42'},async(url,options)=>{
   assert.ok(!options.method||options.method==='GET');const u=new URL(url);
   if(u.pathname.endsWith('/article_games')){assert.equal(u.searchParams.get('article_id'),'eq.42');return Response.json([{game:{id,title:'Game'}}]);}
+  if(u.pathname.endsWith('/game_discoveries'))return Response.json([]);
   if(u.pathname.endsWith('/game_following')){assert.equal(u.searchParams.get('game_id'),`in.(${id})`);return Response.json([{game_id:id,is_favorite:true}]);}
   assert.equal(u.pathname,'/rest/v1/article_discovery_context');assert.equal(u.searchParams.get('article_id'),'eq.42');return Response.json([{selection_reason:'具体的な遊びが面白い'}]);
  });
@@ -23,7 +24,7 @@ test('article context returns stored reasons and favorite state without content 
 });
 test('missing provenance stays absent and does not manufacture reasons or query all favorites',async()=>{
  const res=await run({article_id:'42'},async(url)=>{assert.ok(!url.includes('game_following'));return Response.json([]);});
- assert.deepEqual(res.body,{games:[],contexts:[]});
+ assert.deepEqual(res.body,{games:[],contexts:[],discoveries:[]});
 });
 test('game reasons are scoped to linked articles and adopted discoveries with bounded history',async()=>{
  const res=await run({game_id:id},async(url)=>{
@@ -36,4 +37,20 @@ test('game reasons are scoped to linked articles and adopted discoveries with bo
 });
 test('context outage is reported separately without leaking database details',async()=>{
  const res=await run({article_id:'42'},async()=>new Response('SQL secret',{status:500}));assert.equal(res.code,502);assert.ok(!JSON.stringify(res.body).includes('SQL secret'));
+});
+
+test('article management includes actual discovery reasons only from its linked games',async()=>{
+ const res=await run({article_id:'42'},async(url)=>{
+  const u=new URL(url);
+  if(u.pathname.endsWith('/article_games'))return Response.json([{game:{id,title:'関連作品'}}]);
+  if(u.pathname.endsWith('/game_discoveries')){
+   assert.equal(u.searchParams.get('adopted_game_id'),`in.(${id})`);
+   assert.equal(u.searchParams.get('limit'),'50');
+   return Response.json([{adopted_game_id:id,reason:'独自の遊びを確認したため',source_url:'https://example.com/game'}]);
+  }
+  return Response.json([]);
+ });
+ assert.equal(res.code,200);assert.equal(res.body.contexts.length,0);
+ assert.equal(res.body.discoveries[0].reason,'独自の遊びを確認したため');
+ assert.equal(res.body.discoveries[0].game_title,'関連作品');
 });

@@ -4,10 +4,11 @@
  const channels={news:'通常のニュース収集',discovery:'未知のゲーム探索',favorite:'お気に入り作品の追跡',manual:'手動検索・登録'};
  function reasons(container,data){
   container.replaceChildren();
-  const entries=[...(data.contexts||[]),...(data.discoveries||[]).map(d=>({selection_reason:d.reason,evidence_url:d.source_url,observed_at:d.observed_at}))];
+  const entries=[...(data.contexts||[]),...(data.discoveries||[]).map(d=>({selection_reason:d.reason,evidence_url:d.source_url,observed_at:d.observed_at,game_title:d.game_title,scope:'game'}))];
   if(!entries.length){container.append(node('p','発見理由：未記録'));return;}
   for(const entry of entries){
    const block=node('div');block.className='discovery-context-entry';
+   if(entry.scope==='game')block.append(node('strong',entry.game_title?`作品を見つけた理由：${entry.game_title}`:'作品を見つけた理由（過去の記録）'));
    block.append(node('p',`発見経路：${channels[entry.channel]||'未記録'}`));
    block.append(node('p',`見つけたきっかけ：${entry.trigger_reason||'未記録'}`));
    block.append(node('p',`注目した理由：${entry.selection_reason||'未記録'}`));
