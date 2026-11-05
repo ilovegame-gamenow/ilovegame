@@ -28,14 +28,13 @@
  }
  async function mount(container,articleId){
   const games=node('div'),reason=node('div'),status=node('p');status.setAttribute('role','status');
-  const heading=node('h3','この記事のゲーム');
-  const change=node('a','作品を登録・変更');change.href=`/editor-games.html?article_id=${articleId}&return=${encodeURIComponent(location.pathname+location.search)}`;
+  const heading=node('h3','この記事のゲーム');heading.hidden=true;games.hidden=true;
   const reload=node('button','再試行');reload.type='button';reload.hidden=true;
-  container.replaceChildren(heading,games,change,node('h3','AIのおすすめ理由'),node('p','編集室専用：この記事を取り上げたいと判断した理由です。'),reason,status,reload);
+  container.replaceChildren(heading,games,node('h3','AIのおすすめ理由'),reason,status,reload);
   async function load(){reload.hidden=true;reload.disabled=true;status.textContent='読み込み中…';
    try{const data=await request(`/api/editor-games?resource=context&article_id=${articleId}`);if(!data)return;
     games.replaceChildren();
-    if(!data.games.length)games.append(node('p','作品がまだ登録されていません。'));
+    heading.hidden=games.hidden=data.games.length===0;
     for(const game of data.games){
      const row=node('p'),link=node('a',game.title);link.href=`/editor-games.html?q=${encodeURIComponent(game.title)}&filter=all`;
      const star=node('button',game.is_favorite?'★ お気に入り':'☆ お気に入り');star.type='button';star.setAttribute('aria-pressed',String(Boolean(game.is_favorite)));
