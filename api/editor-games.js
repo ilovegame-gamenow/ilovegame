@@ -1,3 +1,5 @@
+import { handleGameFinder } from '../lib/game-finder.js';
+import { catalogRequest } from '../lib/catalog-database.js';
 import { handleSocialEvidence } from '../lib/social-evidence.js';
 import { handleSourcePreviews } from '../lib/editor-source-previews-handler.js';
 import { requireEditor, requireEditorOrigin } from '../lib/editor-auth.js';
@@ -19,6 +21,7 @@ export default async function handler(req, res) {
   const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SECRET_KEY;
   if (!url || !key) return res.status(503).json({ error:'作品データベースに接続できません。' });
   const {resource,...query}=req.query || {};
+  if(resource==='finder') return handleGameFinder({...req,query},res,{url,key});
   if(resource==='social-evidence') return handleSocialEvidence({...req,query},res,{url,key});
   if(resource==='discoveries') return handleDiscoveries({...req,query},res,{url,key});
   if(['steam-media','showcase','bluesky-preview','media-preview'].includes(resource))return handleSourcePreviews({...req,query},res,{url,key},resource);
@@ -35,6 +38,11 @@ export default async function handler(req, res) {
     }
     const body = req.body;
     if (!body || typeof body !== 'object' || Array.isArray(body)) return res.status(400).json({ error:'Invalid request' });
+    if(body.action==='following'){
+      if(!isGameId(body.game_id)||!['favorite_on','favorite_off','remove','restore'].includes(body.operation)||Object.keys(body).some(k=>!['action','game_id','operation'].includes(k)))return res.status(400).json({error:'お気に入りの指定が正しくありません。'});
+      const following=await catalogRequest(url,key,'rpc/set_game_following',{method:'POST',body:JSON.stringify({p_game_id:body.game_id,p_action:body.operation})});
+      return res.status(200).json({following});
+    }
     if (body.action === 'create') {
       if (Object.keys(body).some(k => !['action','game'].includes(k))) return res.status(400).json({ error:'Invalid request' });
       const input = readGameInput(body.game);

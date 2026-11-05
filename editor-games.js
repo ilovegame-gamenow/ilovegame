@@ -7,6 +7,8 @@
   const form = document.getElementById('gameCreate');
   const fields = document.getElementById('gameFields');
   const query = document.getElementById('gameQuery');
+  query.value=params.get('q')||'';
+  const followingFilter=document.getElementById('followingFilter');
   const message = document.getElementById('catalogMessage');
   const previous = document.getElementById('previousGames');
   const next = document.getElementById('nextGames');
@@ -33,15 +35,25 @@
     document.getElementById('openGameCreate').disabled=busy||!ready;
     document.getElementById('createMissingGame').disabled=busy||!ready;
     query.disabled=busy || !ready;
+    followingFilter.disabled=busy||!ready;
     search.querySelector('button').disabled=busy || !ready;
     previous.disabled=busy || !ready || page===1;
     next.disabled=busy || !ready || !hasMore;
-    document.querySelectorAll('[data-game-action]').forEach(button => button.disabled=busy || !ready);
+    document.querySelectorAll('[data-game-action],[data-following]').forEach(button => button.disabled=busy || !ready);
   }
   const request=(path,options={})=>GameCatalogClient.request(path,options,()=>{stash();ending=true;});
   function card(game, action) {
     const li=node('li');
     li.append(node('h3',game.title));
+    if(articleId===null){
+    const actions=node('div',undefined,'following-actions');
+    const favorite=node('button',game.is_favorite?'★ お気に入り':'☆ お気に入り');favorite.type='button';favorite.dataset.following=game.is_favorite?'favorite_off':'favorite_on';favorite.dataset.gameId=game.id;favorite.setAttribute('aria-pressed',String(Boolean(game.is_favorite)));actions.append(favorite);
+    const remove=node('button',game.is_managed===false?'管理リストに戻す':'管理リストから外す');remove.type='button';remove.dataset.following=game.is_managed===false?'restore':'remove';remove.dataset.gameId=game.id;actions.append(remove);li.append(actions);
+    const outcomes={no_change:'新情報なし',news_found:'新情報あり',partial:'一部確認',failed:'確認できず'};
+    li.append(node('p',game.last_checked_at?`最終確認：${GameDate.format(game.last_checked_at)} ／ ${outcomes[game.check_outcome]||'確認済み'}`:game.is_favorite?'定期確認待ち':'通常のニュース収集の対象','following-status'));
+    if(game.check_note)li.append(node('p',game.check_note,'catalog-note'));
+    }
+
     li.append(node('small',({draft:'未公開の作品',published:'公開用',archived:'保管中'})[game.status] || '未公開の作品'));
     const details=node('details'),summary=node('summary','資料・作品の詳細');details.append(summary);
     if(game.original_title)details.append(node('small',game.original_title));
@@ -70,12 +82,14 @@
     const empty=document.getElementById('gamesEmpty');
     empty.hidden=games.length>0;
     document.getElementById('gamesEmptyText').textContent=query.value.trim()?'該当する作品がありません。作品名や原題を変えて検索してください。':'まだ作品が登録されていません。「作品を追加」から始められます。';
+    if(articleId===null&&!query.value.trim()&&followingFilter.value==='favorites')document.getElementById('gamesEmptyText').textContent='お気に入りはまだありません。作品の☆ボタンか「ゲームを探す」から追加できます。';
+    if(articleId===null&&!query.value.trim()&&followingFilter.value==='removed')document.getElementById('gamesEmptyText').textContent='管理リストから外した作品はありません。';
     if (page>1 && !games.length) document.getElementById('gamesEmptyText').textContent='このページに作品はありません。「前へ」で戻ってください。';
     document.getElementById('gamePage').textContent=`${page}ページ`;
     controls();
   }
   async function load() {
-    const filters=new URLSearchParams({ q:query.value.trim(), page:String(page) });
+    const filters=new URLSearchParams({ q:query.value.trim(), page:String(page),filter:articleId!==null?'all':followingFilter.value });
     if (articleId!==null) filters.set('article_id',String(articleId));
     const data=await request(`/api/editor-games?${filters}`);
     if (!data) return false;
@@ -89,6 +103,7 @@
     finally { busy=false; controls(); }
   }
   search.addEventListener('submit',event=>{event.preventDefault();refresh(1);});
+  followingFilter.addEventListener('change',()=>refresh(1));
   previous.addEventListener('click',()=>refresh(page-1));
   next.addEventListener('click',()=>refresh(page+1));
   form.addEventListener('input',stash);
@@ -111,6 +126,13 @@
       try { await load(); } catch { notify('作品は登録されました。一覧を再読み込みして確認してください。',true); }
     } catch(error) { notify(error.message,true); }
     finally { busy=false; controls(); }
+  });
+  document.addEventListener('click',async event=>{
+    const button=event.target.closest('[data-following]');if(!button||busy||!ready)return;
+    if(button.dataset.following==='remove'&&!confirm('管理リストから外し、お気に入りの個別確認を停止します。公開記事・発売情報は残ります。よろしいですか？'))return;
+    busy=true;controls();
+    try{const result=await request('/api/editor-games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'following',operation:button.dataset.following,game_id:button.dataset.gameId})});if(result){await load();notify('管理状態を保存しました。');}}
+    catch(error){notify(error.message,true);}finally{busy=false;controls();}
   });
   document.addEventListener('click',async event=>{
     const button=event.target.closest('[data-game-action]');

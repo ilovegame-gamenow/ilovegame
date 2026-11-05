@@ -19,7 +19,7 @@ test('catalog input strips fragments, rejects untrusted fields and unsafe URLs',
  for(const data of [null,[],{...game,id:'1'},{...game,title:' '},{...game,title:'x'.repeat(301)}, {...game,original_title:'x'.repeat(301)},{...game,description:'x'.repeat(5001)}, {...game,status:'published'},{...game,source_type:'random'},...['javascript:alert(1)','file:///tmp/a','https://user:password@example.org'].map(source_url=>({...game,source_url}))]) assert.equal(readGameInput(data),null);
 });
 test('catalog query validates bounded pagination and exact article identifiers',()=>{
- assert.deepEqual(readGameQuery({q:' title ',page:'2',article_id:'123'}),{q:'title',page:2,articleId:123});
+ assert.deepEqual(readGameQuery({q:' title ',page:'2',article_id:'123'}),{q:'title',page:2,articleId:123,filter:'all'});
  for(const q of [{page:'0'},{page:'1e3'},{page:'10002'},{q:['a']},{q:'x'.repeat(101)},{article_id:'1x'},{article_id:'9007199254740993'},{extra:'ignored?'}]) assert.equal(readGameQuery(q),null);
 });
 test('authorization, origin, feature flag and validation fail before any DB request',async()=>{
@@ -34,7 +34,7 @@ test('authorization, origin, feature flag and validation fail before any DB requ
 test('creation is one transactional RPC with a stable ID and no publication fields',async()=>{
  let calls=0;
  await withFetch(async(url,options)=>{
-  calls++;assert.equal(url,'https://catalog.invalid/rest/v1/rpc/create_editor_game');
+  calls++;assert.equal(url,'https://catalog.invalid/rest/v1/rpc/create_followed_game');
   assert.equal(options.headers.apikey,'test-server-key');
   assert.deepEqual(JSON.parse(options.body),{p_id:id,p_title:'Test game',p_original_title:'Original',p_description:'Notes',p_source_url:'https://example.org/game',p_source_type:'official'});
   return Response.json({id,title:'Test game',status:'draft'});
@@ -45,8 +45,8 @@ test('search and linked works use catalog reads, with no article-content queries
  const calls=[];
  await withFetch(async(url,options)=>{
   const u=new URL(url);calls.push(u);
-  if(u.pathname.endsWith('/rpc/search_editor_games')) {
-   assert.deepEqual(JSON.parse(options.body),{p_query:'%,(title)',p_offset:20});
+  if(u.pathname.endsWith('/rpc/search_managed_games')) {
+   assert.deepEqual(JSON.parse(options.body),{p_query:'%,(title)',p_offset:20,p_filter:'all'});
    return Response.json(Array.from({length:21},(_,i)=>({id:`game-${i}`})));
   }
   assert.equal(u.pathname,'/rest/v1/article_games');assert.equal(u.searchParams.get('article_id'),'eq.42');
