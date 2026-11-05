@@ -1,79 +1,24 @@
-import { getSiteSettings, toNewsConfig } from "../lib/site-settings.js";
+import { getSiteSettings } from '../lib/site-settings.js';
+import { catalogRequest } from '../lib/catalog-database.js';
 
-export default async function handler(req, res) {
-  res.setHeader("Cache-Control", "no-store");
-  try {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      return res.status(500).json({
-        error: "Supabase environment variables are missing"
-      });
-    }
-    
-    const newsConfig = toNewsConfig(await getSiteSettings(supabaseUrl, process.env.SUPABASE_SECRET_KEY));
-    const fields = "id,title,summary,source_name,thumbnail_url,importance,site_published_at,created_at,published_at";
-
-    const headers = {
-      apikey: supabaseKey,
-      Authorization: `Bearer ${supabaseKey}`
-    };
-
-    const baseUrl =
-      `${supabaseUrl}/rest/v1/articles` +
-      `?select=${encodeURIComponent(fields)}` +
-      `&status=eq.published` +
-      `&title=not.ilike.${encodeURIComponent("*テスト*")}` +
-      `&source_name=not.ilike.${encodeURIComponent("*I LOVE GAME*")}`;
-
-    
-const now = Date.now();
-const breakingSince = new Date(
-  now - newsConfig.breakingMaxAgeHours * 60 * 60 * 1000
-).toISOString();
-
-// BREAKING：共通設定に基づいて速報記事を選定
-const breakingUrl =
-  baseUrl +
-  `&site_published_at=gte.${encodeURIComponent(breakingSince)}` +
-  `&importance=gte.${newsConfig.breakingThreshold}` +
-  `&order=importance.desc.nullslast,site_published_at.desc` +
-  `&limit=1`;
-
-    // PICK UP：サイト全体から高評価記事を選定
-    const pickupUrl =
-      baseUrl +
-      `&importance=gte.${newsConfig.pickupThreshold}` +
-      `&order=importance.desc.nullslast,site_published_at.desc` +
-      `&limit=${newsConfig.maxPickupArticles + 1}`;
-
-    const [breakingResponse, pickupResponse] = await Promise.all([
-      fetch(breakingUrl, { headers }),
-      fetch(pickupUrl, { headers })
-    ]);
-
-    if (!breakingResponse.ok || !pickupResponse.ok) {
-      return res.status(502).json({
-        error: "Featured news request failed"
-      });
-    }
-
-    const [breakingData, pickupData] = await Promise.all([
-      breakingResponse.json(),
-      pickupResponse.json()
-    ]);
-
-    const breaking = breakingData[0] || null;
-    const pickup = pickupData
-      .filter(article => !breaking || article.id !== breaking.id)
-      .slice(0, newsConfig.maxPickupArticles);
-
-
-
-    return res.status(200).json({ breaking, pickup });
-
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
+// Placement is an editorial decision independent of article importance/publication.
+export default async function handler(req,res){
+ res.setHeader('Cache-Control','no-store');
+ try{
+  const url=process.env.SUPABASE_URL,key=process.env.SUPABASE_PUBLISHABLE_KEY,secret=process.env.SUPABASE_SECRET_KEY;
+  if(!url||!key||!secret)return res.status(503).json({error:'Featured news unavailable'});
+  const settings=await getSiteSettings(url,secret);
+  const slots=await catalogRequest(url,secret,`article_feature_slots?${new URLSearchParams({select:'article_id,slot,selected_at,expires_at',expires_at:`gt.${new Date().toISOString()}`,order:'selected_at.desc,article_id.desc',limit:'100'})}`);
+  const ids=[...new Set(slots.map(s=>s.article_id).filter(id=>Number.isSafeInteger(id)&&id>0))];
+  if(!ids.length)return res.status(200).json({breaking:null,pickup:[]});
+  const params=new URLSearchParams({select:'id,title,summary,ilovegame_point,source_name,thumbnail_url,site_published_at,created_at,published_at',id:`in.(${ids.join(',')})`});
+  const response=await fetch(`${url}/rest/v1/published_articles?${params}`,{headers:{apikey:key,Authorization:`Bearer ${key}`}});
+  if(!response.ok)throw Error('Articles unavailable');
+  const articles=new Map((await response.json()).map(a=>[a.id,a]));
+  const now=Date.now(),maxAge=settings.breaking_max_age_hours*3600000;
+  const breakingSlot=slots.find(s=>s.slot==='breaking'&&articles.has(s.article_id)&&Date.parse(s.selected_at)<=now&&now-Date.parse(s.selected_at)<=maxAge);
+  const breaking=breakingSlot?articles.get(breakingSlot.article_id):null;
+  const pickup=slots.filter(s=>s.slot==='discovery'&&s.article_id!==breaking?.id&&Date.parse(s.selected_at)<=now).map(s=>articles.get(s.article_id)).filter(Boolean).slice(0,settings.pickup_max_articles);
+  return res.status(200).json({breaking,pickup});
+ }catch{return res.status(502).json({error:'Featured news unavailable'});}
 }

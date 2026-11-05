@@ -26,23 +26,21 @@ test('publication thresholds follow saved settings at exact boundaries', () => {
  const config=toNewsConfig({...defaults,publish_threshold:65,no_article_threshold:30});
  for(const [score,expected] of [[0,'rejected'],[30,'rejected'],[31,'review'],[64,'review'],[65,'published'],[100,'published']]) assert.equal(determinePublicationPolicy(score,config),expected);
 });
-test('featured selection uses saved score, age, count and excludes breaking duplicates without writes', async () => {
- const settings={...defaults,breaking_threshold:75,breaking_max_age_hours:72,pickup_threshold:60,pickup_max_articles:2};
+test('featured placements use explicit editorial slots and published articles without scores or private reasons', async () => {
+ const settings={...defaults,pickup_max_articles:2};
  await mockFetch(async(url,options={})=>{
-  assert.equal(options.method,undefined);
   const u=new URL(url);
-  if(u.pathname.endsWith('/site_settings')) {
-   assert.equal(options.headers.apikey,'server-key');return new Response(JSON.stringify([settings]));
+  if(u.pathname.endsWith('/site_settings'))return Response.json([settings]);
+  if(u.pathname.endsWith('/article_feature_slots')){
+   assert.equal(options.headers.apikey,'server-key');assert.ok(u.searchParams.has('expires_at'));assert.ok(!u.searchParams.get('select').includes('reason'));
+   return Response.json([{article_id:1,slot:'breaking',selected_at:new Date().toISOString()},{article_id:1,slot:'discovery',selected_at:new Date().toISOString()},{article_id:2,slot:'discovery',selected_at:new Date().toISOString()},{article_id:3,slot:'discovery',selected_at:new Date().toISOString()},{article_id:4,slot:'discovery',selected_at:new Date().toISOString()}]);
   }
-  assert.equal(options.headers.apikey,'public-key');assert.equal(u.searchParams.get('status'),'eq.published');
-  if(u.searchParams.has('site_published_at')) {
-   assert.equal(u.searchParams.get('importance'),'gte.75');
-   assert.ok(Math.abs(Date.now()-Date.parse(u.searchParams.get('site_published_at').slice(4))-72*3600000)<2000);
-   return new Response('[{"id":1}]');
-  }
-  assert.equal(u.searchParams.get('importance'),'gte.60');assert.equal(u.searchParams.get('limit'),'3');
-  return new Response('[{"id":1},{"id":2},{"id":3}]');
+  assert.equal(u.pathname,'/rest/v1/published_articles');assert.equal(options.headers.apikey,'public-key');assert.ok(!u.searchParams.has('importance'));assert.ok(!u.searchParams.get('select').includes('reason'));
+  return Response.json([{id:1},{id:2},{id:3}]);
  },async()=>{const res=response();await featured({},res);assert.equal(res.code,200);assert.equal(res.body.breaking.id,1);assert.deepEqual(res.body.pickup.map(a=>a.id),[2,3]);assert.equal(res.headers['Cache-Control'],'no-store');});
+});
+test('no editorial selections yields no breaking banner or automatic high-score fallback',async()=>{
+ await mockFetch(async url=>new URL(url).pathname.endsWith('/site_settings')?Response.json([defaults]):Response.json([]),async()=>{const res=response();await featured({},res);assert.deepEqual(res.body,{breaking:null,pickup:[]});});
 });
 test('date highlight remains fixed at 24 hours without a settings request', () => {
  const context=vm.createContext({document:{createElement:()=>({}),head:{appendChild(){}}},fetch:()=>{throw Error('Unexpected settings request');},console});

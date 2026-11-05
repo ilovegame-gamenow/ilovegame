@@ -103,3 +103,5 @@ header nav a:hover {
 }
 
 @media (max-width:600px) { header nav:has(.calendar-link) { display:flex; } header nav a:not(.calendar-link) { display:none; } header nav .calendar-link { font-size:11px; white-space:nowrap; } }
+
+@media(max-width:600px){.header-inner{flex-wrap:wrap}header nav:has(.calendar-link){width:100%;gap:6px}header nav a:not(.calendar-link){display:inline-block}header nav a,header nav .calendar-link{font-size:11px;padding:8px 10px;white-space:nowrap}}

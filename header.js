@@ -1,10 +1,8 @@
 /* I LOVE GAME♪ 共通ヘッダー */
 (function () {
   const navigation = [
-    { label: "速報", href: "/#breaking" },
-    { label: "最新", href: "/#latest" },
-    { label: "ニュース", href: "/#latest" },
-    { label: "PICK UP", href: "/#pickup" },
+    { label: "最新ニュース", href: "/#latest" },
+    { label: "注目のゲーム", href: "/#pickup-heading" },
     { label: "発売カレンダー", href: "/calendar.html" }
   ];
 

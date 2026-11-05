@@ -45,33 +45,33 @@
             <div class="number-field"><input id="no_article_threshold" name="no_article_threshold" type="number" min="0" max="99" step="1"  required><span>点</span></div>
           </div>
           <output id="publicationSummary" class="publication-summary" aria-live="polite"></output>
-          <p class="section-note">次回のAI評価から適用します。既存の記事の点数・掲載状態は変えません。NEWS一覧には手動で掲載した記事も表示されます。生成しない点数は、自動掲載の点数より小さくしてください。</p>
+          <p class="section-note">次回のAI評価から適用します。既存の記事の点数・掲載状態は変えません。最新ニュース一覧には手動で掲載した記事も表示されます。生成しない点数は、自動掲載の点数より小さくしてください。</p>
           </div>
           <div class="rule-group" aria-labelledby="breakingRuleHeading">
-            <h3 id="breakingRuleHeading">BREAKING <span>速報の表示条件</span></h3>
-          <div class="setting-field">
-            <div class="field-description"><label for="breaking_threshold">BREAKINGの最低評価</label><p id="breaking_thresholdHelp">この点数以上の記事を1件表示</p></div>
+            <h3 id="breakingRuleHeading">速報 <span>重要な発表だけを期間限定で表示</span></h3>
+          <div class="setting-field" hidden>
+            <div class="field-description"><label for="breaking_threshold">速報の最低評価</label><p id="breaking_thresholdHelp">この点数以上の記事を1件表示</p></div>
             <div class="number-field"><input id="breaking_threshold" name="breaking_threshold" type="number" min="0" max="100" step="1" aria-describedby="breaking_thresholdHelp" required><span>点</span></div>
           </div>
           <div class="setting-field">
-            <div class="field-description"><label for="breaking_max_age_hours">BREAKINGの対象期間</label><p id="breaking_max_age_hoursHelp">サイト掲載からの経過時間</p></div>
+            <div class="field-description"><label for="breaking_max_age_hours">速報の対象期間</label><p id="breaking_max_age_hoursHelp">速報枠に選んでからの最大表示時間</p></div>
             <div class="number-field"><input id="breaking_max_age_hours" name="breaking_max_age_hours" type="number" min="1" max="720" step="1" aria-describedby="breaking_max_age_hoursHelp" required><span>時間</span></div>
           </div>
-            <p class="section-note">掲載済み記事のうち、評価点・対象期間の両方を満たす記事を1件表示します。</p>
+            <p class="section-note">重要な新発表として別途選んだ公開記事を1件表示します。評価点だけでは速報になりません。</p>
           </div>
           <div class="rule-group" aria-labelledby="pickupRuleHeading">
-            <h3 id="pickupRuleHeading">PICK UP <span>注目記事の表示条件</span></h3>
-          <div class="setting-field">
-            <div class="field-description"><label for="pickup_threshold">PICK UPの最低評価</label></div>
+            <h3 id="pickupRuleHeading">注目のゲーム <span>遊びの特徴・発見の価値で作品を選定</span></h3>
+          <div class="setting-field" hidden>
+            <div class="field-description"><label for="pickup_threshold">注目のゲームの最低評価</label></div>
             <div class="number-field"><input id="pickup_threshold" name="pickup_threshold" type="number" min="0" max="100" step="1"  required><span>点</span></div>
           </div>
           <div class="setting-field">
-            <div class="field-description"><label for="pickup_max_articles">PICK UPの最大表示件数</label></div>
+            <div class="field-description"><label for="pickup_max_articles">注目のゲームの最大表示件数</label></div>
             <div class="number-field"><input id="pickup_max_articles" name="pickup_max_articles" type="number" min="1" max="12" step="1"  required><span>件</span></div>
           </div>
-            <p class="section-note">掲載済み記事のうち、最低評価以上の記事を表示します。BREAKINGと同じ記事は重複表示しません。表示条件は保存後、公開トップを読み込み直すと反映されます。</p>
+            <p class="section-note">遊びの特徴や作品を発見する価値で選び、最長14日間紹介します。速報と同じ記事は重複表示しません。</p>
           </div>
-          <a class="settings-preview-link" href="/editor-preview.html">BREAKING・PICK UPの表示を確認 →</a>
+          <a class="settings-preview-link" href="/editor-preview.html">速報・注目のゲームの表示を確認 →</a>
         </section>
         <section id="editorialSettings" class="settings-section" aria-labelledby="evaluationHeading">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">✎</span><div><h2 id="evaluationHeading">AIの評価基準</h2><p>ニュースの採点で重視する編集方針</p></div></div>

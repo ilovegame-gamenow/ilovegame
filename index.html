@@ -14,12 +14,7 @@
 <body>
 <header></header>
 <main>
-<section id="breaking" class="breaking">
-  <div class="breaking-label">● BREAKING / 速報</div>
-  <img id="breaking-image" alt="" hidden>
-  <h1 id="breaking-title">速報をチェック中...</h1>
-  <div id="breaking-meta" class="meta"></div>
-</section>
+<section id="breaking" class="breaking" hidden></section>
 
 <section id="weeklyReleases" class="weekly-section" aria-labelledby="weekHeading">
   <div class="weekly-heading"><h2 id="weekHeading">今週発売のゲーム</h2></div>
@@ -30,22 +25,22 @@
 </section>
 
 <div class="section-title" id="latest">
-  <h2>🔥 NEWS</h2>
-  <span>最新ゲームニュース</span>
+  <h2>最新ニュース</h2>
+  <span>ゲームの新情報を新しい順に</span>
 </div>
 
 <section class="grid">
   <p class="loading-message">ニュースを読み込み中...</p>
 </section>
 
+<div id="pagination" class="pagination"></div>
+
 <div class="section-title" id="pickup-heading">
-  <h2>🎮 PICK UP</h2>
-  <span>注目ニュース</span>
+  <h2>注目のゲーム</h2>
+  <span>面白いゲームとの出会いを♪</span>
 </div>
 
 <section id="pickup" class="pickup"></section>
-
-<div id="pagination" class="pagination"></div>
 </main>
 
 <footer><div class="footer-logo">I <span>LOVE</span> GAME<span class="music">♪</span></div>ゲームの「今」をお届け♪</footer>
@@ -64,11 +59,11 @@ async function loadLiveNews(){
     const requestedPage = Math.max(1, parseInt(params.get("page") || "1", 10) || 1);
     const [r, featuredResponse] = await Promise.all([
   fetch(`/api/news?page=${requestedPage}`),
-  fetch("/api/featured-news")
+  fetch("/api/featured-news").then(response => response.ok ? response.json() : {breaking:null,pickup:[]}).catch(() => ({breaking:null,pickup:[]}))
 ]);
 const [result, featuredResult] = await Promise.all([
   r.ok ? r.json() : Promise.reject(new Error("記事を取得できませんでした")),
-  featuredResponse.ok ? featuredResponse.json() : Promise.reject(new Error("注目記事を取得できませんでした"))
+  Promise.resolve(featuredResponse)
 ]);
 const rows = result.articles || [];
     

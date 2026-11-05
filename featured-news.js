@@ -7,10 +7,10 @@ window.GameFeatured = (() => {
     box.replaceChildren();
     if (breaking) {
       const image = GameImage.getUrl(breaking.thumbnail_url, breaking.source_name);
-      box.innerHTML = `<div class="breaking-label">● BREAKING / 速報</div>
+      box.innerHTML = `<div class="breaking-label">● 速報</div>
         ${image ? `<img id="breaking-image" src="${esc(image)}" alt="">` : ''}
         <h1>${esc(breaking.title)}</h1>
-        <div class="meta">${esc(breaking.source_name || 'I LOVE GAME♪')} ｜ 注目度 ${esc(breaking.importance || 0)}</div>`;
+        ${GameDate.renderMeta('', breaking.site_published_at || breaking.published_at || breaking.created_at, {showSource:false})}`;
       if (clickable) {
         const link = document.createElement('a');
         link.href = `/article.html?id=${encodeURIComponent(breaking.id)}`;
@@ -21,17 +21,17 @@ window.GameFeatured = (() => {
     }
     const container = document.getElementById('pickup');
     const title = document.getElementById('pickup-heading');
-    title.hidden = pickup.length === 0;
+    title.hidden = false;
     container.innerHTML = pickup.map(article => {
       const image = GameImage.getUrl(article.thumbnail_url, article.source_name);
       const tag = clickable ? 'a' : 'article';
       const destination = clickable ? ` href="/article.html?id=${encodeURIComponent(article.id)}"` : '';
       return `<${tag} class="card news-card-link"${destination}>
-        <div class="time">PICK UP</div>
+        <div class="time">注目のゲーム</div>
         ${image ? `<img class="thumb" src="${esc(image)}" alt="">` : ''}
-        <h3>${esc(article.title)}</h3><p class="meta">${esc(article.summary)}</p>
+        <h3>${esc(article.title)}</h3><p class="meta">${esc(article.ilovegame_point || article.summary)}</p>
       </${tag}>`;
-    }).join('');
+    }).join('') || '<p class="meta">注目のゲームは、見つけた作品から順に紹介します♪</p>';
   }
   return { render };
 })();

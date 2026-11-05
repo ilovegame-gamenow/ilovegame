@@ -36,10 +36,10 @@
           <p>下の選択欄をタップして記事を選ぶと、その下のプレビューがすぐに切り替わります。</p>
           <button id="loadMore" type="button" hidden>選べる記事をもっと読み込む</button>
         <div class="preview-selection">
-          <label>BREAKING <select id="breakingSelect"></select></label>
-          <label>PICK UP 1 <select class="pickup-select"></select></label>
-          <label>PICK UP 2 <select class="pickup-select"></select></label>
-          <label>PICK UP 3 <select class="pickup-select"></select></label>
+          <label>速報 <select id="breakingSelect"></select></label>
+          <label>注目のゲーム 1 <select class="pickup-select"></select></label>
+          <label>注目のゲーム 2 <select class="pickup-select"></select></label>
+          <label>注目のゲーム 3 <select class="pickup-select"></select></label>
         </div>
         </div>
         <div class="preview-toolbar" aria-label="表示パターンの確認">
@@ -50,11 +50,11 @@
       </fieldset>
       <p class="preview-note">下は公開トップと共通の表示です。記事リンクは無効です。端末の幅に合わせたレイアウトも確認できます。</p>
     </section>
-    <p id="emptyNotice" class="preview-empty" hidden>対象なし：BREAKINGとPICK UPは非表示になります。</p>
+    <p id="emptyNotice" class="preview-empty" hidden>対象なし：速報と注目のゲームは非表示になります。</p>
     <section id="breaking" class="breaking" hidden></section>
-    <div class="section-title" id="latest"><h2>🔥 NEWS</h2><span>最新ゲームニュース</span></div>
+    <div class="section-title" id="latest"><h2>最新ニュース</h2><span>最新ゲームニュース</span></div>
     <section id="previewNews" class="grid"></section>
-    <div class="section-title" id="pickup-heading"><h2>🎮 PICK UP</h2><span>注目ニュース</span></div>
+    <div class="section-title" id="pickup-heading"><h2>🎮 注目のゲーム</h2><span>面白いゲームとの出会いを♪</span></div>
     <section id="pickup" class="pickup"></section>
   </main>
   <script src="/header.js"></script>
