@@ -11,6 +11,6 @@
  tabs.querySelectorAll('[data-workspace]').forEach(button=>button.addEventListener('click',()=>{location.hash=button.dataset.workspace;show(button.dataset.workspace);}));
  window.addEventListener('hashchange',()=>show(location.hash==='#find'?'find':'manage'));
  document.addEventListener('game-finder-open',event=>{if(articleMode)return;document.getElementById('findTitle').value=event.detail?.title||'';location.hash='find';show('find');document.getElementById('findTitle').focus();});
- document.addEventListener('game-management-open',event=>{if(articleMode)return;document.getElementById('gameQuery').value=event.detail?.title||'';document.getElementById('followingFilter').value='managed';document.dispatchEvent(new Event('game-following-changed'));show('manage');});
+ document.addEventListener('game-management-open',event=>{if(articleMode)return;document.getElementById('followingFilter').value='managed';document.dispatchEvent(new CustomEvent('game-selection-request',{detail:{title:event.detail?.title||''}}));show('manage');});
  show(location.hash==='#find'?'find':'manage');
 })();
