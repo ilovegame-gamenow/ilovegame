@@ -30,9 +30,9 @@
   const games=node('div'),reason=node('div'),status=node('p');status.setAttribute('role','status');
   const heading=node('h3','この記事のゲーム');
   const change=node('a','作品を登録・変更');change.href=`/editor-games.html?article_id=${articleId}&return=${encodeURIComponent(location.pathname+location.search)}`;
-  const reload=node('button','再読み込み');reload.type='button';
+  const reload=node('button','再試行');reload.type='button';reload.hidden=true;
   container.replaceChildren(heading,games,change,node('h3','AIのおすすめ理由'),node('p','編集室専用：この記事を取り上げたいと判断した理由です。'),reason,status,reload);
-  async function load(){reload.disabled=true;status.textContent='読み込み中…';
+  async function load(){reload.hidden=true;reload.disabled=true;status.textContent='読み込み中…';
    try{const data=await request(`/api/editor-games?resource=context&article_id=${articleId}`);if(!data)return;
     games.replaceChildren();
     if(!data.games.length)games.append(node('p','作品がまだ登録されていません。'));
@@ -43,7 +43,7 @@
      row.append(link,document.createTextNode('　'),star);games.append(row);
     }
     reasons(reason,data);status.textContent='';
-   }catch(error){status.textContent=error.message;}finally{reload.disabled=false;}
+   }catch(error){status.textContent=error.message;reload.hidden=false;}finally{reload.disabled=false;}
   }
   reload.addEventListener('click',load);await load();
  }
