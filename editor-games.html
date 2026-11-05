@@ -13,8 +13,8 @@
   <main class="catalog-main catalog-workspace">
     <a class="back" id="catalogBack" href="/editor-dashboard.html">← 編集室に戻る</a>
     <h1>作品管理</h1>
-    <p class="catalog-intro" id="catalogIntro">同じゲームの記事や資料を、ひとつの作品にまとめる場所です。機種が違っても、同じ作品はひとつにまとめます。</p>
-    <nav class="catalog-shortcuts" aria-label="作品管理の操作"><button type="button" id="openGameCreate">＋ 作品を追加</button><a href="/editor-discoveries.html">見つけた候補から選ぶ →</a></nav>
+    <p class="catalog-intro" id="catalogIntro">気になる作品は★お気に入りにすると、新情報を定期的に確認します。お気に入り以外も通常のニュース収集の対象です。</p>
+    <nav class="catalog-shortcuts" aria-label="作品管理の操作"><button type="button" id="openGameCreate">＋ 作品を追加</button><a href="/editor-discoveries.html">ゲームを探す →</a></nav>
     <p id="catalogMessage" role="status" aria-live="polite">作品情報を読み込んでいます…</p>
     <details class="catalog-panel" id="releaseMaintenance">
       <summary>発売日の確認・変更履歴</summary>
@@ -31,6 +31,7 @@
     </section>
     <section class="catalog-panel" aria-labelledby="searchHeading">
       <h2 id="searchHeading">まず、作品名で探す</h2>
+      <label for="followingFilter">表示する作品</label><select id="followingFilter"><option value="managed">管理中すべて</option><option value="favorites">★ お気に入り</option><option value="removed">管理リストから外した作品</option></select>
       <form id="gameSearch" role="search">
         <label for="gameQuery">作品名・原題で検索</label>
         <div class="catalog-search-row">

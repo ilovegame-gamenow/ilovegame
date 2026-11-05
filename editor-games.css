@@ -43,3 +43,5 @@
 .catalog-workspace .catalog-list details {margin-top:16px;font-size:14px;}
 .catalog-workspace .catalog-list [data-game-action="link"] {background:#c6530c;color:#fff;}
 .catalog-workspace #gamesEmpty {padding:18px;background:#fff8ed;border-radius:12px;line-height:1.8;}
+
+.following-actions{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}.following-actions [aria-pressed="true"]{background:#fff0bd;border-color:#d59a19;color:#725000}.following-status{font-size:13px;color:#786452}.finder-results{display:grid;gap:16px;margin-top:18px}.finder-result{padding:18px;border:1px solid #eadbcb;border-radius:12px;background:#fff}.finder-result h3{margin:0 0 10px}.finder-result a{display:inline-block;margin:4px 14px 10px 0}.finder-result button{display:block;margin-top:10px}#followingFilter{padding:10px;margin:10px 0;max-width:100%}

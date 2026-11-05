@@ -54,6 +54,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - run: psql -h localhost -U postgres -d catalog_test -X -v ON_ERROR_STOP=1 -f tests/database/game-following.sql
+        env:
+          PGPASSWORD: catalog_test_only
       - name: Start isolated PostgREST
         run: >-
           docker run --detach --rm --name catalog-postgrest --network host

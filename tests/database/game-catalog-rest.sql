@@ -20,3 +20,5 @@ alter table public.articles
  add column is_breaking boolean default false, add column published_at timestamptz, add column site_published_at timestamptz;
 grant insert on public.articles to service_role;
 grant usage,select on sequence public.articles_id_seq to service_role;
+
+\ir ../../database/game-following.sql

@@ -28,7 +28,7 @@ import { appendGameMedia } from './editor-game-media.js';
     try{
       const result=await request(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:candidate.id,action,...(gameId?{game_id:gameId}:{})})});
       if(!result)return;
-      try{await load();notify(action.startsWith('adopt')?'作品台帳へ採用しました。':action==='hold'?'候補を保留しました。':'未確認に戻しました。');}
+      try{await load();notify(action.startsWith('adopt')?'作品管理に登録しました。お気に入りにすると個別確認の対象になります。':action==='hold'?'候補を保留しました。':'未確認に戻しました。');}
       catch{ready=false;notify('操作を保存しました。再読み込みして状態を確認してください。',true);}
     }catch(error){notify(error.message,true);}finally{busy=false;controls();}
   }
@@ -65,7 +65,7 @@ import { appendGameMedia } from './editor-game-media.js';
     });
     matchBox.append(searchForm);li.append(matchBox);
     const actions=node('div',undefined,'discovery-actions');
-    actions.append(button('選択した方法で採用',()=>{if(!select.value){notify('新規登録か、まとめる作品を選んでください。',true);return;}review(candidate,select.value==='new'?'adopt_new':'adopt_existing',select.value==='new'?null:select.value);}));
+    actions.append(button('作品管理に登録',()=>{if(!select.value){notify('新規登録か、まとめる作品を選んでください。',true);return;}review(candidate,select.value==='new'?'adopt_new':'adopt_existing',select.value==='new'?null:select.value);}));
     actions.append(button(candidate.status==='held'?'未確認に戻す':'保留する',()=>review(candidate,candidate.status==='held'?'reopen':'hold')));
     li.append(actions);return li;
   }
