@@ -1,7 +1,8 @@
 /* I LOVE GAME♪ 共通ニュースカード */
 
 .card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border: 1px solid #eee2d7;
   border-radius: 18px;
@@ -64,4 +65,10 @@
   font-weight: 1000;
   font-size: 22px;
   margin-bottom: 12px;
+}
+
+/* Keep platform badges at the bottom, independently of headline/summary length. */
+.card > .platform-badges {
+  margin-top: auto;
+  padding-top: 10px;
 }
