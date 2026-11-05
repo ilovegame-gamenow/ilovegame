@@ -35,7 +35,7 @@ test('featured placements use explicit editorial slots and published articles wi
    assert.equal(options.headers.apikey,'server-key');assert.ok(u.searchParams.has('expires_at'));assert.ok(!u.searchParams.get('select').includes('reason'));
    return Response.json([{article_id:1,slot:'breaking',selected_at:new Date().toISOString()},{article_id:1,slot:'discovery',selected_at:new Date().toISOString()},{article_id:2,slot:'discovery',selected_at:new Date().toISOString()},{article_id:3,slot:'discovery',selected_at:new Date().toISOString()},{article_id:4,slot:'discovery',selected_at:new Date().toISOString()}]);
   }
-  assert.equal(u.pathname,'/rest/v1/published_articles');assert.equal(options.headers.apikey,'public-key');assert.ok(!u.searchParams.has('importance'));assert.ok(!u.searchParams.get('select').includes('reason'));
+  assert.ok(u.searchParams.get('select').split(',').includes('platforms'));assert.equal(u.pathname,'/rest/v1/published_articles');assert.equal(options.headers.apikey,'public-key');assert.ok(!u.searchParams.has('importance'));assert.ok(!u.searchParams.get('select').includes('reason'));
   return Response.json([{id:1},{id:2},{id:3}]);
  },async()=>{const res=response();await featured({},res);assert.equal(res.code,200);assert.equal(res.body.breaking.id,1);assert.deepEqual(res.body.pickup.map(a=>a.id),[2,3]);assert.equal(res.headers['Cache-Control'],'no-store');});
 });
