@@ -30,7 +30,6 @@ window.GameFeatured = (() => {
         <div class="time">PICK UP</div>
         ${image ? `<img class="thumb" src="${esc(image)}" alt="">` : ''}
         <h3>${esc(article.title)}</h3><p class="meta">${esc(article.summary)}</p>
-        <span class="tag">注目度 ${esc(article.importance || 0)}</span>
       </${tag}>`;
     }).join('');
   }
