@@ -363,18 +363,6 @@ function renderPagination() {
   );
 }
 
-    function articleSourceLink(article) {
-      const known = sourceOptions.find(option=>option.id !== "all" && option.id !== "other" && option.label === article.source_name);
-      const option = known || sourceOptions.find(option=>option.id === "other");
-      if (!option || !article.source_name) return null;
-      const url = new URL(location.href);
-      url.searchParams.set("source", option.id);
-      url.searchParams.set("status", currentFilter);
-      url.searchParams.set("page", "1");
-      url.hash = "latest";
-      return { id:option.id, href:url.pathname+url.search+url.hash };
-    }
-
     function render() {
       list.replaceChildren();
       renderPagination();
@@ -400,8 +388,7 @@ function renderPagination() {
 
         const card = document.createElement("div");
 card.innerHTML = GameNewsCard.render(article, {
-  clickable: false,
-  sourceLink: articleSourceLink(article)
+  clickable: false
 });
 
 const cardElement = card.querySelector(".card");
@@ -576,11 +563,6 @@ document.addEventListener("click", event => {
   if (sourceButton) {
     event.preventDefault();
     changeConditions({ source:sourceButton.dataset.source });
-    if (sourceButton.classList.contains("game-source-link")) {
-      const control = [...document.querySelectorAll("#sourceFilters [data-source]")].find(button=>button.dataset.source === sourceButton.dataset.source);
-      control?.focus({ preventScroll:true });
-      document.querySelector(".editor-filters-panel")?.scrollIntoView({ block:"start", behavior:"smooth" });
-    }
     return;
   }
   const statusButton = event.target.closest("[data-filter]");
