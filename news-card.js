@@ -12,29 +12,46 @@
     })[char]);
   }
 
+  // 表示だけを整え、保存された対応機種名は変更しない。
+  function platformLabel(name) {
+    const original = String(name ?? "").trim();
+    const key = original.normalize("NFKC").toLowerCase().replace(/[\s_-]+/g, "");
+    const labels = {
+      nintendoswitch2: "Switch 2", switch2: "Switch 2",
+      nintendoswitch: "Switch", switch: "Switch",
+      playstation5: "PS5", ps5: "PS5", playstation4: "PS4", ps4: "PS4",
+      'xboxseriesx|s': "Xbox X|S", 'xboxseriesx/s': "Xbox X|S",
+      xboxseriesxs: "Xbox X|S", xboxseries: "Xbox X|S", 'xboxx|s': "Xbox X|S",
+      xboxseriesx: "Xbox X", xboxseriess: "Xbox S", xboxone: "Xbox One",
+      steam: "Steam", epicgamesstore: "Epic", epicgames: "Epic", epic: "Epic",
+      pc: "PC", windows: "PC", ios: "iOS", iphone: "iOS", ipad: "iOS",
+      android: "Android", browser: "ブラウザ", web: "ブラウザ", ブラウザ: "ブラウザ",
+      macos: "Mac", mac: "Mac", linux: "Linux", mobile: "スマホ", スマートフォン: "スマホ"
+    };
+    return labels[key] || original;
+  }
+
   function platformClass(name) {
-    const value = String(name ?? "").toLowerCase();
-
-    if (value.includes("switch 2")) return "switch2";
-    if (value.includes("switch")) return "switch";
-    if (value.includes("ps5") || value.includes("playstation")) return "ps5";
-    if (value.includes("xbox")) return "xbox";
-    if (value.includes("pc") || value.includes("steam")) return "pc";
-    if (
-      value.includes("ios") ||
-      value.includes("android") ||
-      value.includes("スマホ") ||
-      value.includes("mobile")
-    ) return "mobile";
-
+    if (name === "Switch 2") return "switch2";
+    if (name === "Switch") return "switch";
+    if (/^PS[45]$/.test(name)) return "ps5";
+    if (name.startsWith("Xbox")) return "xbox";
+    if (["PC", "Steam", "Epic", "Mac", "Linux"].includes(name)) return "pc";
+    if (["iOS", "Android", "スマホ"].includes(name)) return "mobile";
     return "other";
+  }
+
+  function platformLabels(values) {
+    const labels = [...new Set(values.map(platformLabel).filter(Boolean))];
+    // ストア名だけではOSを特定できないため、Mac・Linuxは残す。
+    return labels.filter(label => label !== "PC" || !labels.some(value => ["Steam", "Epic"].includes(value)));
   }
 
   function render(article, options = {}) {
     const a = article || {};
     const platforms = Array.isArray(a.platforms) ? a.platforms : [];
 
-    const badges = platforms.map(platform =>
+    const badges = platformLabels(platforms).map(platform =>
       `<span class="platform ${platformClass(platform)}">${escapeHtml(platform)}</span>`
     ).join("");
 
