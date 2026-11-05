@@ -29,8 +29,8 @@ const GameDate = {
       : "#8a817a";
   }
 };
-// 情報元と掲載日時の共通表示
-GameDate.renderMeta = function (sourceName, dateValue, { sourceLink } = {}) {
+// 掲載日時の共通表示（編集室では情報元フィルタも表示可能）
+GameDate.renderMeta = function (sourceName, dateValue, { sourceLink, showSource = true } = {}) {
   const escapeHtml = value =>
     String(value ?? "").replace(/[&<>"']/g, char => ({
       "&": "&amp;",
@@ -40,7 +40,7 @@ GameDate.renderMeta = function (sourceName, dateValue, { sourceLink } = {}) {
       "'": "&#039;"
     })[char]);
 
-  const source = escapeHtml(sourceName);
+  const source = showSource ? escapeHtml(sourceName) : "";
   const date = this.format(dateValue);
   const color = this.color(dateValue);
 

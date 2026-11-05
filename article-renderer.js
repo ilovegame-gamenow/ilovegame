@@ -57,7 +57,8 @@ window.GameArticle = (() => {
 
         ${GameDate.renderMeta(
           article.source_name,
-          updateTime
+          updateTime,
+          { showSource: false }
         )}
 
         ${thumbnail ? `
