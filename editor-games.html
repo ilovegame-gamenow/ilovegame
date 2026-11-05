@@ -14,7 +14,14 @@
     <a class="back" id="catalogBack" href="/editor-dashboard.html">← 編集室に戻る</a>
     <h1>作品管理</h1>
     <p class="catalog-intro" id="catalogIntro">気になる作品は★お気に入りにすると、新情報を定期的に確認します。お気に入り以外も通常のニュース収集の対象です。</p>
-    <nav class="catalog-shortcuts" aria-label="作品管理の操作"><button type="button" id="openGameCreate">＋ 作品を追加</button><a href="/editor-discoveries.html">ゲームを探す →</a></nav>
+    <nav class="catalog-workspace-tabs" aria-label="作品管理の表示" id="workspaceTabs"><button type="button" data-workspace="manage" aria-pressed="true">管理中のゲーム</button><button type="button" data-workspace="find" aria-pressed="false">＋ ゲームを探す</button></nav>
+    <section class="catalog-panel" id="finderPanel" aria-labelledby="finderHeading" hidden>
+      <h2 id="finderHeading">ゲームを探して登録</h2>
+      <form id="titleFinder"><label for="findTitle">気になるゲームのタイトル</label><div class="catalog-search-row"><input id="findTitle" maxlength="100" required placeholder="ゲームのタイトルを入力"><button class="catalog-primary" type="submit">探す</button></div></form>
+      <p id="finderMessage" class="catalog-note" role="status" aria-live="polite">登録済み作品・Steamを検索します。全機種の公式情報や関連記事は「Webで探す」から確認できます。</p><div id="finderResults" class="finder-results"></div>
+    </section>
+    <div id="managedPanel">
+    <button type="button" id="openGameCreate" hidden>＋ 作品を追加</button>
     <p id="catalogMessage" role="status" aria-live="polite">作品情報を読み込んでいます…</p>
     <details class="catalog-panel" id="releaseMaintenance">
       <summary>発売日の確認・変更履歴</summary>
@@ -30,7 +37,7 @@
       <ul class="catalog-list" id="linkedGames"></ul>
     </section>
     <section class="catalog-panel" aria-labelledby="searchHeading">
-      <h2 id="searchHeading">まず、作品名で探す</h2>
+      <h2 id="searchHeading">管理中のゲーム</h2>
       <label for="followingFilter">表示する作品</label><select id="followingFilter"><option value="managed">管理中すべて</option><option value="favorites">★ お気に入り</option><option value="removed">管理リストから外した作品</option></select>
       <form id="gameSearch" role="search">
         <label for="gameQuery">作品名・原題で検索</label>
@@ -47,7 +54,8 @@
         <button type="button" id="nextGames" disabled>次へ</button>
       </nav>
     </section>
-    <details class="catalog-panel catalog-create" id="createPanel">
+    </div>
+    <details class="catalog-panel catalog-create" id="createPanel" hidden>
       <summary id="createHeading">新しい作品を登録</summary>
       <p class="catalog-note">検索して見つからなかった作品を追加します。ここで登録してもサイトには公開されません。</p>
       <form id="gameCreate">
@@ -86,6 +94,8 @@
   <script src="/editor-social-evidence.js"></script>
   <script src="/editor-game-workflow.js"></script>
   <script src="/editor-games.js"></script>
+  <script src="/editor-game-finder.js"></script>
+  <script src="/editor-game-workspace.js"></script>
   <script type="module" src="/editor-release-maintenance.js"></script>
 </body>
 </html>

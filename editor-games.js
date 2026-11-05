@@ -16,7 +16,7 @@
   const createPanel=document.getElementById('createPanel');
   let articleSource=null,baseline=null;
   const names = ['title','original_title','description','source_url','source_type'];
-  let page=1, hasMore=false, ready=false, busy=false, ending=false;
+  let page=1, hasMore=false, ready=false, busy=false, ending=false, pendingRefresh=false;
   const {createId,node}=GameCatalogClient;
   let games=[], linkedGames=[], requestId=createId(), sent=false;
   const values = () => Object.fromEntries(names.map(name => [name,form.elements.namedItem(name).value]));
@@ -27,10 +27,11 @@
   function clearDraft() { try { sessionStorage.removeItem(storageKey); } catch {} }
   function dirty() { return sent || (baseline!==null&&JSON.stringify(values())!==baseline); }
   function resetForm(){form.reset();if(articleSource){form.elements.namedItem('source_url').value=articleSource.url;form.elements.namedItem('source_type').value=articleSource.type;}baseline=JSON.stringify(values());}
-  function openCreate(){if(busy||!ready)return;createPanel.open=true;if(!form.elements.namedItem('title').value.trim()&&query.value.trim()){form.elements.namedItem('title').value=query.value.trim();stash();}createPanel.scrollIntoView({block:'start',behavior:'smooth'});form.elements.namedItem('title').focus();}
+  function openCreate(){if(busy||!ready)return;if(articleId===null){document.dispatchEvent(new CustomEvent('game-finder-open',{detail:{title:query.value.trim()}}));return;}createPanel.open=true;if(!form.elements.namedItem('title').value.trim()&&query.value.trim()){form.elements.namedItem('title').value=query.value.trim();stash();}createPanel.scrollIntoView({block:'start',behavior:'smooth'});form.elements.namedItem('title').focus();}
   document.getElementById('openGameCreate').addEventListener('click',openCreate);
   document.getElementById('createMissingGame').addEventListener('click',openCreate);
   function controls() {
+    if(!busy&&pendingRefresh){pendingRefresh=false;queueMicrotask(()=>refresh(1));}
     fields.disabled=busy || !ready;
     document.getElementById('openGameCreate').disabled=busy||!ready;
     document.getElementById('createMissingGame').disabled=busy||!ready;
@@ -81,7 +82,8 @@
     if (!linkedGames.length) links.append(node('li','まだ関連作品はありません。'));
     const empty=document.getElementById('gamesEmpty');
     empty.hidden=games.length>0;
-    document.getElementById('gamesEmptyText').textContent=query.value.trim()?'該当する作品がありません。作品名や原題を変えて検索してください。':'まだ作品が登録されていません。「作品を追加」から始められます。';
+    document.getElementById('createMissingGame').textContent=articleId===null?'ゲームを探して追加':'この作品を新しく登録';
+    document.getElementById('gamesEmptyText').textContent=query.value.trim()?'該当する作品がありません。作品名や原題を変えて検索してください。':'まだ管理中の作品はありません。「ゲームを探す」から追加できます。';
     if(articleId===null&&!query.value.trim()&&followingFilter.value==='favorites')document.getElementById('gamesEmptyText').textContent='お気に入りはまだありません。作品の☆ボタンか「ゲームを探す」から追加できます。';
     if(articleId===null&&!query.value.trim()&&followingFilter.value==='removed')document.getElementById('gamesEmptyText').textContent='管理リストから外した作品はありません。';
     if (page>1 && !games.length) document.getElementById('gamesEmptyText').textContent='このページに作品はありません。「前へ」で戻ってください。';
@@ -104,6 +106,7 @@
   }
   search.addEventListener('submit',event=>{event.preventDefault();refresh(1);});
   followingFilter.addEventListener('change',()=>refresh(1));
+  document.addEventListener('game-following-changed',()=>{if(busy){pendingRefresh=true;return;}refresh(1);});
   previous.addEventListener('click',()=>refresh(page-1));
   next.addEventListener('click',()=>refresh(page+1));
   form.addEventListener('input',stash);
@@ -175,6 +178,7 @@
     busy=true;
     try {
       if (articleId!==null) {
+        createPanel.hidden=false;document.getElementById('openGameCreate').hidden=false;
         const detail=await request(`/api/editor-detail?id=${articleId}`);
         if (!detail) return;
         document.getElementById('contextTitle').textContent=detail.article.title;
