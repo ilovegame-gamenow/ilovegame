@@ -102,6 +102,7 @@ test('editor pagination is independent and clamps pages while preserving filters
  await mockFetch(async url=>{
   const u=new URL(url);calls.push(u);
   if(u.pathname.endsWith('/site_settings')) return new Response(JSON.stringify([settings]));
+  if(u.searchParams.get('select')==='id,source_name,status')return Response.json(Array.from({length:15},(_,i)=>({id:i+1,source_name:'Studio',status:'pending'})));
   if(u.searchParams.get('limit')==='0') return new Response('[]',{headers:{'content-range':'*/15'}});
   assert.equal(u.searchParams.get('limit'),'7');
   assert.equal(u.searchParams.get('status'),'eq.pending');

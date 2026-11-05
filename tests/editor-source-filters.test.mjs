@@ -16,8 +16,8 @@ async function database(data, run) {
   let matched=data.filter(row=>!params.has('status')||`eq.${row.status}`===params.get('status'));
   if(params.has('source_name')) matched=matched.filter(row=>`eq.${row.source_name}`===params.get('source_name'));
   if(params.has('or')) {
-   assert.equal(params.get('or'),'(source_name.is.null,source_name.not.in.("Nintendo","PlayStation"))');
-   matched=matched.filter(row=>!['Nintendo','PlayStation'].includes(row.source_name));
+   assert.equal(params.get('or'),'(source_name.is.null,source_name.eq.)');
+   matched=matched.filter(row=>!row.source_name);
   }
   const offset=Number(params.get('offset')||0),limit=Number(params.get('limit'));
   const status=offset>0&&offset>=matched.length?416:200;
@@ -35,7 +35,7 @@ test('source and publication filters combine in list, counters and corrected pag
   assert.deepEqual(result.counts,{all:4,pending:1,published:2,rejected:1});
   assert.deepEqual(Object.fromEntries(result.sources.map(s=>[s.id,s.count])),{all:6,nintendo:3,playstation:2,other:1});
   assert.deepEqual(result.filters,{status:'published',source:'playstation'});
-  const pages=calls.filter(p=>p.has('offset'));
+  const pages=calls.filter(p=>p.has('offset')&&p.get('select')!=='id,source_name,status');
   assert.equal(pages.length,2);
   assert.ok(pages.every(p=>p.get('source_name')==='eq.PlayStation'&&p.get('status')==='eq.published'));
   assert.equal(pages[1].get('offset'),'1');
@@ -64,7 +64,7 @@ test('empty combined filters and status changes refresh counters without hiding 
   const after=await getEditorNews(query({source:'playstation',status:'pending',page:10}));
   assert.equal(after.total,0);assert.equal(after.page,1);assert.deepEqual(after.articles,[]);
   assert.equal(after.counts.pending,0);assert.equal(after.counts.published,3);
-  assert.deepEqual(after.sources.map(s=>[s.id,s.count]),[['all',0],['nintendo',0],['playstation',0]]);
+  assert.deepEqual(Object.fromEntries(after.sources.map(s=>[s.id,s.count])),{all:0,nintendo:0,playstation:0,other:0});
  });
 });
 test('invalid filters and unauthenticated calls never reach the database',async()=>{
@@ -79,4 +79,17 @@ test('invalid filters and unauthenticated calls never reach the database',async(
    await editorNews({method:'GET',headers,query},res);assert.equal(res.code,expected);
   }
  }finally{globalThis.fetch=original;}
+});
+
+test('new publishers and media get individual exact filters without collector registration',async()=>{
+ const label='Studio A&B, (Japan)';
+ const data=[...rows(),{id:10,source_name:label,status:'published'},{id:11,source_name:'Metacritic',status:'pending'}];
+ await database(data,async()=>{
+  const parsed=parseEditorNewsQuery({source:`name:${label}`});assert.equal(parsed.source,`name:${label}`);
+  const all=await getEditorNews(query({limit:100}));
+  assert.equal(all.sources.find(s=>s.id===`name:${label}`).count,1);
+  assert.equal(all.sources.find(s=>s.id==='name:Metacritic').count,1);
+  const selected=await getEditorNews(query({source:`name:${label}`,status:'published',limit:100}));
+  assert.deepEqual(selected.articles.map(a=>a.id),[10]);assert.equal(selected.counts.all,1);
+ });
 });

@@ -43,3 +43,5 @@
 .game-meta a.game-source-link { color:#77706a; font:inherit; font-weight:400; text-decoration:underline; text-decoration-color:#c8b7a8; text-underline-offset:3px; border-radius:2px; }
 .game-meta a.game-source-link:hover { color:#a95012; text-decoration-color:currentColor; }
 .game-meta a.game-source-link:focus-visible { outline:2px solid #c6530c; outline-offset:3px; }
+
+#articleSourceSelect{width:100%;max-width:560px;min-height:48px;padding:10px 14px;border:1px solid #d9c8b7;border-radius:10px;background:#fffaf4;color:#51443a;font:inherit}#articleSourceSelect:focus-visible{outline:3px solid #c6530c;outline-offset:3px}

@@ -199,7 +199,7 @@
 <section class="editor-filters-panel" aria-label="記事の絞り込み">
   <div class="editor-filter-group">
     <h2 id="statusFilterHeading" class="filter-heading">掲載状態</h2>
-    <p id="statusCountNote" class="filter-note">全メーカーの掲載状態別件数</p>
+    <p id="statusCountNote" class="filter-note">全情報元の掲載状態別件数</p>
 <div class="stats" role="group" aria-labelledby="statusFilterHeading" aria-describedby="statusCountNote">
   <button type="button" class="stat all" data-filter="all">
     <span class="stat-label">すべて</span>
@@ -220,8 +220,8 @@
 </div>
   </div>
   <div class="editor-filter-group">
-    <h2 id="sourceFilterHeading" class="filter-heading">メーカー</h2>
-    <p id="sourceCountNote" class="filter-note">メーカー別の件数を読み込み中…</p>
+    <h2 id="sourceFilterHeading" class="filter-heading">情報元</h2>
+    <p id="sourceCountNote" class="filter-note">情報元別の件数を読み込み中…</p>
   <div id="sourceFilters" class="source-filters" role="group" aria-labelledby="sourceFilterHeading" aria-describedby="sourceCountNote">
     <button type="button" class="source-filter active" data-source="all" aria-pressed="true">すべて</button>
   </div>
@@ -389,7 +389,7 @@ function renderPagination() {
 
       const sourceLabel = sourceOptions.find(option => option.id === currentSource)?.label || "すべて";
       const statusLabel = labels[currentFilter] || "すべての掲載状態";
-      const condition = `${currentSource === "all" ? "全メーカー" : sourceLabel} ／ ${statusLabel}`;
+      const condition = `${currentSource === "all" ? "全情報元" : sourceLabel} ／ ${statusLabel}`;
       message.textContent = totalArticles
         ? `${condition}：全${totalArticles}件中、${filtered.length}件を表示しています。`
         : `${condition}：該当する記事はありません。`;
@@ -528,24 +528,25 @@ function updateFilterButtons() {
 
 function renderSources() {
   const container = document.getElementById("sourceFilters");
-  const focusedSource = document.activeElement?.dataset.source;
+  const wasFocused = document.activeElement?.id === "articleSourceSelect";
   container.replaceChildren();
+  const select = document.createElement("select");
+  select.id = "articleSourceSelect";
+  select.setAttribute("aria-labelledby", "sourceFilterHeading");
   for (const option of sourceOptions) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "source-filter";
-    button.dataset.source = option.id;
-    button.textContent = `${option.label}（${option.count}件）`;
-    const active = option.id === currentSource;
-    button.classList.toggle("active", active);
-    button.setAttribute("aria-pressed", String(active));
-    container.append(button);
-    if (focusedSource === option.id) button.focus({ preventScroll:true });
+    const item = document.createElement("option");
+    item.value = option.id;
+    item.textContent = `${option.label}（${option.count}件）`;
+    select.append(item);
   }
+  select.value = currentSource;
+  select.addEventListener("change", () => changeConditions({source:select.value}));
+  container.append(select);
+  if(wasFocused)select.focus({preventScroll:true});
   const statusLabel = labels[currentFilter] || "すべての掲載状態";
-  document.getElementById("sourceCountNote").textContent = `${statusLabel}のメーカー別件数`;
+  document.getElementById("sourceCountNote").textContent = `${statusLabel}の情報元別件数`;
   const sourceLabel = sourceOptions.find(option=>option.id===currentSource)?.label;
-  document.getElementById("statusCountNote").textContent = `${currentSource === "all" ? "全メーカー" : sourceLabel}の掲載状態別件数`;
+  document.getElementById("statusCountNote").textContent = `${currentSource === "all" ? "全情報元" : sourceLabel}の掲載状態別件数`;
 }
 
 function changeConditions({ status = currentFilter, source = currentSource }) {
