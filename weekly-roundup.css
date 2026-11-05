@@ -8,3 +8,5 @@
 .roundup-game{background:transparent;box-shadow:none}.roundup-game .source-links{border-top:1px solid #eadfce;padding-top:16px;margin-top:22px}
 @media(max-width:600px){.roundup-entry{padding:18px 14px;margin-top:30px}.roundup-title{font-size:21px}}
 @media print{.roundup-entry{box-shadow:none;border-color:#b7a28e}.roundup-title{break-after:avoid}.roundup-date{break-after:avoid}}
+
+.roundup-game .source-links.source{display:block;text-align:right;margin-top:30px;padding-top:22px;border-top:1px solid #eee}.roundup-game .source-links.source a{color:#e86512;font-weight:700;overflow-wrap:anywhere}
