@@ -14,7 +14,7 @@
   else if(game)card.append(node('span','登録済み','finder-source'));
   if(result?.image){const image=node('img');const valid=externalLink('',result.image);if(valid){image.src=valid.href;image.alt='';image.loading='lazy';image.className='finder-image';image.addEventListener('error',()=>{image.hidden=true;});card.append(image);}}
   card.append(node('h3',title));if(description)card.append(node('p',description.slice(0,500),'finder-description'));
-  if(result?.platforms?.length)card.append(node('p',result.platforms.join(' / '),'finder-platforms'));
+  if(result?.platforms?.length)card.append(GamePlatforms.element(result.platforms));
   if(result?.developer)card.append(node('p',result.developer,'catalog-note'));
   if(result){
    const source=externalLink(result.provider==='appstore'?'App Storeで見る ↗':result.provider==='steam'?'Steamで見る ↗':'作品情報・出典を見る ↗',result.url);if(source)card.append(source);

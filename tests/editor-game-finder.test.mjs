@@ -16,15 +16,16 @@ async function setup(data){
  nodes.findTitle.value='テスト作品';nodes.titleFinder.append(nodes.findTitle,new Element('button'));
  const calls=[],events=[];
  const ctx={URL,console,location:{replace(){}},Event:class{constructor(type){this.type=type;}},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail;}},confirm:()=>true,
- document:{getElementById:id=>nodes[id],dispatchEvent:event=>events.push(event.type)},
+ document:{createElement:tag=>new Element(tag),getElementById:id=>nodes[id],dispatchEvent:event=>events.push(event.type)},
  GameCatalogClient:{node:(...args)=>new Element(...args),createId:()=> '11000000-0000-4000-8000-000000000001',request:async(path,options)=>{calls.push({path,options});return options?.method?{game:{id:'saved'}}:data;}}};
+ vm.runInNewContext(readFileSync(new URL('../platform-display.js',import.meta.url),'utf8'),ctx);
  vm.runInNewContext(readFileSync(new URL('../editor-game-finder.js',import.meta.url),'utf8'),ctx);
  await nodes.titleFinder.events.submit({preventDefault(){}});return {nodes,calls,events};
 }
 test('finder shows source, platform and plain text and registers the selected external identity',async()=>{
  const {nodes,calls,events}=await setup({games:[],results:[{provider:'wikidata',externalId:'Q123',title:'<script>作品</script>',description:'<b>説明</b>',platforms:['Nintendo Switch'],url:'https://www.wikidata.org/wiki/Q123',sourceLabel:'Wikidata',officialUrl:'javascript:alert(1)'}],sources:[{name:'全機種の作品データ',available:true,count:1}]});
  const cards=nodes.finderResults.children.filter(c=>c.className==='finder-result');assert.equal(cards.length,1);
- const card=cards[0];assert.equal(card.children.find(c=>c.tag==='h3').textContent,'<script>作品</script>');assert.equal(card.children.find(c=>c.className==='finder-platforms').textContent,'Nintendo Switch');
+ const card=cards[0];assert.equal(card.children.find(c=>c.tag==='h3').textContent,'<script>作品</script>');assert.equal(card.children.find(c=>c.className==='platform-badges').children[0].textContent,'Switch');
  assert.equal(card.children.some(c=>c.href?.startsWith('javascript:')),false);
  await card.children.find(c=>c.tag==='button').events.click();
  assert.deepEqual(JSON.parse(calls[1].options.body),{id:'11000000-0000-4000-8000-000000000001',provider:'wikidata',external_id:'Q123'});

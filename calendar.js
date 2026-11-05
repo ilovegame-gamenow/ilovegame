@@ -42,7 +42,7 @@ async function load(){
   if(demo)result=sampleCalendar({month,platform,region});else result=await requestCalendar(query,controller.signal);
   if(id!==requestId)return;
   if(!Array.isArray(result.releases)||!Array.isArray(result.platforms))throw Error('発売情報の形式を確認できませんでした。');
-  data=result;$('platformFilter').replaceChildren(new Option('すべての機種',''),...result.platforms.map(p=>new Option(p.name,p.code)));
+  data=result;$('platformFilter').replaceChildren(new Option('すべての機種',''),...result.platforms.map(p=>new Option(globalThis.GamePlatforms.describe(p.name).label,p.code)));
   if(platform&&!result.platforms.some(p=>p.code===platform))$('platformFilter').append(new Option('指定した機種',platform));
   $('platformFilter').value=platform;$('regionFilter').value=region;
   $('calendarMessage').textContent=result.truncated?'情報が多いため一部を表示しています。機種で絞り込んでください。':'日付を選ぶと、その日の発売作品を表示します。';render();

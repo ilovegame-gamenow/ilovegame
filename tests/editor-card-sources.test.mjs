@@ -6,6 +6,7 @@ const html=readFileSync(new URL('../editor-dashboard.html',import.meta.url),'utf
 function renderer(){
  const context=vm.createContext({window:{},document:{createElement:()=>({}),head:{appendChild(){}}},GameImage:{getUrl:()=>''}});
  vm.runInContext(readFileSync(new URL('../date-utils.js',import.meta.url),'utf8'),context);
+ vm.runInContext(readFileSync(new URL('../platform-display.js',import.meta.url),'utf8'),context);
  vm.runInContext(readFileSync(new URL('../news-card.js',import.meta.url),'utf8'),context);
  return (sourceName,options)=>context.window.GameNewsCard.render({id:1,source_name:sourceName,title:'記事'},options);
 }

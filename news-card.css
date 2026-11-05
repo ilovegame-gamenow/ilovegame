@@ -65,36 +65,3 @@
   font-size: 22px;
   margin-bottom: 12px;
 }
-
-.card .platforms {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-}
-
-.card .platform {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  min-width: 76px;
-  min-height: 26px;
-  line-height: 16px;
-  white-space: nowrap;
-  font-size: 11px;
-  font-weight: 900;
-  padding: 5px 8px;
-  border-radius: 999px;
-  color: #fff;
-  letter-spacing: .02em;
-}
-
-.card .platform.switch,
-.card .platform.switch2 { background: #e60012; }
-
-.card .platform.ps5 { background: #1674d1; }
-.card .platform.xbox { background: #107c10; }
-.card .platform.pc { background: #5d6470; }
-.card .platform.mobile { background: #8e44ad; }
-.card .platform.other { background: #ff7a2f; }

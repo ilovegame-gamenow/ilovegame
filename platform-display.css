@@ -1,0 +1,3 @@
+.platform-badges{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 0}
+.platform-badge{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:26px;padding:5px 10px;border-radius:999px;color:#fff;background:#79634e;font:700 11px/16px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.02em;white-space:nowrap}
+.platform-badge--switch{background:#d90011}.platform-badge--playstation{background:#126ac1}.platform-badge--xbox{background:#107c10}.platform-badge--pc{background:#5d6470}.platform-badge--mobile{background:#8540a1}.platform-badge--other{background:#79634e}

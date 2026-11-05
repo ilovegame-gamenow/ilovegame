@@ -61,6 +61,8 @@ window.GameArticle = (() => {
           { showSource: false }
         )}
 
+        ${GamePlatforms.render(article.platforms)}
+
         ${thumbnail ? `
           <img
             class="hero"
