@@ -28,12 +28,12 @@ window.GameFeatured = (() => {
       const tag = clickable ? 'a' : 'article';
       const destination = clickable ? ` href="/article.html?id=${encodeURIComponent(article.id)}"` : '';
       return `<${tag} class="card news-card-link"${destination}>
-        <div class="time">注目のゲーム</div>
+        <div class="time">注目</div>
         ${image ? `<img class="thumb" src="${esc(image)}" alt="">` : ''}
         <h3>${esc(article.title)}</h3><p class="meta">${esc(article.ilovegame_point || article.summary)}</p>
         ${GamePlatforms.render(article.platforms)}
       </${tag}>`;
-    }).join('') || '<p class="meta featured-status">注目のゲームは、見つけた作品から順に紹介します♪</p>';
+    }).join('') || '<p class="meta featured-status">注目の記事は、見つけた作品から順に紹介します♪</p>';
     window.GamePickupCarousel?.refresh();
   }
   return { render };

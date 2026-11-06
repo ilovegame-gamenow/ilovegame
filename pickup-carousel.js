@@ -30,7 +30,7 @@ window.GamePickupCarousel = (() => {
     dots.replaceChildren(...positions.map((_, i) => {
       const dot = document.createElement('button');
       dot.type = 'button';
-      dot.setAttribute('aria-label', `注目ゲームの表示位置 ${i + 1}`);
+      dot.setAttribute('aria-label', `注目記事の表示位置 ${i + 1}`);
       dot.setAttribute('aria-controls', 'pickup');
       dot.addEventListener('click', () => move(i));
       return dot;

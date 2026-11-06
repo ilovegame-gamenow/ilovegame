@@ -35,11 +35,11 @@
       // Reset the previous selection before rendering a fresh response.
       GameFeatured.render(result.featured || { breaking: null, pickup: [] });
       if (!result.featured) {
-        rail.innerHTML = '<p class="meta featured-status">注目のゲームを読み込めませんでした。再読み込みをお試しください。</p>';
+        rail.innerHTML = '<p class="meta featured-status">注目を読み込めませんでした。再読み込みをお試しください。</p>';
         retry.hidden = false;
       }
       latest.innerHTML = result.articles.map(article => GameNewsCard.render(article)).join('') ||
-        (result.featured?.pickup.length ? '<p class="meta featured-status">最新ニュースは上の「注目のゲーム」で紹介しています♪</p>' : '<p class="meta">公開中のニュースはありません。</p>');
+        (result.featured?.pickup.length ? '<p class="meta featured-status">最新の記事は上の「注目」で紹介しています♪</p>' : '<p class="meta">公開中のニュースはありません。</p>');
       const currentPage = result.page || requestedPage;
       const totalPages = Math.max(1, Math.ceil(result.total / (result.limit || 20)));
       if (currentPage !== requestedPage) {
