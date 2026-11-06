@@ -45,7 +45,7 @@ main{max-width:1100px;margin:0 auto;padding:28px 20px 65px}
 }
 .meta{font-size:12px;color:var(--muted)}
 .section-title{
-  display:flex;align-items:end;justify-content:space-between;
+  display:flex;align-items:end;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;
   margin:30px 0 12px;border-bottom:2px solid var(--line);padding-bottom:9px;
 }
 .section-title h2{margin:0;font-size:21px;font-weight:1000}
@@ -56,20 +56,33 @@ main{max-width:1100px;margin:0 auto;padding:28px 20px 65px}
   display:inline-block;font-size:10px;font-weight:800;color:#8a4b28;
   background:#fff0e5;border:1px solid #ffd5bd;border-radius:999px;padding:4px 8px;
 }
-.pickup{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:14px}
-.pickup .card:first-child{min-height:210px;background:#fff3e8;border-color:#ffc8a5}
-.pickup .card:first-child h3{font-size:21px}
-.pickup .card:first-child .time{font-size:13px;letter-spacing:.08em}
+/* Equal cards on wide screens; a swipeable row when space is limited. */
+.pickup{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pickup > .card{min-width:0}
+.pickup .card h3{font-size:16px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pickup .card .meta{line-height:1.65;margin:0 0 10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pickup-controls{display:flex;align-items:center;gap:10px;margin-top:12px}
+.pickup-controls > button{width:44px;height:44px;border:1px solid var(--line);border-radius:50%;background:var(--white);color:var(--ink);font-size:24px;cursor:pointer}
+.pickup-controls > button:disabled{opacity:.35;cursor:default}
+.pickup-dots{display:flex;align-items:center;gap:2px}
+.pickup-dots button{display:grid;place-items:center;width:26px;height:44px;border:0;background:transparent;cursor:pointer;padding:0}
+.pickup-dots button::after{content:"";width:6px;height:6px;border-radius:9px;background:#dfd2c7}
+.pickup-dots button[aria-pressed="true"]::after{width:18px;background:var(--orange)}
+.pickup-hint{margin-left:auto;font-size:10px;color:var(--muted)}
+@media(prefers-reduced-motion:no-preference){.pickup{scroll-behavior:smooth}}
 footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12px}
 .footer-logo{font-size:20px;font-weight:1000;margin-bottom:5px}
 .footer-logo span{color:var(--orange2)}
 @media(max-width:800px){
-  .grid{grid-template-columns:1fr 1fr}.pickup{grid-template-columns:1fr 1fr}
-  .pickup .card:first-child{grid-column:1/-1}
+  .grid{grid-template-columns:1fr 1fr}
+  .pickup{display:flex;overflow-x:auto;gap:14px;scroll-snap-type:x mandatory;scroll-padding-inline:20px;padding:0 20px 10px;margin-inline:-20px;scrollbar-width:none;overscroll-behavior-x:contain}
+  .pickup::-webkit-scrollbar{display:none}
+  .pickup > .card{flex:0 0 min(84%,340px);scroll-snap-align:start}
+  .pickup > .featured-status{flex:1 0 100%}
 }
 
 @media(max-width:600px){
-  .grid,.pickup{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
   .breaking h1{font-size:22px}
 }
 
@@ -78,3 +91,24 @@ footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12
 
 [hidden] { display:none !important; }
 .breaking-link { display:block; color:inherit; text-decoration:none; }
+
+/* Status text must span the grid rather than occupy a narrow card column. */
+.pickup > .featured-status {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 12px 0;
+  line-height: 1.7;
+}
+.featured-retry { margin-top: 8px; }
+.featured-retry button {
+  font: inherit;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 8px 20px;
+  cursor: pointer;
+}
+
+@media(max-width:360px){.pickup-hint{font-size:9px}.pickup-controls{gap:4px}}

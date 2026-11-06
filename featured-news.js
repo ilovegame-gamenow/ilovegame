@@ -33,7 +33,8 @@ window.GameFeatured = (() => {
         <h3>${esc(article.title)}</h3><p class="meta">${esc(article.ilovegame_point || article.summary)}</p>
         ${GamePlatforms.render(article.platforms)}
       </${tag}>`;
-    }).join('') || '<p class="meta">注目のゲームは、見つけた作品から順に紹介します♪</p>';
+    }).join('') || '<p class="meta featured-status">注目のゲームは、見つけた作品から順に紹介します♪</p>';
+    window.GamePickupCarousel?.refresh();
   }
   return { render };
 })();

@@ -25,6 +25,20 @@
   <div class="weekly-status"><p id="weekMessage" role="status" aria-live="polite">発売情報を確認中…</p><button id="retryWeek" type="button" hidden>再読み込み</button></div>
 </section>
 
+<div class="section-title" id="pickup-heading">
+  <h2>注目のゲーム</h2>
+  <span>面白いゲームとの出会いを♪</span>
+</div>
+
+<section id="pickup" class="pickup" aria-live="polite"><p class="meta featured-status">注目のゲームを読み込み中…</p></section>
+<div id="pickup-controls" class="pickup-controls" hidden>
+  <button id="pickup-prev" type="button" aria-label="前の注目ゲームを表示" aria-controls="pickup">‹</button>
+  <div id="pickup-dots" class="pickup-dots" aria-label="注目ゲームの表示位置"></div>
+  <button id="pickup-next" type="button" aria-label="次の注目ゲームを表示" aria-controls="pickup">›</button>
+  <span class="pickup-hint">横にスワイプしてチェック →</span>
+</div>
+<div id="featured-retry" class="featured-retry" hidden><button type="button">再読み込み</button></div>
+
 <div class="section-title" id="latest">
   <h2>最新ニュース</h2>
   <span>ゲームの新情報を新しい順に</span>
@@ -36,12 +50,6 @@
 
 <div id="pagination" class="pagination"></div>
 
-<div class="section-title" id="pickup-heading">
-  <h2>注目のゲーム</h2>
-  <span>面白いゲームとの出会いを♪</span>
-</div>
-
-<section id="pickup" class="pickup"></section>
 </main>
 
 <footer><div class="footer-logo">I <span>LOVE</span> GAME<span class="music">♪</span></div>ゲームの「今」をお届け♪</footer>
@@ -50,7 +58,9 @@
 <script src="/date-utils.js"></script>
 <script src="/image-utils.js"></script>
 <script src="/news-card.js"></script>
+<script src="/pickup-carousel.js"></script>
 <script src="/featured-news.js"></script>
+<script src="/featured-news-client.js"></script>
 <script src="/pagination.js"></script>
 <script type="module" src="/weekly-releases.js"></script>
 <script>
@@ -59,18 +69,11 @@ async function loadLiveNews(){
   try{
     const params = new URLSearchParams(location.search);
     const requestedPage = Math.max(1, parseInt(params.get("page") || "1", 10) || 1);
-    const [r, featuredResponse] = await Promise.all([
-  fetch(`/api/news?page=${requestedPage}`),
-  fetch("/api/featured-news").then(response => response.ok ? response.json() : {breaking:null,pickup:[]}).catch(() => ({breaking:null,pickup:[]}))
-]);
-const [result, featuredResult] = await Promise.all([
-  r.ok ? r.json() : Promise.reject(new Error("記事を取得できませんでした")),
-  Promise.resolve(featuredResponse)
-]);
-const rows = result.articles || [];
-    
+    const r = await fetch(`/api/news?page=${requestedPage}`);
+    if (!r.ok) throw new Error("記事を取得できませんでした");
+    const result = await r.json();
+    const rows = result.articles || [];
 
-GameFeatured.render(featuredResult);
     const latest = document.querySelector(".news-grid,.grid");
     const pagination = document.getElementById("pagination");
     if(!latest || !pagination) return;
