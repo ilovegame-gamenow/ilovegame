@@ -60,51 +60,10 @@
 <script src="/news-card.js"></script>
 <script src="/pickup-carousel.js"></script>
 <script src="/featured-news.js"></script>
-<script src="/featured-news-client.js"></script>
+
 <script src="/pagination.js"></script>
 <script type="module" src="/weekly-releases.js"></script>
-<script>
-
-async function loadLiveNews(){
-  try{
-    const params = new URLSearchParams(location.search);
-    const requestedPage = Math.max(1, parseInt(params.get("page") || "1", 10) || 1);
-    const r = await fetch(`/api/news?page=${requestedPage}`);
-    if (!r.ok) throw new Error("記事を取得できませんでした");
-    const result = await r.json();
-    const rows = result.articles || [];
-
-    const latest = document.querySelector(".news-grid,.grid");
-    const pagination = document.getElementById("pagination");
-    if(!latest || !pagination) return;
-
-    const perPage = result.limit || 20;
-    const totalPages = Math.max(1, Math.ceil(result.total / perPage));
-    const currentPage = result.page || requestedPage;
-    if (currentPage !== requestedPage) {
-      const correctedUrl = new URL(location.href);
-      correctedUrl.searchParams.set("page", String(currentPage));
-      history.replaceState(null, "", correctedUrl);
-    }
-    const pageRows = rows;
-    
-latest.innerHTML = pageRows
-  .map(article => GameNewsCard.render(article))
-  .join("");
-
-    pagination.replaceChildren(
-  GamePagination.render(currentPage, totalPages, page => {
-    location.href = `?page=${page}#latest`;
-  })
-);
-
-  }catch(e){
-    console.error(e);
-    alert("Supabase接続エラー: " + e.message);
-  }
-}
-loadLiveNews();
-</script>
+<script src="/home-news.js"></script>
   
 </body>
 </html>

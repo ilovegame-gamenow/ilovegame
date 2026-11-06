@@ -1,3 +1,4 @@
+import { getFeaturedNews } from '../lib/featured-news.js';
 import { handleCalendar } from '../lib/release-calendar.js';
 import { getSiteSettings } from "../lib/site-settings.js";
 
@@ -17,7 +18,16 @@ export default async function handler(req, res) {
     let page = Math.max(1, parseInt(req.query.page, 10) || 1);
     if (!Number.isSafeInteger(page)) page = 1;
     const articleId = req.query.id;
-    const limit = articleId ? 1 : (await getSiteSettings(supabaseUrl, process.env.SUPABASE_SECRET_KEY)).public_page_size;
+    const settings = articleId ? null : await getSiteSettings(supabaseUrl, process.env.SUPABASE_SECRET_KEY);
+    const homeView = !articleId && req.query.view === 'home';
+    let featured = null;
+    if (homeView) {
+      // On selection failure, keep every article available in latest news.
+      try { featured = await getFeaturedNews(supabaseUrl, supabaseKey, process.env.SUPABASE_SECRET_KEY, settings); }
+      catch { /* The client offers retry without claiming there are no selections. */ }
+    }
+    const excludedIds = [...new Set(featured?.pickup.map(article => article.id) || [])];
+    const limit = articleId ? 1 : settings.public_page_size;
     const offset = (page - 1) * limit;
     const fields =
       "id,title,summary,article_body,ilovegame_point,platforms,category,thumbnail_url,source_name,source_url,source_published_at,importance,is_breaking,status,published_at,created_at,site_published_at";
@@ -29,7 +39,8 @@ export default async function handler(req, res) {
 
     (articleId
         ? `&id=eq.${encodeURIComponent(articleId)}&limit=1`
-        : `&order=site_published_at.desc.nullslast,id.desc&limit=${limit}&offset=${offset}`);
+        : `&order=site_published_at.desc.nullslast,id.desc&limit=${limit}&offset=${offset}` +
+          (excludedIds.length ? `&id=not.in.(${excludedIds.join(",")})` : ""));
 
     const response = await fetch(url, {
         headers: {
@@ -71,6 +82,7 @@ export default async function handler(req, res) {
       data = await corrected.json();
     }
     return res.status(200).json({
+        ...(homeView ? { featured } : {}),
         articles: data,
         total,
         page,
