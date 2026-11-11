@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="/site-home.css">
 <link rel="stylesheet" href="/header.css">
 <link rel="stylesheet" href="/news-card.css">
+<link rel="stylesheet" href="/news-feed.css">
 <link rel="stylesheet" href="/pagination.css">
 <link rel="stylesheet" href="/release-cards.css">
 <link rel="stylesheet" href="/weekly-roundup.css">
@@ -26,7 +27,7 @@
 </section>
 
 <div class="section-title" id="pickup-heading">
-  <h2>注目</h2>
+  <h2>PICK UP</h2>
 </div>
 
 <section id="pickup" class="pickup" aria-live="polite"><p class="meta featured-status">注目の記事を読み込み中…</p></section>
@@ -39,10 +40,16 @@
 <div id="featured-retry" class="featured-retry" hidden><button type="button">再読み込み</button></div>
 
 <div class="section-title" id="latest">
-  <h2>最新</h2>
+  <h2>NEWS FEED</h2>
 </div>
 
-<section class="grid">
+<div class="feed-tools">
+<form id="feed-search" role="search"><label class="sr-only" for="feed-query">ゲーム名・記事タイトルで検索</label><input id="feed-query" type="search" maxlength="100" placeholder="ゲーム名・記事タイトルで検索"><button type="submit">検索</button><button id="feed-clear" type="button" hidden>解除</button></form>
+<div id="feed-filters" class="feed-filters" role="group" aria-label="ニュースのカテゴリー"><button type="button" data-filter="all" aria-pressed="true">ALL</button><button type="button" data-filter="switch" aria-pressed="false">Switch</button><button type="button" data-filter="playstation" aria-pressed="false">PlayStation</button><button type="button" data-filter="xbox" aria-pressed="false">Xbox</button><button type="button" data-filter="pc" aria-pressed="false">PC</button><button type="button" data-filter="mobile" aria-pressed="false">Mobile</button><button type="button" data-filter="movie" aria-pressed="false">MOVIE</button></div>
+<div class="feed-options"><label><input id="feed-include" type="checkbox"> 速報・注目の記事も表示</label><span id="feed-count" role="status" aria-live="polite"></span></div>
+<p id="feed-search-note" class="meta" hidden>全公開記事から検索中</p>
+</div>
+<section class="grid news-feed" aria-label="NEWS FEED" aria-live="polite">
   <p class="loading-message">ニュースを読み込み中...</p>
 </section>
 

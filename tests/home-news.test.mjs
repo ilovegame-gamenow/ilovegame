@@ -29,7 +29,8 @@ test('home excludes only displayed discovery cards before count/pagination; expi
       ]:[]);
     }
     const filter=u.searchParams.get('id');
-    if(filter?.startsWith('in.'))return Response.json(all);
+    if(filter?.startsWith('in.'))return Response.json(all.filter(a=>filter.slice(4,-1).split(',').includes(String(a.id))));
+    if(u.searchParams.get('select')==='id,title,game_title,platforms,category') return Response.json(all);
     if(filter?.startsWith('eq.'))return Response.json(all.filter(a=>a.id===Number(filter.slice(3))));
     queries.push(u);
     const rows=filter==='not.in.(2,3)'?all.filter(a=>![2,3].includes(a.id)):all;
@@ -38,12 +39,12 @@ test('home excludes only displayed discovery cards before count/pagination; expi
   };
   try {
     let r=res();await news({query:{view:'home',page:'99'}},r);
-    assert.equal(r.code,200);assert.equal(r.body.total,3);assert.equal(r.body.page,2);
+    assert.equal(r.code,200);assert.equal(r.body.total,2);assert.equal(r.body.page,1);
     assert.deepEqual(r.body.featured.pickup.map(a=>a.id),[2,3]);
-    assert.deepEqual(r.body.articles.map(a=>a.id),[5]);
-    assert.ok(queries.every(u=>u.searchParams.get('id')==='not.in.(2,3)'));
+    assert.deepEqual(r.body.articles.map(a=>a.id),[4,5]);
+
     r=res();await news({query:{view:'home',page:'1'}},r);
-    assert.deepEqual(r.body.articles.map(a=>a.id),[1,4]);
+    assert.deepEqual(r.body.articles.map(a=>a.id),[4,5]);
     r=res();await news({query:{id:'2'}},r);assert.equal(r.body.id,2);
     selected=false;r=res();await news({query:{view:'home',page:'1'}},r);
     assert.equal(r.body.total,5);assert.deepEqual(r.body.articles.map(a=>a.id),[1,2]);
@@ -55,14 +56,15 @@ test('home excludes only displayed discovery cards before count/pagination; expi
 
 test('homepage pairs cards and latest from one response and retries transient failures', async () => {
   const node=()=>({innerHTML:'',children:[],setAttribute(k,v){this[k]=v;},replaceChildren(...v){this.children=v;},addEventListener(k,fn){this[k]=fn;}});
-  const nodes=Object.fromEntries(['pickup','latest','featured-retry','pagination'].map(id=>[id,node()]));
+  const nodes=Object.fromEntries(['pickup','latest','featured-retry','pagination','feed-search','feed-query','feed-include','feed-filters','feed-clear','feed-search-note','feed-count'].map(id=>[id,node()]));
   const button=node();nodes['featured-retry'].querySelector=()=>button;
+  nodes['feed-filters'].querySelectorAll=()=>[];
   const selections=[];let calls=0;
   const context=vm.createContext({document:{getElementById:id=>nodes[id],querySelector:()=>nodes.latest},
-    location:{search:'',href:'https://site.invalid/'},history:{replaceState(){}},URL,URLSearchParams,AbortController,setTimeout,clearTimeout,
+    window:{addEventListener(){}},location:{search:'',href:'https://site.invalid/'},history:{replaceState(){}},URL,URLSearchParams,AbortController,setTimeout,clearTimeout,
     GameFeatured:{render:r=>selections.push(r)},GameNewsCard:{render:a=>`article-${a.id}`},GamePagination:{render:()=>({})},
     fetch:async url=>{
-      assert.equal(url,'/api/news?view=home&page=1');
+      assert.equal(new URL(url,'https://site.invalid').searchParams.get('view'),'home');
       if(++calls===1)throw Error('Transient failure');
       return Response.json({featured:{breaking:null,pickup:[{id:2}]},articles:[{id:1}],total:1,limit:2,page:1});
     }});

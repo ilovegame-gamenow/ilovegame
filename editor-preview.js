@@ -55,7 +55,7 @@
     const pickup = selectors.slice(1).map(articleFor).filter(Boolean).filter((a,i,all) => a.id !== breaking?.id && all.findIndex(b=>b.id===a.id)===i);
     GameFeatured.render({ breaking, pickup }, { clickable:false });
     byId('emptyNotice').hidden = Boolean(breaking || pickup.length);
-    byId('previewNews').innerHTML = candidates().slice(0,4).map(a => GameNewsCard.render({ ...a, thumbnail_url:byId('showImages').checked ? a.thumbnail_url : null }, { clickable:false })).join('');
+    byId('previewNews').innerHTML = candidates().slice(0,4).map(a => GameNewsCard.render({ ...a, thumbnail_url:byId('showImages').checked ? a.thumbnail_url : null }, { clickable:false, compact:true })).join('');
   }
   async function loadSaved() {
     byId('loadMore').disabled = true;

@@ -7,7 +7,7 @@ window.GameFeatured = (() => {
     box.replaceChildren();
     if (breaking) {
       const image = GameImage.getUrl(breaking.thumbnail_url, breaking.source_name);
-      box.innerHTML = `<div class="breaking-label">● 速報</div>
+      box.innerHTML = `<div class="breaking-label">● BREAKING</div>
         ${image ? `<img id="breaking-image" src="${esc(image)}" alt="">` : ''}
         <h1>${esc(breaking.title)}</h1>
         ${GameDate.renderMeta('', breaking.site_published_at || breaking.published_at || breaking.created_at, {showSource:false})}
@@ -28,7 +28,7 @@ window.GameFeatured = (() => {
       const tag = clickable ? 'a' : 'article';
       const destination = clickable ? ` href="/article.html?id=${encodeURIComponent(article.id)}"` : '';
       return `<${tag} class="card news-card-link"${destination}>
-        <div class="time">注目</div>
+        <div class="time">PICK UP</div>
         ${image ? `<img class="thumb" src="${esc(image)}" alt="">` : ''}
         <h3>${esc(article.title)}</h3><p class="meta">${esc(article.ilovegame_point || article.summary)}</p>
         ${GamePlatforms.render(article.platforms)}

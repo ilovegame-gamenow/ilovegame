@@ -5,7 +5,7 @@ globalThis.GamePlatforms = (() => {
   ['Switch 2','switch',['nintendoswitch2','switch2']],['Switch','switch',['nintendoswitch','switch']],
   ['Wii U','switch',['wiiu']],['PS5','playstation',['playstation5','ps5']],['PS4','playstation',['playstation4','ps4']],
   ['Xbox Series X|S','xbox',['xboxseriesx|s','xboxseriesx/s','xboxseriesxs','xboxseries','xboxx|s']],
-  ['Xbox Series X','xbox',['xboxseriesx','xboxx']],['Xbox Series S','xbox',['xboxseriess','xboxs']],['Xbox One','xbox',['xboxone']],
+  ['Xbox Series X','xbox',['xboxseriesx','xboxx']],['Xbox Series S','xbox',['xboxseriess','xboxs']],['Xbox One','xbox',['xboxone']],['Xbox','xbox',['xbox']],
   ['PC','pc',['pc','windows','microsoftwindows']],['Steam','pc',['steam','pc(steam)']],['Epic','pc',['epic','epicgames','epicgamesstore']],
   ['Mac','pc',['mac','macos']],['Linux','pc',['linux']],['iOS','mobile',['ios','iphone','ipad','ios(appstore)','iphone/ipad(appstore)']],
   ['Android','mobile',['android']],['スマホ','mobile',['mobile','スマホ','スマートフォン']],['ブラウザ','other',['browser','web','ブラウザ']]

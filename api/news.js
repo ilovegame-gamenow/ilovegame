@@ -1,3 +1,4 @@
+import { getNewsFeed } from '../lib/news-feed.js';
 import { getFeaturedNews } from '../lib/featured-news.js';
 import { handleCalendar } from '../lib/release-calendar.js';
 import { getSiteSettings } from "../lib/site-settings.js";
@@ -26,7 +27,7 @@ export default async function handler(req, res) {
       try { featured = await getFeaturedNews(supabaseUrl, supabaseKey, process.env.SUPABASE_SECRET_KEY, settings); }
       catch { /* The client offers retry without claiming there are no selections. */ }
     }
-    const excludedIds = [...new Set(featured?.pickup.map(article => article.id) || [])];
+    if (homeView) return res.status(200).json(await getNewsFeed(supabaseUrl, supabaseKey, process.env.SUPABASE_SECRET_KEY, settings, req.query, featured));
     const limit = articleId ? 1 : settings.public_page_size;
     const offset = (page - 1) * limit;
     const fields =
@@ -39,8 +40,7 @@ export default async function handler(req, res) {
 
     (articleId
         ? `&id=eq.${encodeURIComponent(articleId)}&limit=1`
-        : `&order=site_published_at.desc.nullslast,id.desc&limit=${limit}&offset=${offset}` +
-          (excludedIds.length ? `&id=not.in.(${excludedIds.join(",")})` : ""));
+        : `&order=site_published_at.desc.nullslast,id.desc&limit=${limit}&offset=${offset}`);
 
     const response = await fetch(url, {
         headers: {
@@ -82,7 +82,6 @@ export default async function handler(req, res) {
       data = await corrected.json();
     }
     return res.status(200).json({
-        ...(homeView ? { featured } : {}),
         articles: data,
         total,
         page,
