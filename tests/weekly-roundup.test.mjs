@@ -91,23 +91,24 @@ test('an editorial outage still returns verified release information with an exp
 });
 
 
-test('calendar chooses the latest linked public article and omits private or unrelated articles',async()=>{
+test('calendar lists all linked public articles newest first and omits private or unrelated articles',async()=>{
  const old=globalThis.fetch,oldDocument=globalThis.document;
  globalThis.document={createElement:tag=>new Element(tag)};
  globalThis.fetch=async(input,options)=>{
   const url=new URL(input);
   if(url.pathname.endsWith('/article_games'))return new Response(JSON.stringify([{game_id:id,article_id:1},{game_id:id,article_id:2},{game_id:id,article_id:3}]));
   assert.equal(options.headers.apikey,'public-access');
-  assert.equal(url.searchParams.get('select'),'id,site_published_at');
-  return new Response(JSON.stringify([{id:1,site_published_at:'2026-11-01'},{id:2,site_published_at:'2026-11-02'},{id:999,site_published_at:'2026-11-03'}]));
+  assert.equal(url.searchParams.get('select'),'id,title,site_published_at');
+  return new Response(JSON.stringify([{id:1,title:'発表記事',site_published_at:'2026-11-01'},{id:2,title:'<新しい紹介>',site_published_at:'2026-11-02'},{id:999,site_published_at:'2026-11-03'}]));
  };
  try{
   const result=await addCalendarArticleLinks('https://db.invalid','server-only',{releases:[release,{...release,game:{id:'b0da9ffc-273a-4c04-99ea-2521423724d6',title:'別作品'}}]},'public-access');
   assert.equal(result.releases[0].articleId,2);
   assert.equal(result.releases[1].articleId,undefined);
-  const links=releaseCard(result.releases[0]).children.find(c=>c.className==='source-links');
-  assert.equal(links.children[0].href,'/article.html?id=2');
-  assert.equal(links.children[0].textContent,'紹介記事を読む');
+  assert.deepEqual(result.releases[0].articles.map(a=>a.id),[2,1]);
+  const related=releaseCard(result.releases[0]).children.find(c=>c.className==='related-articles').children[1];
+  assert.deepEqual(related.children.map(li=>li.children[0].href),['/article.html?id=2','/article.html?id=1']);
+  assert.equal(related.children[0].children[0].textContent,'<新しい紹介>');
   assert.equal(releaseCard({...release,articleId:'javascript:alert(1)'}).children.find(c=>c.className==='source-links').children.length,1);
   assert.equal(releaseCard(result.releases[0],{demo:true}).children.some(c=>c.className==='source-links'),false);
  }finally{globalThis.fetch=old;if(oldDocument===undefined)delete globalThis.document;else globalThis.document=oldDocument;}

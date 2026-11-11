@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readCalendarQuery,loadCalendar} from '../lib/release-calendar.js';
-import {monthRange,shiftMonth,tokyoMonth,weekRange,formatReleaseDate,calendarGroups} from '../release-calendar-model.js';
+import {monthRange,shiftMonth,tokyoMonth,weekRange,formatReleaseDate,calendarGroups,calendarWindow} from '../release-calendar-model.js';
 import news from '../api/news.js';
 const response=()=>({setHeader(){},status(code){this.code=code;return this;},json(body){this.body=body;return this;}});
 const good={id:'release',release_date:'2026-11-12',date_precision:'day',release_kind:'full',region_code:'JP',status:'announced',verified_at:'2026-11-01',game:{id:'game',title:'A',status:'published'},platform:{code:'ps5',name:'PlayStation 5'},source:{url:'https://official.invalid/game',source_type:'official',review_status:'verified',verified_at:'2026-11-01',notes:'private'}};
@@ -77,4 +77,21 @@ test('weekly data spans month boundaries, excludes monthly precision and the fol
   assert.deepEqual(result.releases.map(r=>r.date),['2026-10-31','2026-11-01']);
   assert.equal(result.last,'2026-11-01');assert.equal(result.view,'week');
  });
+});
+
+
+test('continuous calendar preserves weekdays through month boundaries, leap days and new years',()=>{
+ for(const month of ['2026-11','2026-12','2024-02']){
+  const window=calendarWindow(month);
+  assert.equal(window.months.length,2);
+  assert.equal(window.days[0],`${month}-01`);
+  assert.equal(window.days.at(-1),new Date(Date.parse(`${window.end}T00:00:00Z`)-86400000).toISOString().slice(0,10));
+  for(let i=0;i<window.days.length;i++)assert.equal((window.leading+i)%7,new Date(`${window.days[i]}T00:00:00Z`).getUTCDay());
+  assert.equal(new Set(window.days).size,window.days.length);
+ }
+ assert.ok(calendarWindow('2024-02').days.includes('2024-02-29'));
+ assert.deepEqual(calendarWindow('2026-12').months,['2026-12','2027-01']);
+ assert.equal(calendarWindow('2026-11').days.length,61);
+ assert.equal(calendarWindow('bad'),null);
+ assert.equal(calendarWindow('9998-12').months.length,1);
 });

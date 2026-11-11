@@ -26,6 +26,15 @@ export function shiftMonth(month, offset) {
   const [y,m] = month.split('-').map(Number), date = new Date(Date.UTC(y,m-1+offset,1));
   return date.toISOString().slice(0,7);
 }
+// Two consecutive months share one weekday grid, including a week crossing the boundary.
+export function calendarWindow(month) {
+ const first=monthRange(month);
+ if(!first)return null;
+ const next=shiftMonth(month,1),months=monthRange(next)?[month,next]:[month];
+ const end=monthRange(months.at(-1)).end,days=[];
+ for(let date=new Date(`${first.start}T00:00:00Z`);date.toISOString().slice(0,10)<end;date.setUTCDate(date.getUTCDate()+1))days.push(date.toISOString().slice(0,10));
+ return {months,days,start:first.start,end,leading:new Date(`${first.start}T00:00:00Z`).getUTCDay()};
+}
 export function calendarGroups(releases) {
   const groups = new Map();
   for (const release of releases) {

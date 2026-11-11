@@ -8,7 +8,10 @@ export function releaseCard(release,{showDate=false,demo=false,showTitle=true}={
  if(showDate){const time=node('time',formatReleaseDate(release.date),'weekly-date');time.dateTime=release.date;card.append(time);}
  if(release.kind==='early_access')card.append(node('span','早期アクセス開始','early-access'));
  if(showTitle)card.append(node('h3',release.game.title));card.append(globalThis.GamePlatforms.element(release.platforms));
- if(!demo){const links=node('p',undefined,'source-links');if(Number.isSafeInteger(release.articleId)&&release.articleId>0){const article=node('a','紹介記事を読む');article.href=`/article.html?id=${release.articleId}`;links.append(article);}release.sources.forEach((s,i)=>{const a=node('a',release.sources.length>1?`公式情報 ${i+1} ↗`:'公式サイト・ストアで確認 ↗');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';links.append(a);});card.append(links);}
+ if(!demo){
+  const related=[...new Map((Array.isArray(release.articles)?release.articles:[]).filter(a=>Number.isSafeInteger(a.id)&&a.id>0).map(a=>[a.id,a])).values()];
+  if(related.length){const section=node('section',undefined,'related-articles'),list=node('ul');section.append(node('h4','関連記事'));for(const article of related){const item=node('li'),link=node('a',article.title||'紹介記事を読む');link.href=`/article.html?id=${article.id}`;item.append(link);list.append(item);}section.append(list);card.append(section);}
+  const links=node('p',undefined,'source-links');if(!related.length&&Number.isSafeInteger(release.articleId)&&release.articleId>0){const article=node('a','紹介記事を読む');article.href=`/article.html?id=${release.articleId}`;links.append(article);}release.sources.forEach((s,i)=>{const a=node('a',release.sources.length>1?`公式情報 ${i+1} ↗`:'公式サイト・ストアで確認 ↗');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';links.append(a);});card.append(links);}
  return card;
 }
 export async function requestCalendar(query,signal){
