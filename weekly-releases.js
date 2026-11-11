@@ -16,7 +16,7 @@ let busy=false;
 async function loadWeek(){
  if(busy)return;busy=true;
  const range=weekRange();$('weekRange').textContent=`${formatReleaseDate(range.start)}〜${formatReleaseDate(range.last)}`;
- $('retryWeek').hidden=true;$('weekMessage').textContent='発売情報を確認中…';showHighlights([]);
+ $('retryWeek').hidden=true;$('weekMessage').hidden=false;$('weekMessage').textContent='発売情報を確認中…';showHighlights([]);
  $('weeklyDemo').hidden=!demo;
  if(demo){
   $('calendarLink').href='/weekly-roundup-preview.html?demo=1';
@@ -29,8 +29,8 @@ async function loadWeek(){
   const result=await requestCalendar(new URLSearchParams({view:'roundup',region:'JP'}));
   $('weekRange').textContent=`${formatReleaseDate(result.start)}〜${formatReleaseDate(result.last)}`;
   const releases=result.releases.filter(r=>r.precision==='day');
-  const count=new Set(releases.map(r=>r.game.id)).size;showHighlights(releases,result);
-  $('weekMessage').textContent=result.truncated?`登録済み ${count}作品以上・今週のラインアップを見る →` : count?`登録済み ${count}作品・今週のラインアップを見る →`:'発売情報は確認できた作品から追加します。';
+  showHighlights(releases,result);
+  $('weekMessage').textContent=result.truncated?'掲載内容は一部です。今週のラインアップを見る →':releases.length?'今週のラインアップを見る →':'発売情報は確認できた作品から追加します。';
  }catch(error){$('weekMessage').textContent='発売情報を取得できませんでした。';$('retryWeek').hidden=false;}
  finally{busy=false;}
 }

@@ -29,7 +29,7 @@ test('home weekly failures and retries stay independent from news and calendar q
   await import(`../weekly-releases.js?test=${Date.now()}`);await settle();
   assert.equal(ids.weekMessage.textContent,'発売情報を取得できませんでした。');assert.equal(ids.retryWeek.hidden,false);assert.equal(ids.latest.textContent,'Existing news remains visible');
   await ids.retryWeek.listeners.click();
-  assert.equal(calls,2);assert.equal(ids.retryWeek.hidden,true);assert.equal(ids.weekList.children.length,0);assert.equal(ids.weekHighlights.children.length,0);assert.match(ids.weekTitle.textContent,/『Game 0』や『Game 1』など/);assert.equal(ids.weeklyEmpty.hidden,true);assert.match(ids.weekMessage.textContent,/登録済み 100作品/);assert.equal(ids.latest.textContent,'Existing news remains visible');
+  assert.equal(calls,2);assert.equal(ids.retryWeek.hidden,true);assert.equal(ids.weekList.children.length,0);assert.equal(ids.weekHighlights.children.length,0);assert.match(ids.weekTitle.textContent,/『Game 0』や『Game 1』など/);assert.equal(ids.weeklyEmpty.hidden,true);assert.equal(ids.weekMessage.textContent,'今週のラインアップを見る →');assert.equal(ids.latest.textContent,'Existing news remains visible');
   await ids.retryWeek.listeners.click();
   assert.equal(ids.weekHighlights.children.length,0);assert.equal(ids.weeklyEmpty.hidden,false);assert.equal(calls,3);assert.equal(ids.weekList.children.length,0);assert.match(ids.weekMessage.textContent,/確認できた作品から追加/);
  }finally{for(const [key,value] of Object.entries(originals)){if(value===undefined)delete globalThis[key];else globalThis[key]=value;}}
