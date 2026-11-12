@@ -21,8 +21,6 @@
   controller?.abort();controller=new AbortController();const signal=controller.signal,run=++revision;
   const activeController=controller,timer=setTimeout(()=>activeController.abort(),20000);
   retry.hidden=true;latest.setAttribute('aria-busy','true');rail.setAttribute('aria-busy','true');
-  byId('feed-count').hidden=!read().searchParams.get('q')?.trim();
-  byId('feed-count').textContent='検索中…';
   const params=new URLSearchParams(read().searchParams);params.set('view','home');
   try{
    let result;
@@ -39,7 +37,6 @@
    GameFeatured.render(result.featured||{breaking:null,pickup:[]});
    if(!result.featured){rail.innerHTML='<p class="meta featured-status">PICK UPを読み込めませんでした。再読み込みをお試しください。</p>';retry.hidden=false;}
    latest.innerHTML=result.articles.map(a=>GameNewsCard.render(a,{compact:true})).join('')||'<p class="feed-empty">条件に合う記事がありません。フィルターや検索語を変えてお試しください。</p>';
-   byId('feed-count').textContent=`検索結果 ${result.total}件`;
    const url=read();
    if(result.page!==Number(params.get('page')||1)){url.searchParams.set('page',String(result.page));history.replaceState(null,'',url);}
    pagination.replaceChildren(GamePagination.render(result.page,Math.max(1,Math.ceil(result.total/result.limit)),page=>{
@@ -49,7 +46,7 @@
    if(run!==revision)return;
    GameFeatured.render({breaking:null,pickup:[]});
    rail.innerHTML='<p class="meta featured-status">ニュースを読み込めませんでした。再読み込みをお試しください。</p>';
-   latest.innerHTML='<p class="feed-empty">ニュースを読み込めませんでした。</p>';byId('feed-count').textContent='取得失敗';pagination.replaceChildren();retry.hidden=false;
+   latest.innerHTML='<p class="feed-empty">ニュースを読み込めませんでした。</p>';pagination.replaceChildren();retry.hidden=false;
   }finally{clearTimeout(timer);if(run===revision){latest.setAttribute('aria-busy','false');rail.setAttribute('aria-busy','false');}}
  }
  form.addEventListener('submit',e=>{

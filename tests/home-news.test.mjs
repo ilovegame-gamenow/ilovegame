@@ -56,7 +56,7 @@ test('home excludes only displayed discovery cards before count/pagination; expi
 
 test('homepage pairs cards and latest from one response and retries transient failures', async () => {
   const node=()=>({innerHTML:'',children:[],setAttribute(k,v){this[k]=v;},replaceChildren(...v){this.children=v;},addEventListener(k,fn){this[k]=fn;}});
-  const nodes=Object.fromEntries(['pickup','latest','featured-retry','pagination','feed-search','feed-query','feed-include','feed-filters','feed-clear','feed-search-note','feed-count'].map(id=>[id,node()]));
+  const nodes=Object.fromEntries(['pickup','latest','featured-retry','pagination','feed-search','feed-query','feed-include','feed-filters','feed-clear','feed-search-note'].map(id=>[id,node()]));
   const button=node();nodes['featured-retry'].querySelector=()=>button;
   nodes['feed-filters'].querySelectorAll=()=>[];
   const selections=[];let calls=0;
