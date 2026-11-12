@@ -16,5 +16,8 @@
       "destination": "/editor-games.html#find",
       "permanent": false
     }
+  ],
+  "regions": [
+    "hnd1"
   ]
 }
