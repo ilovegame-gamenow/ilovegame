@@ -1,10 +1,12 @@
 import { getNewsFeed } from '../lib/news-feed.js';
 import { getFeaturedNews } from '../lib/featured-news.js';
-import { handleCalendar } from '../lib/release-calendar.js';
-import { getSiteSettings } from "../lib/site-settings.js";
+import { getPublicDisplaySettings } from "../lib/site-settings.js";
 
 export default async function handler(req, res) {
-  if (req.query?.resource === 'calendar') return handleCalendar(req,res);
+  if (req.query?.resource === 'calendar') {
+    const {handleCalendar}=await import('../lib/release-calendar.js');
+    return handleCalendar(req,res);
+  }
   if (req.query?.resource !== undefined) return res.status(400).json({ error: 'Invalid resource' });
   res.setHeader("Cache-Control", "no-store");
   try {
@@ -19,15 +21,30 @@ export default async function handler(req, res) {
     let page = Math.max(1, parseInt(req.query.page, 10) || 1);
     if (!Number.isSafeInteger(page)) page = 1;
     const articleId = req.query.id;
-    const settings = articleId ? null : await getSiteSettings(supabaseUrl, process.env.SUPABASE_SECRET_KEY);
     const homeView = !articleId && req.query.view === 'home';
-    let featured = null;
+    const timings=[];
+    const measure=async(name,task)=>{const start=performance.now();try{return await task();}finally{timings.push(`${name};dur=${(performance.now()-start).toFixed(1)}`);}};
+    const started=performance.now();
+    const settingsTask=articleId?null:measure('settings',()=>getPublicDisplaySettings(supabaseUrl,process.env.SUPABASE_SECRET_KEY));
     if (homeView) {
-      // On selection failure, keep every article available in latest news.
-      try { featured = await getFeaturedNews(supabaseUrl, supabaseKey, process.env.SUPABASE_SECRET_KEY, settings); }
-      catch { /* The client offers retry without claiming there are no selections. */ }
+      let expires=Infinity;
+      // Slot/article reads overlap settings and search-index reads. A single response still
+      // pairs displayed selections with the exact same feed exclusion.
+      const featuredTask=measure('featured',()=>getFeaturedNews(supabaseUrl,supabaseKey,process.env.SUPABASE_SECRET_KEY,settingsTask,{
+        onExpiry:time=>{expires=Math.min(expires,time);}
+      })).catch(()=>null);
+      const result=await measure('feed',()=>getNewsFeed(supabaseUrl,supabaseKey,process.env.SUPABASE_SECRET_KEY,settingsTask,req.query,featuredTask));
+      timings.push(`home;dur=${(performance.now()-started).toFixed(1)}`);
+      res.setHeader('Server-Timing',timings.join(', '));
+      // No stale-while-revalidate: expired selections must not be served indefinitely.
+      const ttl=Math.min(15,Math.floor((expires-Date.now())/1000));
+      if(req.method==='GET' && result.featured && ttl>0){
+        res.setHeader('Cache-Control','public, max-age=0, must-revalidate');
+        res.setHeader('Vercel-CDN-Cache-Control',`public, s-maxage=${ttl}`);
+      }
+      return res.status(200).json(result);
     }
-    if (homeView) return res.status(200).json(await getNewsFeed(supabaseUrl, supabaseKey, process.env.SUPABASE_SECRET_KEY, settings, req.query, featured));
+    const settings=await settingsTask;
     const limit = articleId ? 1 : settings.public_page_size;
     const offset = (page - 1) * limit;
     const fields =

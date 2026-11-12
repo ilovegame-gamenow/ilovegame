@@ -21,12 +21,14 @@
   controller?.abort();controller=new AbortController();const signal=controller.signal,run=++revision;
   const activeController=controller,timer=setTimeout(()=>activeController.abort(),20000);
   retry.hidden=true;latest.setAttribute('aria-busy','true');rail.setAttribute('aria-busy','true');
-  const params=new URLSearchParams(read().searchParams);params.set('view','home');
+  const state=read().searchParams,params=new URLSearchParams({view:'home'});
+  // UI restoration parameters do not affect API results or CDN cache keys.
+  for(const key of ['page','filter','q','include_featured'])if(state.get(key))params.set(key,state.get(key));
   try{
    let result;
    for(let attempt=0;attempt<2;attempt++){
     try{
-     const response=await fetch(`/api/news?${params}`,{cache:'no-store',signal});
+     const response=await fetch(`/api/news?${params}`,{signal});
      if(!response.ok)throw Error('News unavailable');
      result=await response.json();
      if(!Array.isArray(result.articles)||!Object.hasOwn(result,'featured'))throw Error('Invalid news response');

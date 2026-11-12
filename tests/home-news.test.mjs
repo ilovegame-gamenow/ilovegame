@@ -33,7 +33,8 @@ test('home excludes only displayed discovery cards before count/pagination; expi
     if(u.searchParams.get('select')==='id,title,game_title,platforms,category') return Response.json(all);
     if(filter?.startsWith('eq.'))return Response.json(all.filter(a=>a.id===Number(filter.slice(3))));
     queries.push(u);
-    const rows=filter==='not.in.(2,3)'?all.filter(a=>![2,3].includes(a.id)):all;
+    const excluded=filter?.startsWith('not.in.')?filter.slice(8,-1).split(',').map(Number):[];
+    const rows=all.filter(a=>!excluded.includes(a.id));
     const offset=Number(u.searchParams.get('offset'));
     return Response.json(rows.slice(offset,offset+2),{status:offset>=rows.length?416:200,headers:{'content-range':`*/${rows.length}`}});
   };
