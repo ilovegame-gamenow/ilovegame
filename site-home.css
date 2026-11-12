@@ -50,7 +50,9 @@ main{max-width:1100px;margin:0 auto;padding:28px 20px 65px}
 }
 /* The first visible section uses main padding instead of an inter-section gap. */
 .breaking[hidden] + .weekly-section > .section-title{margin-top:0}
-.section-title h2{margin:0;font-size:21px;font-weight:1000}
+.section-title h2{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;margin:0;font-size:21px;font-weight:1000}
+.section-title .section-subtitle,.breaking-label .section-subtitle{font-size:12px;font-weight:400;color:#84694f;white-space:nowrap}
+.breaking-label{display:flex;align-items:baseline;gap:10px}
 .section-title span{font-size:11px;color:var(--muted);font-weight:700}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .pickup .time{font-size:11px;color:var(--orange);font-weight:900;margin-bottom:12px}

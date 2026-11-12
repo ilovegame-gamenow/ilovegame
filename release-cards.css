@@ -18,5 +18,5 @@
 @media(max-width:650px){.release-card-header.has-image{grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:start}.release-card .release-thumbnail{width:96px;height:64px}.release-card-info h3{font-size:14px}.release-card-info .platform-badges{gap:4px}.release-card-info .platform-badge{font-size:10px}}
 @media(max-width:359px){.release-card-header.has-image{grid-template-columns:76px minmax(0,1fr);gap:8px}.release-card .release-thumbnail{width:76px;height:54px}}
 
-.weekly-heading h2{display:flex;align-items:baseline;gap:10px;font-size:21px;font-weight:1000}.weekly-heading .weekly-heading-subtitle{font-size:12px;font-weight:400;color:#84694f;white-space:nowrap}.weekly-heading .week-note{margin-left:auto}
+.weekly-heading h2{font-size:21px;font-weight:1000}.weekly-heading .week-note{margin-left:auto}
 @media(max-width:650px){.weekly-heading{gap:6px 12px}}
