@@ -44,10 +44,8 @@
 
 <div class="feed-tools">
 <form id="feed-search" role="search"><label class="sr-only" for="feed-query">ゲーム名・記事タイトルで検索</label><input id="feed-query" type="search" maxlength="100" placeholder="ゲーム名・記事タイトルで検索"><button type="submit">検索</button><button id="feed-clear" type="button" hidden>解除</button></form>
-<div class="feed-toolbar">
 <div id="feed-filters" class="feed-filters" role="group" aria-label="ニュースのカテゴリー"><button type="button" data-filter="all" aria-pressed="true">ALL</button><button type="button" data-filter="switch" aria-pressed="false">Switch</button><button type="button" data-filter="playstation" aria-pressed="false">PlayStation</button><button type="button" data-filter="xbox" aria-pressed="false">Xbox</button><button type="button" data-filter="pc" aria-pressed="false">PC</button><button type="button" data-filter="mobile" aria-pressed="false">Mobile</button><button type="button" data-filter="movie" aria-pressed="false">MOVIE</button></div>
-<div class="feed-options"><label><input id="feed-include" type="checkbox"> 速報・注目の記事も表示</label><span id="feed-count" role="status" aria-live="polite"></span></div>
-</div>
+<div class="feed-options"><label><input id="feed-include" type="checkbox"> 速報・注目の記事も表示</label><span id="feed-count" role="status" aria-live="polite" hidden></span></div>
 <p id="feed-search-note" class="meta" hidden>全公開記事から検索中</p>
 </div>
 <section class="grid news-feed" aria-label="NEWS FEED" aria-live="polite">
