@@ -12,7 +12,7 @@ class Element {
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 test('home weekly failures and retries stay independent from news and calendar query parameters',async()=>{
  const originals={document:globalThis.document,location:globalThis.location,fetch:globalThis.fetch};
- const ids=Object.fromEntries(['weekTitle','weekRange','retryWeek','weekList','weekMessage','weeklyDemo','calendarLink','latest','weekHighlights','weeklyEmpty'].map(id=>[id,new Element()]));
+ const ids=Object.fromEntries(['weekStatus','weekTitle','weekRange','retryWeek','weekList','weekMessage','weeklyDemo','calendarLink','latest','weekHighlights','weeklyEmpty'].map(id=>[id,new Element()]));
  ids.latest.textContent='Existing news remains visible';
  globalThis.document={getElementById:id=>ids[id],createElement:tag=>new Element(tag)};
  globalThis.location={search:'?page=3&month=2027-04&platform=windows&region=WW'};
@@ -27,11 +27,11 @@ test('home weekly failures and retries stay independent from news and calendar q
  };
  try{
   await import(`../weekly-releases.js?test=${Date.now()}`);await settle();
-  assert.equal(ids.weekMessage.textContent,'発売情報を取得できませんでした。');assert.equal(ids.retryWeek.hidden,false);assert.equal(ids.latest.textContent,'Existing news remains visible');
+  assert.equal(ids.weekMessage.textContent,'発売情報を取得できませんでした。');assert.equal(ids.retryWeek.hidden,false);assert.equal(ids.weekStatus.hidden,false);assert.equal(ids.latest.textContent,'Existing news remains visible');
   await ids.retryWeek.listeners.click();
-  assert.equal(calls,2);assert.equal(ids.retryWeek.hidden,true);assert.equal(ids.weekList.children.length,0);assert.equal(ids.weekHighlights.children.length,0);assert.match(ids.weekTitle.textContent,/『Game 0』や『Game 1』など/);assert.equal(ids.weeklyEmpty.hidden,true);assert.equal(ids.weekMessage.textContent,'今週のラインアップを見る →');assert.equal(ids.latest.textContent,'Existing news remains visible');
+  assert.equal(calls,2);assert.equal(ids.retryWeek.hidden,true);assert.equal(ids.weekList.children.length,0);assert.equal(ids.weekHighlights.children.length,0);assert.match(ids.weekTitle.textContent,/『Game 0』や『Game 1』など/);assert.equal(ids.weeklyEmpty.hidden,true);assert.equal(ids.weekMessage.textContent,'');assert.equal(ids.weekStatus.hidden,true);assert.equal(ids.latest.textContent,'Existing news remains visible');
   await ids.retryWeek.listeners.click();
-  assert.equal(ids.weekHighlights.children.length,0);assert.equal(ids.weeklyEmpty.hidden,false);assert.equal(calls,3);assert.equal(ids.weekList.children.length,0);assert.match(ids.weekMessage.textContent,/確認できた作品から追加/);
+  assert.equal(ids.weekHighlights.children.length,0);assert.equal(ids.weeklyEmpty.hidden,false);assert.equal(calls,3);assert.equal(ids.weekList.children.length,0);assert.equal(ids.weekStatus.hidden,true);
  }finally{for(const [key,value] of Object.entries(originals)){if(value===undefined)delete globalThis[key];else globalThis[key]=value;}}
 });
 test('sample week and sample month share the same dates, platforms and grouping',()=>{
