@@ -48,7 +48,7 @@ test('empty weeks make no editorial requests and unsafe images are not returned'
 });
 
 class Element{
- constructor(tag){this.tag=tag;this.children=[];this.listeners={};this.className='';this.classList={add:name=>{this.className+=' '+name;}};}
+ constructor(tag){this.tag=tag;this.children=[];this.listeners={};this.className='';this.classList={add:name=>{this.className+=' '+name;},remove:name=>{this.className=this.className.split(' ').filter(n=>n!==name).join(' ');}};}
  append(...items){this.children.push(...items);}
  replaceChildren(...items){this.children=items;}
  insertBefore(item,before){const i=this.children.indexOf(before);if(i<0)this.children.push(item);else this.children.splice(i,0,item);}
@@ -98,12 +98,13 @@ test('calendar lists all linked public articles newest first and omits private o
   const url=new URL(input);
   if(url.pathname.endsWith('/article_games'))return new Response(JSON.stringify([{game_id:id,article_id:1},{game_id:id,article_id:2},{game_id:id,article_id:3}]));
   assert.equal(options.headers.apikey,'public-access');
-  assert.equal(url.searchParams.get('select'),'id,title,site_published_at');
-  return new Response(JSON.stringify([{id:1,title:'発表記事',site_published_at:'2026-11-01'},{id:2,title:'<新しい紹介>',site_published_at:'2026-11-02'},{id:999,site_published_at:'2026-11-03'}]));
+  assert.equal(url.searchParams.get('select'),'id,title,thumbnail_url,site_published_at');
+  return new Response(JSON.stringify([{id:1,title:'発表記事',thumbnail_url:'https://images.invalid/older.jpg',site_published_at:'2026-11-01'},{id:2,title:'<新しい紹介>',thumbnail_url:'javascript:alert(1)',site_published_at:'2026-11-02'},{id:999,site_published_at:'2026-11-03'}]));
  };
  try{
   const result=await addCalendarArticleLinks('https://db.invalid','server-only',{releases:[release,{...release,game:{id:'b0da9ffc-273a-4c04-99ea-2521423724d6',title:'別作品'}}]},'public-access');
   assert.equal(result.releases[0].articleId,2);
+  assert.equal(result.releases[0].image,'https://images.invalid/older.jpg');
   assert.equal(result.releases[1].articleId,undefined);
   assert.deepEqual(result.releases[0].articles.map(a=>a.id),[2,1]);
   const related=releaseCard(result.releases[0]).children.find(c=>c.className==='related-articles').children[1];
@@ -112,4 +113,21 @@ test('calendar lists all linked public articles newest first and omits private o
   assert.equal(releaseCard({...release,articleId:'javascript:alert(1)'}).children.find(c=>c.className==='source-links').children.length,1);
   assert.equal(releaseCard(result.releases[0],{demo:true}).children.some(c=>c.className==='source-links'),false);
  }finally{globalThis.fetch=old;if(oldDocument===undefined)delete globalThis.document;else globalThis.document=oldDocument;}
+});
+
+
+test('calendar thumbnails are optional, safe and collapse on image failure without losing details',()=>{
+ const old=globalThis.document;globalThis.document={createElement:tag=>new Element(tag)};
+ try{
+  const card=releaseCard({...release,image:'https://images.invalid/game.jpg'},{showImage:true});
+  const header=card.children.find(c=>c.className.includes('release-card-header'));
+  const image=header.children[0];assert.equal(image.src,'https://images.invalid/game.jpg');assert.equal(image.loading,'lazy');
+  assert.equal(header.children[1].children[0].textContent,release.game.title);
+  image.listeners.error();assert.equal(image.hidden,true);assert.equal(header.className.includes('has-image'),false);
+  for(const url of [null,'javascript:alert(1)','https://user:pass@images.invalid/game.jpg']){
+   const noImage=releaseCard({...release,image:url},{showImage:true});
+   assert.equal(noImage.children[0].children.length,1);
+  }
+  assert.equal(releaseCard({...release,image:'https://images.invalid/game.jpg'}).children.some(c=>c.className.includes('release-card-header')),false);
+ }finally{globalThis.document=old;}
 });

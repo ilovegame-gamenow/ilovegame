@@ -30,9 +30,9 @@ function render(){
  $('releaseHeading').textContent=selectedDay?`${Number(selectedDay.slice(5,7))}月${Number(selectedDay.slice(8))}日の発売予定`:'この期間に遊べる新作';
  $('releaseCount').textContent=`発売予定 ${releases.length}件`;
  const list=$('releaseList');list.replaceChildren();const days=[...new Set(releases.map(r=>r.date))];
- for(const date of days){const section=node('section',undefined,'release-day'),time=node('time',formatReleaseDate(date),'release-date');time.dateTime=date;section.append(time);const cards=node('div');for(const r of releases.filter(r=>r.date===date))cards.append(releaseCard(r,{demo}));section.append(cards);list.append(section);}
+ for(const date of days){const section=node('section',undefined,'release-day'),time=node('time',formatReleaseDate(date),'release-date');time.dateTime=date;section.append(time);const cards=node('div');for(const r of releases.filter(r=>r.date===date))cards.append(releaseCard(r,{demo,showImage:true}));section.append(cards);list.append(section);}
  if(!days.length)list.append(node('p',selectedDay?'この日の発売情報はまだ掲載されていません。':'この期間の発売情報はまだ掲載されていません。確認できた作品から順次追加します。','empty-calendar'));
- const uncertain=data.releases.filter(r=>r.precision==='month'&&r.date.slice(0,7)===month);$('monthOnlySection').hidden=!uncertain.length;$('monthOnlyList').replaceChildren(...uncertain.map(r=>{const card=releaseCard(r,{demo});card.prepend(node('p',`${r.date.slice(0,4)}年${Number(r.date.slice(5,7))}月 発売予定`,'month-only-date'));return card;}));
+ const uncertain=data.releases.filter(r=>r.precision==='month'&&r.date.slice(0,7)===month);$('monthOnlySection').hidden=!uncertain.length;$('monthOnlyList').replaceChildren(...uncertain.map(r=>{const card=releaseCard(r,{demo,showImage:true});card.prepend(node('p',`${r.date.slice(0,4)}年${Number(r.date.slice(5,7))}月 発売予定`,'month-only-date'));return card;}));
 }
 async function load(){
  const id=++requestId;controller?.abort();controller=new AbortController();selectedDay=null;data=null;
