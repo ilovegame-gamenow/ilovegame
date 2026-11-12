@@ -16,9 +16,9 @@
 .news-feed .platform-badge{font-size:10px;padding:3px 7px;min-height:22px}
 .feed-empty{grid-column:1/-1;font-size:14px;line-height:1.7;padding:20px 0}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #126ac1;outline-offset:3px}
-@media(max-width:900px){.news-feed{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){.news-feed{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.news-feed{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.news-feed .card h3{font-size:14px;margin-inline:10px}.news-feed .card .game-meta{margin-inline:10px}.news-feed .card .platform-badges{margin-inline:10px}.feed-tools button{padding-inline:12px}#feed-query{font-size:16px}}
-@media(max-width:359px){.news-feed{grid-template-columns:1fr}}
+@media(max-width:359px){.news-feed{gap:8px}.news-feed .card h3{font-size:13px;margin-inline:8px}.news-feed .thumb-placeholder{font-size:14px}.news-feed .card .platform-badges{margin-inline:8px}}
 
 .feed-toolbar{display:flex;align-items:center;gap:16px}.feed-toolbar .feed-filters{flex:1;min-width:0}.feed-toolbar .feed-options{flex:none;white-space:nowrap}
 @media(max-width:1000px){.feed-toolbar{display:block}.feed-toolbar .feed-options{margin-top:2px}.feed-options label{min-height:36px}}
