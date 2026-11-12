@@ -1,11 +1,11 @@
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.feed-tools{margin:0 0 18px}.feed-tools button,.feed-tools input{font:inherit}
-#feed-search{display:flex;gap:8px;margin-bottom:14px}#feed-query{min-width:0;flex:1;border:1px solid var(--line);border-radius:12px;background:white;padding:12px;font-size:14px}
+.feed-tools{margin:0 0 12px}.feed-tools button,.feed-tools input{font:inherit}
+#feed-search{display:flex;gap:8px;margin-bottom:10px}#feed-query{min-width:0;flex:1;border:1px solid var(--line);border-radius:12px;background:white;padding:12px;font-size:14px}
 .feed-tools button{cursor:pointer;min-height:44px;border:1px solid var(--line);border-radius:999px;background:white;color:var(--ink);padding:8px 16px;font-size:13px;font-weight:700}
 #feed-search button[type=submit]{background:var(--orange);color:white;border-color:var(--orange)}
-.feed-filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;white-space:nowrap;overscroll-behavior-x:contain}
+.feed-filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:0;white-space:nowrap;overscroll-behavior-x:contain}
 .feed-filters button{flex:none}.feed-filters button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:white}
-.feed-options{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;font-size:12px;color:var(--muted)}
+.feed-options{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:0;font-size:12px;color:var(--muted)}
 .feed-options label{display:flex;align-items:center;min-height:44px;gap:5px}.feed-options input{width:18px;height:18px;accent-color:var(--orange)}
 .news-feed{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .news-feed .card--compact{min-width:0;min-height:0;padding:0;overflow:hidden;border-radius:14px}
@@ -19,3 +19,6 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #126a
 @media(max-width:900px){.news-feed{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){.news-feed{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.news-feed .card h3{font-size:14px;margin-inline:10px}.news-feed .card .game-meta{margin-inline:10px}.news-feed .card .platform-badges{margin-inline:10px}.feed-tools button{padding-inline:12px}#feed-query{font-size:16px}}
 @media(max-width:359px){.news-feed{grid-template-columns:1fr}}
+
+.feed-toolbar{display:flex;align-items:center;gap:16px}.feed-toolbar .feed-filters{flex:1;min-width:0}.feed-toolbar .feed-options{flex:none;white-space:nowrap}.feed-options #feed-count{min-width:3em;text-align:right}
+@media(max-width:1000px){.feed-toolbar{display:block}.feed-toolbar .feed-options{margin-top:2px}.feed-options label{min-height:36px}}
