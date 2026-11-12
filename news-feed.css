@@ -20,5 +20,5 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #126a
 @media(max-width:600px){.news-feed{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.news-feed .card h3{font-size:14px;margin-inline:10px}.news-feed .card .game-meta{margin-inline:10px}.news-feed .card .platform-badges{margin-inline:10px}.feed-tools button{padding-inline:12px}#feed-query{font-size:16px}}
 @media(max-width:359px){.news-feed{grid-template-columns:1fr}}
 
-.feed-toolbar{display:flex;align-items:center;gap:16px}.feed-toolbar .feed-filters{flex:1;min-width:0}.feed-toolbar .feed-options{flex:none;white-space:nowrap}.feed-options #feed-count{min-width:3em;text-align:right}
+.feed-toolbar{display:flex;align-items:center;gap:16px}.feed-toolbar .feed-filters{flex:1;min-width:0}.feed-toolbar .feed-options{flex:none;white-space:nowrap}
 @media(max-width:1000px){.feed-toolbar{display:block}.feed-toolbar .feed-options{margin-top:2px}.feed-options label{min-height:36px}}
