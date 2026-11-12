@@ -1,5 +1,5 @@
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.feed-tools{margin:18px 0}.feed-tools button,.feed-tools input{font:inherit}
+.feed-tools{margin:0 0 18px}.feed-tools button,.feed-tools input{font:inherit}
 #feed-search{display:flex;gap:8px;margin-bottom:14px}#feed-query{min-width:0;flex:1;border:1px solid var(--line);border-radius:12px;background:white;padding:12px;font-size:14px}
 .feed-tools button{cursor:pointer;min-height:44px;border:1px solid var(--line);border-radius:999px;background:white;color:var(--ink);padding:8px 16px;font-size:13px;font-weight:700}
 #feed-search button[type=submit]{background:var(--orange);color:white;border-color:var(--orange)}
