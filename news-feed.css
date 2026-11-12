@@ -21,4 +21,4 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #126a
 @media(max-width:359px){.news-feed{gap:8px}.news-feed .card h3{font-size:13px;margin-inline:8px}.news-feed .thumb-placeholder{font-size:14px}.news-feed .card .platform-badges{margin-inline:8px}}
 
 .feed-toolbar{display:flex;align-items:center;gap:16px}.feed-toolbar .feed-filters{flex:1;min-width:0}.feed-toolbar .feed-options{flex:none;white-space:nowrap}
-@media(max-width:1000px){.feed-toolbar{display:block}.feed-toolbar .feed-options{margin-top:2px}.feed-options label{min-height:36px}}
+@media(max-width:700px){.feed-toolbar{display:block}.feed-toolbar .feed-options{margin-top:2px;justify-content:flex-end}.feed-options label{min-height:36px}}
