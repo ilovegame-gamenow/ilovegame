@@ -6,7 +6,8 @@
 .feed-filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:0;white-space:nowrap;overscroll-behavior-x:contain}
 .feed-filters button{flex:none}.feed-filters button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:white}
 .feed-heading{align-items:center;flex-wrap:wrap;gap:0 16px}.feed-heading .feed-options{display:flex;align-items:center;margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}
-.feed-options label{display:flex;align-items:center;min-height:44px;gap:5px}.feed-options input{width:18px;height:18px;accent-color:var(--orange)}
+.feed-options label{position:relative;display:flex;align-items:center;gap:5px;cursor:pointer}
+.feed-options label::before{content:"";position:absolute;inset:-12px 0;min-height:44px}.feed-options input{width:18px;height:18px;accent-color:var(--orange)}
 .news-feed{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .news-feed .card--compact{min-width:0;min-height:0;padding:0;overflow:hidden;border-radius:14px}
 .news-feed .thumb,.news-feed .thumb-placeholder{border-radius:0;margin-bottom:10px;aspect-ratio:16/9;flex-shrink:0}
@@ -21,4 +22,4 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #126a
 @media(max-width:359px){.news-feed{gap:8px}.news-feed .card h3{font-size:13px;margin-inline:8px}.news-feed .thumb-placeholder{font-size:14px}.news-feed .card .platform-badges{margin-inline:8px}}
 
 .feed-toolbar .feed-filters{min-width:0}
-@media(max-width:600px){.feed-heading .feed-options{flex-basis:100%;justify-content:flex-end}.feed-options label{min-height:36px}}
+@media(max-width:600px){.feed-heading .feed-options{flex-basis:100%;justify-content:flex-end}}
