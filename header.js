@@ -22,8 +22,13 @@
          </div>`
       : `<nav>${links}</nav>`;
 
+    const mascot = header.dataset.mascot === "true"
+      ? '<img class="header-mascot" src="/assets/site-astronaut-playful.webp" width="68" height="68" decoding="async" alt="">'
+      : "";
+
     header.innerHTML = `
       <div class="header-inner">
+        <div class="header-brand-group">
         <a class="brand" href="${homeUrl}">
           <div class="logo-mark">♥</div>
           <div>
@@ -34,6 +39,8 @@
             <div class="tagline">ゲームの「今」をお届け♪</div>
           </div>
         </a>
+        ${mascot}
+        </div>
         ${rightContent}
       </div>
     `;

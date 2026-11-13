@@ -106,3 +106,14 @@ header nav a:hover {
     padding: 8px 10px;
   }
 }
+
+/* Keep the mascot beside the brand without increasing the header height. */
+.header-brand-group{position:relative;flex:none}
+header[data-mascot="true"] .header-brand-group{padding-right:80px}
+.header-mascot{position:absolute;right:0;top:50%;width:68px;height:68px;object-fit:contain;transform:translateY(-50%);pointer-events:none}
+@media(max-width:600px){
+  header[data-mascot="true"] .header-brand-group{padding-right:48px;max-width:100%}
+  header[data-mascot="true"] .logo{font-size:clamp(18px,4.6vw,24px)}
+  header[data-mascot="true"] .brand{gap:8px}
+  .header-mascot{width:44px;height:44px}
+}
