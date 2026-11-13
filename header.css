@@ -123,3 +123,15 @@ header .header-brand-group{padding-right:80px}
 .section-icon-heading{display:flex;align-items:center;gap:8px}
 .section-title h2,.breaking-label{column-gap:8px}
 .section-title h2>.section-icon,.breaking-label>.section-icon{align-self:center}
+
+/* Consistent compact section headings on phones. */
+@media(max-width:600px){
+  .section-title h2,.breaking-label{font-size:18px;column-gap:4px}
+  .section-title h2 .section-subtitle,.breaking-label .section-subtitle{font-size:11px}
+  .section-icon{width:20px;height:20px;flex-basis:20px}
+}
+@media(max-width:359px){
+  .section-title h2,.breaking-label{font-size:15px}
+  .section-title h2 .section-subtitle,.breaking-label .section-subtitle{font-size:10px}
+  .section-icon{width:18px;height:18px;flex-basis:18px}
+}
