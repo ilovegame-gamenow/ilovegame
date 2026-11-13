@@ -22,9 +22,7 @@
          </div>`
       : `<nav>${links}</nav>`;
 
-    const mascot = header.dataset.mascot === "true"
-      ? '<img class="header-mascot" src="/assets/site-astronaut-playful.webp" width="68" height="68" decoding="async" alt="">'
-      : "";
+    const mascot = '<img class="header-mascot" src="/assets/site-astronaut-playful.webp" width="68" height="68" decoding="async" alt="">';
 
     header.innerHTML = `
       <div class="header-inner">
