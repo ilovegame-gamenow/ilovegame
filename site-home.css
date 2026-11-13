@@ -14,7 +14,7 @@ body{
   background:var(--cream);
 }
 
-main{max-width:1100px;margin:0 auto;padding:28px 20px 65px}
+main{max-width:1100px;margin:0 auto;padding:28px 20px 28px}
 
 .breaking[hidden] {
   display: none;
