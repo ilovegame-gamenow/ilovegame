@@ -135,8 +135,11 @@ footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12
   }
 }
 
-/* A lightweight, decorative greeting at the end of the homepage. */
-.footer-mascot{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 auto 14px}
-.footer-mascot img{display:block;flex:none;width:88px;height:88px;object-fit:contain}
-.footer-mascot p{margin:0;padding:10px 14px;border:1px solid #ffffff33;border-radius:14px;background:#ffffff0a;font-size:12px;line-height:1.6}
-@media(max-width:600px){.footer-mascot{gap:10px}.footer-mascot img{width:72px;height:72px}}
+/* Expressive footer mascot; movement is limited and respects reduced motion. */
+.footer-mascot{display:flex;justify-content:center;margin:0 auto 14px}
+.footer-mascot img{display:block;width:112px;height:112px;object-fit:contain;transform-origin:50% 90%}
+@media(max-width:600px){.footer-mascot img{width:96px;height:96px}}
+@media(prefers-reduced-motion:no-preference){
+.footer-mascot img{animation:mascot-greeting 1.5s ease-in-out 2}
+@keyframes mascot-greeting{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-6px) rotate(-5deg)}65%{transform:translateY(-2px) rotate(4deg)}}
+}
