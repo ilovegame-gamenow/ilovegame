@@ -7,7 +7,7 @@ window.GameFeatured = (() => {
     box.replaceChildren();
     if (breaking) {
       const image = GameImage.getUrl(breaking.thumbnail_url, breaking.source_name);
-      box.innerHTML = `<div class="breaking-label">● BREAKING <span class="section-subtitle">速報</span></div>
+      box.innerHTML = `<div class="breaking-label"><svg class="section-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m13 2-9 12h7l-1 8 10-12h-7l1-8Z"/></svg>BREAKING <span class="section-subtitle">速報</span></div>
         ${image ? `<img id="breaking-image" src="${esc(image)}" alt="">` : ''}
         <h1>${esc(breaking.title)}</h1>
         ${GameDate.renderMeta('', breaking.site_published_at || breaking.published_at || breaking.created_at, {showSource:false})}
