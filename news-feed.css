@@ -5,7 +5,7 @@
 #feed-search button[type=submit]{background:var(--orange);color:white;border-color:var(--orange)}
 .feed-filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:0;white-space:nowrap;overscroll-behavior-x:contain}
 .feed-filters button{flex:none}.feed-filters button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:white}
-.feed-heading{align-items:center;flex-wrap:wrap;gap:0 16px}.feed-heading .feed-options{display:flex;align-items:center;margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}
+.feed-heading{align-items:baseline;flex-wrap:wrap;gap:0 16px}.feed-heading .feed-options{display:flex;align-items:center;margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}
 .feed-options label{position:relative;display:flex;align-items:center;gap:5px;cursor:pointer}
 .feed-options label::before{content:"";position:absolute;inset:-12px 0;min-height:44px}.feed-options input{width:18px;height:18px;accent-color:var(--orange)}
 .news-feed{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
