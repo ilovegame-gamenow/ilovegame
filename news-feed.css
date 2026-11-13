@@ -22,4 +22,19 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #126a
 @media(max-width:359px){.news-feed{gap:8px}.news-feed .card h3{font-size:13px;margin-inline:8px}.news-feed .thumb-placeholder{font-size:14px}.news-feed .card .platform-badges{margin-inline:8px}}
 
 .feed-toolbar .feed-filters{min-width:0}
-@media(max-width:600px){.feed-heading .feed-options{flex-basis:100%;justify-content:flex-end}}
+@media(max-width:600px){
+  .feed-heading{flex-wrap:nowrap;column-gap:8px}
+  .feed-heading h2{flex:none;flex-wrap:nowrap;column-gap:4px;font-size:18px;white-space:nowrap}
+  .feed-heading h2 .section-subtitle{font-size:11px}
+  .feed-heading .section-icon{width:20px;height:20px;flex-basis:20px}
+  .feed-heading .feed-options{flex:none;font-size:10px}
+  .feed-heading .feed-options label{gap:4px}
+  .feed-heading .feed-options input{width:16px;height:16px;margin:0}
+}
+@media(max-width:359px){
+  .feed-heading{column-gap:6px}
+  .feed-heading h2{font-size:15px}
+  .feed-heading h2 .section-subtitle{font-size:10px}
+  .feed-heading .section-icon{width:18px;height:18px;flex-basis:18px}
+  .feed-heading .feed-options{font-size:9px}
+}
