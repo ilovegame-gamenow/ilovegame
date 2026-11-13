@@ -5,7 +5,7 @@
 #feed-search button[type=submit]{background:var(--orange);color:white;border-color:var(--orange)}
 .feed-filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:0;white-space:nowrap;overscroll-behavior-x:contain}
 .feed-filters button{flex:none}.feed-filters button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:white}
-.feed-options{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:0;font-size:12px;color:var(--muted)}
+.feed-heading{align-items:center;flex-wrap:wrap;gap:0 16px}.feed-heading .feed-options{display:flex;align-items:center;margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
 .feed-options label{display:flex;align-items:center;min-height:44px;gap:5px}.feed-options input{width:18px;height:18px;accent-color:var(--orange)}
 .news-feed{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .news-feed .card--compact{min-width:0;min-height:0;padding:0;overflow:hidden;border-radius:14px}
@@ -20,5 +20,5 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #126a
 @media(max-width:600px){.news-feed{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.news-feed .card h3{font-size:14px;margin-inline:10px}.news-feed .card .game-meta{margin-inline:10px}.news-feed .card .platform-badges{margin-inline:10px}.feed-tools button{padding-inline:12px}#feed-query{font-size:16px}}
 @media(max-width:359px){.news-feed{gap:8px}.news-feed .card h3{font-size:13px;margin-inline:8px}.news-feed .thumb-placeholder{font-size:14px}.news-feed .card .platform-badges{margin-inline:8px}}
 
-.feed-toolbar{display:flex;align-items:center;gap:16px}.feed-toolbar .feed-filters{flex:1;min-width:0}.feed-toolbar .feed-options{flex:none;white-space:nowrap}
-@media(max-width:700px){.feed-toolbar{display:block}.feed-toolbar .feed-options{margin-top:2px;justify-content:flex-end}.feed-options label{min-height:36px}}
+.feed-toolbar .feed-filters{min-width:0}
+@media(max-width:600px){.feed-heading .feed-options{flex-basis:100%;justify-content:flex-end}.feed-options label{min-height:36px}}
