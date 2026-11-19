@@ -21,7 +21,7 @@
     "hnd1"
   ],
   "functions": {
-    "api/source-evidence.js": {
+    "api/news.js": {
       "maxDuration": 60
     }
   }
