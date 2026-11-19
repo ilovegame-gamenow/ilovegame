@@ -2,10 +2,10 @@
 
 既存の収集・AI処理・DB更新とは独立したGET専用API。外部生成AI APIは使用しない。
 
-- `/api/source-evidence?source=nintendo&page=1`：任天堂の一覧（ページ1〜5）
-- `/api/source-evidence?source=playstation`：公式RSS（配信中の項目のみ）
-- `/api/source-evidence?source=prtimes`：公式コンシューマーゲームカテゴリ先頭ページ（未採点の発見入口）
-- `/api/source-evidence?source=nintendo&id=一覧のid`：元記事の日時・タイトル・画像・動画の根拠
+- `/api/news?resource=source-evidence&source=nintendo&page=1`：任天堂の一覧（ページ1〜5）
+- `/api/news?resource=source-evidence&source=playstation`：公式RSS（配信中の項目のみ）
+- `/api/news?resource=source-evidence&source=prtimes`：公式コンシューマーゲームカテゴリ先頭ページ（未採点の発見入口）
+- `/api/news?resource=source-evidence&source=nintendo&id=一覧のid`：元記事の日時・タイトル・画像・動画の根拠
 
 記事は明示した3ソースの正規IDのみを受け付け、任意URL・リダイレクトは取得しない。画像は登録済みの公式配信ホストのみ実際の応答を確認する。失敗を記事なしと混同しない。公開データはメタ情報のみ。本文全文は認証済みの内部利用向け `include_text=1` のみで返す（専用秘密値 SOURCE_EVIDENCE_SECRET が設定され、適切な認証経路が確立した場合）。秘密値をChatのプロンプトに貼らない。本文はキャッシュしない。公開メタ情報のキャッシュは5分。
 
