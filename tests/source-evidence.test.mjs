@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {sourceArticleUrl,parsePrTimesList} from '../lib/source-evidence.js';
 import {extractVideoEvidence,normalizePublishedDate} from '../lib/source-video-evidence.js';
-import handler from '../api/source-evidence.js';
+import {handleSourceEvidence as handler} from '../lib/source-evidence-handler.js';
 test('article source IDs are strictly scoped',()=>{
  assert.equal(sourceArticleUrl('nintendo','d053fb5f-e501-4da3-9a8c-609922c8c895'),'https://www.nintendo.com/jp/topics/article/d053fb5f-e501-4da3-9a8c-609922c8c895');
  for(const id of ['https://example.com/foo','../../api','2026/11/19/x?redirect=evil','2026/11/19/x%2f..'])assert.equal(sourceArticleUrl('playstation',id),null);
