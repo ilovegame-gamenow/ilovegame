@@ -3,6 +3,10 @@ import { getFeaturedNews } from '../lib/featured-news.js';
 import { getPublicDisplaySettings } from "../lib/site-settings.js";
 
 export default async function handler(req, res) {
+  if (req.query?.resource === 'source-evidence') {
+    const {handleSourceEvidence}=await import('../lib/source-evidence-handler.js');
+    return handleSourceEvidence(req,res);
+  }
   if (req.query?.resource === 'calendar') {
     const {handleCalendar}=await import('../lib/release-calendar.js');
     return handleCalendar(req,res);
