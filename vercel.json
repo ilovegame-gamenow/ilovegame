@@ -19,5 +19,10 @@
   ],
   "regions": [
     "hnd1"
-  ]
+  ],
+  "functions": {
+    "api/source-evidence.js": {
+      "maxDuration": 60
+    }
+  }
 }
