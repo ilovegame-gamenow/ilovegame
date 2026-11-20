@@ -22,7 +22,7 @@
          </div>`
       : `<nav>${links}</nav>`;
 
-    const mascot = '<img class="header-mascot" src="/assets/cosmochi_welcome_clean.png" width="68" height="68" decoding="async" alt="">';
+    const mascot = '<img class="header-mascot" src="/assets/cosmochi_welcome_mitten.png" width="68" height="68" decoding="async" alt="">';
 
     header.innerHTML = `
       <div class="header-inner">
