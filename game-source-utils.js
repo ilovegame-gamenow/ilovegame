@@ -42,11 +42,11 @@ export function articleContentSegments(article) {
  const parts=[],seen=new Set();let lines=[];
  const flush=()=>{const text=lines.join('\n').trim();if(text)parts.push({type:'text',text});lines=[];};
  for(const line of String(article.article_body||article.summary||'').trim().split('\n')){
-  const match=line.match(/^公式動画[：:][ \t]*(https:\/\/\S+)[ \t]*$/);
-  const id=match?youtubeVideoId(match[1]):null;
+  const match=line.match(/^公式動画(リンク)?[：:][ \t]*(https:\/\/\S+)[ \t]*$/);
+  const id=match?youtubeVideoId(match[2]):null;
   if(!id){lines.push(line);continue;}
   flush();
-  if(!seen.has(id)){parts.push({type:'video',url:`https://www.youtube.com/watch?v=${id}`});seen.add(id);}
+  if(!seen.has(id)){parts.push({type:match[1]?'video-link':'video',url:`https://www.youtube.com/watch?v=${id}`});seen.add(id);}
  }
  flush();
  // Compatibility: a video used as the primary source follows the article text.
