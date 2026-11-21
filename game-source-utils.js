@@ -32,6 +32,27 @@ export function youtubeVideoId(value) {
  }catch{return null;}
 }
 
+// Accept only canonical public post paths; never embed arbitrary URLs or profiles.
+export function socialVideoPost(value) {
+ try {
+  const u=new URL(value);
+  if(u.protocol!=='https:'||u.username||u.password||u.port)return null;
+  const host=u.hostname, path=u.pathname;
+  let m;
+  if(['x.com','www.x.com','twitter.com','www.twitter.com','mobile.twitter.com'].includes(host)){
+   m=path.match(/^\/([A-Za-z0-9_]{1,15})\/status\/([0-9]{1,20})\/?$/);
+   if(m)return {provider:'x',id:m[2],url:'https://x.com/'+m[1]+'/status/'+m[2]};
+  }else if(['www.instagram.com','instagram.com'].includes(host)){
+   m=path.match(/^\/(reel|p|tv)\/([A-Za-z0-9_-]{1,32})\/?$/);
+   if(m)return {provider:'instagram',id:m[2],url:'https://www.instagram.com/'+m[1]+'/'+m[2]+'/'};
+  }else if(['www.tiktok.com','tiktok.com'].includes(host)){
+   m=path.match(/^\/@([A-Za-z0-9_.]{1,32})\/video\/([0-9]{1,20})\/?$/);
+   if(m)return {provider:'tiktok',id:m[2],url:'https://www.tiktok.com/@'+m[1]+'/video/'+m[2]};
+  }
+ }catch{}
+ return null;
+}
+
 // Deliberate editorial marker only; do not guess videos from arbitrary prose.
 export function articleVideoUrl(article) {
  return articleContentSegments(article).find(part=>part.type==='video')?.url??null;
@@ -44,13 +65,20 @@ export function articleContentSegments(article) {
  for(const line of String(article.article_body||article.summary||'').trim().split('\n')){
   const match=line.match(/^公式動画(リンク)?[：:][ \t]*(https:\/\/\S+)[ \t]*$/);
   const id=match?youtubeVideoId(match[2]):null;
-  if(!id){lines.push(line);continue;}
+  if(!id){
+   const social=line.match(/^公式(?:動画|映像)[（(](X|Instagram|TikTok)[）)](リンク)?[：:][ \t]*(https:\/\/\S+)[ \t]*$/i);
+   const post=social?socialVideoPost(social[3]):null;
+   if(!post||post.provider!==social[1].toLowerCase()){lines.push(line);continue;}
+   flush();const key=post.provider+':'+post.id;
+   if(!seen.has(key)){parts.push({type:social[2]?'social-link':'social-video',...post});seen.add(key);}
+   continue;
+  }
   flush();
   if(!seen.has(id)){parts.push({type:match[1]?'video-link':'video',url:`https://www.youtube.com/watch?v=${id}`});seen.add(id);}
  }
  flush();
  // Compatibility: a video used as the primary source follows the article text.
  const sourceId=youtubeVideoId(article.source_url);
- if(!seen.size&&sourceId)parts.push({type:'video',url:`https://www.youtube.com/watch?v=${sourceId}`});
+ if(!parts.some(p=>p.type==='video'||p.type==='video-link')&&sourceId)parts.push({type:'video',url:`https://www.youtube.com/watch?v=${sourceId}`});
  return parts;
 }
