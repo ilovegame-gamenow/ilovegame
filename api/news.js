@@ -1,3 +1,4 @@
+import { publicPublisherLabel } from '../lib/publisher-directory.js';
 import { getNewsFeed } from '../lib/news-feed.js';
 import { getFeaturedNews } from '../lib/featured-news.js';
 import { getPublicDisplaySettings } from "../lib/site-settings.js";
@@ -83,7 +84,9 @@ export default async function handler(req, res) {
       if (!data.length) {
           return res.status(404).json({ error: "記事が見つかりません" });
       }
-    return res.status(200).json(data[0]);
+    const article=data[0];
+    article.source_display_name=await publicPublisherLabel(supabaseUrl,process.env.SUPABASE_SECRET_KEY,article.source_name);
+    return res.status(200).json(article);
     }
     const contentRange = response.headers.get("content-range");
     const total = Number(contentRange?.split("/")[1]);
