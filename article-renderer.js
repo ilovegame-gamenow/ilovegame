@@ -149,12 +149,14 @@ window.GameArticle = (() => {
       }
     };
     Promise.all([import('./official-video.js'), import('./game-source-utils.js')])
-      .then(([{officialVideo}, {articleContentSegments}]) => {
+      .then(([{officialVideo, officialSocialVideo}, {articleContentSegments}]) => {
         if (!bodyElement.isConnected) return;
         contentParts = articleContentSegments(article).map(part => {
           let element;
           if (part.type === 'video') {
             element = officialVideo(article.title, part.url);
+          } else if (part.type === 'social-video' || part.type === 'social-link') {
+            element = officialSocialVideo(article.title, part, part.type === 'social-link');
           } else if (part.type === 'video-link') {
             element = document.createElement('div');
             element.className = 'official-video';
