@@ -64,30 +64,9 @@ window.GameArticle = (() => {
     return html + esc(text.slice(last));
   }
 
-  function formatText(text, width) {
-    const charsPerLine = Math.max(
-      12,
-      Math.floor((width - 64) / 17)
-    );
-    const target = Math.round(charsPerLine * 1.7);
-    let count = 0;
-
-    return String(text ?? "")
-      .replace(/([。！？♪])(?=\S)/g, match => {
-        count += 1;
-        return match;
-      })
-      .split(/(?<=[。！？♪])/)
-      .map(sentence => {
-        count += sentence.length;
-        if (count >= target) {
-          count = 0;
-          return sentence + "\n";
-        }
-        return sentence;
-      })
-      .join("")
-      .trim();
+  // Preserve editorial paragraphs and let CSS handle line wrapping at every width.
+  function formatText(text) {
+    return String(text ?? "").replace(/\r\n?/g, "\n").trim();
   }
 
   function render(article, width = window.innerWidth) {
