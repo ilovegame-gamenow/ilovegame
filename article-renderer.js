@@ -17,19 +17,19 @@ window.GameArticle = (() => {
     const name = raw.replace(/\s*[（(]\s*(?:PR\s*TIMES|PlayStation\.Blog)\s*[）)]\s*$/i, "").trim() || raw;
     const short = name.replace(/^株式会社\s*|\s*株式会社$/g, "").trim() || name;
     const aliases = new Map([
-      ["セガ", "SEGA"], ["sega", "SEGA"],
-      ["nintendo", "任天堂"], ["任天堂", "任天堂"],
-      ["capcom", "カプコン"], ["カプコン", "カプコン"],
-      ["バンダイナムコエンターテインメント", "バンダイナムコエンターテインメント"]
+      ["セガ", "株式会社セガ"], ["sega", "株式会社セガ"],
+      ["nintendo", "任天堂株式会社"], ["任天堂", "任天堂株式会社"],
+      ["capcom", "株式会社カプコン"], ["カプコン", "株式会社カプコン"],
+      ["バンダイナムコエンターテインメント", "株式会社バンダイナムコエンターテインメント"]
     ]);
-    return aliases.get(short.toLowerCase()) || short;
+    return aliases.get(short.toLowerCase()) || name;
   }
 
   function displayBodyText(text, article) {
     // Keep explicitly recorded secondary image-source URLs, but label them by
     // confirmed publisher (not the distribution platform).
-    const publisher = sourceDisplayName(article.source_name);
-    if (publisher !== "HoYoverse") return text;
+    const publisher = article.source_display_name || sourceDisplayName(article.source_name);
+    if (sourceDisplayName(article.source_name) !== "HoYoverse" || /[\[\]\r\n]/.test(publisher)) return text;
     return String(text).replace(/^画像出典：[ \t]*(https:\/\/prtimes\.jp\/main\/html\/rd\/p\/000000470\.000096124\.html)[ \t]*$/gm,
       (_, url) => "画像出典：[" + publisher + "](" + url + ")");
   }
@@ -151,7 +151,7 @@ window.GameArticle = (() => {
               href="${esc(article.source_url)}"
               target="_blank"
               rel="noopener noreferrer"
-            >${esc(sourceDisplayName(article.source_name))}</a>
+            >${esc(article.source_display_name || sourceDisplayName(article.source_name))}</a>
           </div>
         ` : ""}
       </article>
@@ -171,7 +171,7 @@ window.GameArticle = (() => {
     const caption = document.createElement('figcaption');
     caption.textContent = imageCaption(part.caption);
     const source = document.createElement('small');
-    source.textContent = '画像：' + sourceDisplayName(article.source_name, '公式発表');
+    source.textContent = '画像：' + (article.source_display_name || sourceDisplayName(article.source_name, '公式発表'));
     caption.append(document.createElement('br'), source);
     figure.append(img, caption);
     return figure;
