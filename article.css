@@ -434,3 +434,7 @@ body[data-page="editor"] #discardDraftButton:focus-visible {
 .article-game-context p,.discovery-context-entry p{line-height:1.7;overflow-wrap:anywhere}
 .article-game-context button{padding:8px 12px;cursor:pointer}
 .discovery-context-entry+.discovery-context-entry{border-top:1px solid #ddd;margin-top:16px;padding-top:12px}
+
+/* Keep editorial links readable and tappable on narrow screens. */
+.body a,.summary a,.point a{color:#a34615;text-decoration:underline;overflow-wrap:anywhere}
+.official-video-player[hidden]{display:none}
