@@ -438,3 +438,12 @@ body[data-page="editor"] #discardDraftButton:focus-visible {
 /* Keep editorial links readable and tappable on narrow screens. */
 .body a,.summary a,.point a{color:#a34615;text-decoration:underline;overflow-wrap:anywhere}
 .official-video-player[hidden]{display:none}
+
+/* Official social embeds fit the article column; load only near the viewport. */
+.social-embed{width:100%;max-width:100%;min-width:0;margin-inline:auto;overflow:hidden}
+.social-embed[hidden]{display:none}
+.social-embed-x,.social-embed-instagram{max-width:550px}
+.social-embed iframe{display:block;max-width:100%;border:0;margin-inline:auto}
+.social-embed-instagram .instagram-media{width:100%!important;min-width:0!important;max-width:100%!important;margin:0 auto!important}
+.social-embed-tiktok{max-width:360px;aspect-ratio:9/16;background:#f4ece2;border-radius:12px}
+.social-embed-tiktok iframe{width:100%;height:100%}
