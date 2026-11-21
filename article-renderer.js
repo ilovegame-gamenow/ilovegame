@@ -8,6 +8,32 @@ window.GameArticle = (() => {
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
 
+
+  // Turn plain editorial URLs into safe anchors without interpreting supplied HTML.
+  function linkText(text) {
+    const pattern = /\[([^\]\r\n]+)\]\((https?:\/\/[^\s<>"'（）「」『』【】]+?)\)|https?:\/\/[^\s<>"'`（）「」『』【】、。！？♪]+/gi;
+    let html = "", last = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      html += esc(text.slice(last, match.index));
+      let raw = match[2] || match[0], tail = "";
+      if (!match[2]) {
+        while (/[.,;:!?]$/.test(raw) || (raw.endsWith(")") && (raw.match(/\)/g)||[]).length > (raw.match(/\(/g)||[]).length) || (raw.endsWith("]") && (raw.match(/\]/g)||[]).length > (raw.match(/\[/g)||[]).length)) {
+          tail = raw.slice(-1) + tail;
+          raw = raw.slice(0,-1);
+        }
+      }
+      try {
+        const url = new URL(raw);
+        if (!["https:", "http:"].includes(url.protocol) || url.username || url.password) throw new Error("Invalid URL");
+        html += '<a href="' + esc(url.href) + '" target="_blank" rel="noopener noreferrer">' + esc(match[1] || raw) + '</a>' + esc(tail);
+      } catch {
+        html += esc(match[0]);
+      }
+      last = match.index + match[0].length;
+    }
+    return html + esc(text.slice(last));
+  }
+
   function formatText(text, width) {
     const charsPerLine = Math.max(
       12,
@@ -73,20 +99,18 @@ window.GameArticle = (() => {
 
         ${article.summary ? `
           <div class="summary">
-            ${esc(article.summary)}
+            ${linkText(article.summary)}
           </div>
         ` : ""}
 
-        <div class="body">${esc(
-          formatText(originalText, width)
-        )}</div>
+        <div class="body">${linkText(formatText(originalText, width))}</div>
 
         ${article.ilovegame_point ? `
           <div class="point">
             <div class="point-title">
               ここに注目♪
             </div>
-            <div>${esc(article.ilovegame_point)}</div>
+            <div>${linkText(article.ilovegame_point)}</div>
           </div>
         ` : ""}
 
@@ -117,11 +141,11 @@ window.GameArticle = (() => {
     let contentParts = null;
     const draw = width => {
       if (!contentParts) {
-        bodyElement.textContent = formatText(originalText, width);
+        bodyElement.innerHTML = linkText(formatText(originalText, width));
         return;
       }
       for (const part of contentParts) {
-        if (part.type === 'text') part.element.textContent = formatText(part.text, width);
+        if (part.type === 'text') part.element.innerHTML = linkText(formatText(part.text, width));
       }
     };
     Promise.all([import('./official-video.js'), import('./game-source-utils.js')])
