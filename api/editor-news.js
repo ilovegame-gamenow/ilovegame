@@ -1,7 +1,9 @@
 import { getEditorNews, parseEditorNewsQuery } from "../lib/editor-news-repository.js";
+import { savePublisherDirectory } from "../lib/publisher-directory.js";
 import { getSiteSettings } from "../lib/site-settings.js";
 import {
   requireEditor,
+  requireEditorOrigin,
   SESSION_SECONDS,
   setEditorCookie,
   getEditorSessionRemainingSeconds
@@ -17,6 +19,16 @@ export default async function handler(req, res) {
   }
 
   if (!requireEditor(req, res)) return;
+
+  if (req.method === 'POST' && req.query.action === 'publisher') {
+    if (!requireEditorOrigin(req,res)) return;
+    try {
+      const result=await savePublisherDirectory(process.env.SUPABASE_URL,process.env.SUPABASE_SECRET_KEY,req.body);
+      return res.status(result.status).json(result);
+    } catch {
+      return res.status(503).json({error:'情報元設定を保存できませんでした。'});
+    }
+  }
 
   // 操作中のログイン期限を延長する
   if (req.method === "POST") {
