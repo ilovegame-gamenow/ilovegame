@@ -53,6 +53,28 @@ export function socialVideoPost(value) {
  return null;
 }
 
+// Editorial images are explicitly selected and never fetched by the server.
+// Accept known publication assets or the article's exact official source host.
+const editorialImageHosts=new Set([
+ 'prcdn.freetls.fastly.net','prtimes.jp','assets.topics.apps-jp.nintendo.com',
+ 'www.nintendo.com','www.nintendo.co.jp','blog.ja.playstation.com',
+ 'blog.playstation.com','gmedia.playstation.com','media.playstation.com'
+]);
+export function editorialImageUrl(value,sourceUrl){
+ try{
+  const u=new URL(value);
+  if(u.protocol!=='https:'||u.username||u.password||u.port||u.href.length>2000)return null;
+  let sourceHost='';try{const source=new URL(sourceUrl);if(source.protocol==='https:'&&!source.username&&!source.password&&!source.port)sourceHost=source.hostname;}catch{}
+  if(!/^[a-z0-9-]+(?:\.[a-z0-9-]+)+$/i.test(u.hostname)||/^\d+(?:\.\d+)+$/.test(u.hostname)||/\.(?:local|internal|localhost|test|invalid|example)$/i.test(u.hostname))return null;
+  if(!editorialImageHosts.has(u.hostname)&&u.hostname!==sourceHost)return null;
+  if(!/\.(?:jpe?g|png|webp|avif|gif)$/i.test(u.pathname)&&!(u.hostname==='assets.topics.apps-jp.nintendo.com'&&u.pathname.startsWith('/image/')))return null;
+  u.hash='';return u.href;
+ }catch{return null;}
+}
+function imageIdentity(value){
+ try{const u=new URL(value);return u.hostname+u.pathname;}catch{return null;}
+}
+
 // Deliberate editorial marker only; do not guess videos from arbitrary prose.
 export function articleVideoUrl(article) {
  return articleContentSegments(article).find(part=>part.type==='video')?.url??null;
@@ -60,9 +82,20 @@ export function articleVideoUrl(article) {
 
 // Preserve editorial placement, validate every marker and deduplicate by video ID.
 export function articleContentSegments(article) {
- const parts=[],seen=new Set();let lines=[];
+ const parts=[],seen=new Set(),seenImages=new Set();let lines=[];
+ const hero=imageIdentity(article.thumbnail_url)||((String(article.source_name||'').toLowerCase()==='nintendo'&&article.thumbnail_url)?imageIdentity('https://assets.topics.apps-jp.nintendo.com/image/'+String(article.thumbnail_url).replace(/^\/+/,'')):null);
+ if(hero)seenImages.add(hero);
  const flush=()=>{const text=lines.join('\n').trim();if(text)parts.push({type:'text',text});lines=[];};
  for(const line of String(article.article_body||article.summary||'').trim().split('\n')){
+  const image=line.match(/^公式画像[：:][ \t]*(https:\/\/[^\s｜]+)[ \t]*｜[ \t]*([^\r\n]{1,200})$/);
+  if(image){
+   const url=editorialImageUrl(image[1],article.source_url);
+   if(url){
+    flush();const key=imageIdentity(url);
+    if(!seenImages.has(key)){parts.push({type:'image',url,caption:image[2].trim()});seenImages.add(key);}
+    continue;
+   }
+  }
   const match=line.match(/^公式動画(リンク)?[：:][ \t]*(https:\/\/\S+)[ \t]*$/);
   const id=match?youtubeVideoId(match[2]):null;
   if(!id){
