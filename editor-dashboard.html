@@ -522,7 +522,6 @@ function updateFilterButtons() {
 
 function renderSources() {
   const container = document.getElementById("sourceFilters");
-  const wasFocused = document.activeElement?.id === "articleSourceSelect";
   container.replaceChildren();
   const select = document.createElement("select");
   select.id = "articleSourceSelect";
@@ -534,10 +533,14 @@ function renderSources() {
     select.append(item);
   }
   select.value = currentSource;
-  select.addEventListener("change", () => changeConditions({source:select.value}));
+  select.addEventListener("change", () => {
+    const source = select.value;
+    // Safari may reopen the native picker when the select is refocused after loading.
+    select.blur();
+    changeConditions({source});
+  });
   container.append(select);
   renderPublisherEditor(container);
-  if(wasFocused)select.focus({preventScroll:true});
   const statusLabel = labels[currentFilter] || "すべての掲載状態";
   document.getElementById("sourceCountNote").textContent = `${statusLabel}の情報元別件数`;
   const sourceLabel = sourceOptions.find(option=>option.id===currentSource)?.label;
