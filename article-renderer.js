@@ -9,6 +9,36 @@ window.GameArticle = (() => {
       .replaceAll("'", "&#039;");
 
 
+
+  // Reader-facing publisher labels are separate from stored provenance and links.
+  function sourceDisplayName(value, fallback = "公式サイト") {
+    const raw = String(value ?? "").trim();
+    if (!raw) return fallback;
+    const name = raw.replace(/\s*[（(]\s*(?:PR\s*TIMES|PlayStation\.Blog)\s*[）)]\s*$/i, "").trim() || raw;
+    const short = name.replace(/^株式会社\s*|\s*株式会社$/g, "").trim() || name;
+    const aliases = new Map([
+      ["セガ", "SEGA"], ["sega", "SEGA"],
+      ["nintendo", "任天堂"], ["任天堂", "任天堂"],
+      ["capcom", "カプコン"], ["カプコン", "カプコン"],
+      ["バンダイナムコエンターテインメント", "バンダイナムコエンターテインメント"]
+    ]);
+    return aliases.get(short.toLowerCase()) || short;
+  }
+
+  function displayBodyText(text, article) {
+    // Keep explicitly recorded secondary image-source URLs, but label them by
+    // confirmed publisher (not the distribution platform).
+    const publisher = sourceDisplayName(article.source_name);
+    if (publisher !== "HoYoverse") return text;
+    return String(text).replace(/^画像出典：[ \t]*(https:\/\/prtimes\.jp\/main\/html\/rd\/p\/000000470\.000096124\.html)[ \t]*$/gm,
+      (_, url) => "画像出典：[" + publisher + "](" + url + ")");
+  }
+
+  function imageCaption(value) {
+    // Legacy distribution annotation is redundant; retain actual credits.
+    return String(value ?? "").replace(/（([^（）]+)／PR TIMES発表素材）/g, "（$1提供）");
+  }
+
   // Turn plain editorial URLs into safe anchors without interpreting supplied HTML.
   function linkText(text) {
     const pattern = /\[([^\]\r\n]+)\]\((https?:\/\/[^\s<>"'（）「」『』【】]+?)\)|https?:\/\/[^\s<>"'`（）「」『』【】、。！？♪]+/gi;
@@ -103,7 +133,7 @@ window.GameArticle = (() => {
           </div>
         ` : ""}
 
-        <div class="body">${linkText(formatText(originalText, width))}</div>
+        <div class="body">${linkText(formatText(displayBodyText(originalText, article), width))}</div>
 
         ${article.ilovegame_point ? `
           <div class="point">
@@ -121,7 +151,7 @@ window.GameArticle = (() => {
               href="${esc(article.source_url)}"
               target="_blank"
               rel="noopener noreferrer"
-            >${esc(article.source_name || "公式サイト")}</a>
+            >${esc(sourceDisplayName(article.source_name))}</a>
           </div>
         ` : ""}
       </article>
@@ -132,16 +162,16 @@ window.GameArticle = (() => {
     const figure = document.createElement('figure');
     figure.className = 'official-article-image';
     const img = document.createElement('img');
-    img.alt = part.caption;
+    img.alt = imageCaption(part.caption);
     img.loading = 'lazy';
     img.decoding = 'async';
     img.referrerPolicy = 'no-referrer';
     img.addEventListener('error', () => { figure.hidden = true; }, {once:true});
     img.src = part.url;
     const caption = document.createElement('figcaption');
-    caption.textContent = part.caption;
+    caption.textContent = imageCaption(part.caption);
     const source = document.createElement('small');
-    source.textContent = '画像：' + (article.source_name || '公式発表');
+    source.textContent = '画像：' + sourceDisplayName(article.source_name, '公式発表');
     caption.append(document.createElement('br'), source);
     figure.append(img, caption);
     return figure;
@@ -160,11 +190,11 @@ window.GameArticle = (() => {
     let contentParts = null;
     const draw = width => {
       if (!contentParts) {
-        bodyElement.innerHTML = linkText(formatText(originalText, width));
+        bodyElement.innerHTML = linkText(formatText(displayBodyText(originalText, article), width));
         return;
       }
       for (const part of contentParts) {
-        if (part.type === 'text') part.element.innerHTML = linkText(formatText(part.text, width));
+        if (part.type === 'text') part.element.innerHTML = linkText(formatText(displayBodyText(part.text, article), width));
       }
     };
     Promise.all([import('./official-video.js'), import('./game-source-utils.js')])
