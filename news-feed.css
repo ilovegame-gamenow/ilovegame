@@ -33,3 +33,13 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #126a
   .feed-heading{column-gap:6px}
   .feed-heading .feed-options{font-size:9px}
 }
+
+/* Keep all seven news categories visible on narrow touch screens. */
+@media(max-width:600px){
+  .feed-filters{gap:3px;overflow-x:visible;flex-wrap:nowrap}
+  .feed-filters button{flex:1 0 auto;min-width:0;padding:6px 3px;font-size:clamp(10px,3.05vw,12px);line-height:1.2;min-height:44px;white-space:nowrap}
+}
+@media(max-width:359px){
+  .feed-filters{gap:2px}
+  .feed-filters button{padding-inline:2px}
+}
