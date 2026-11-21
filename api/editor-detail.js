@@ -1,3 +1,4 @@
+import { publicPublisherLabel } from '../lib/publisher-directory.js';
 import { getArticleDraft } from "../lib/article-draft-repository.js";
 import { requireEditor } from "../lib/editor-auth.js";
 
@@ -76,7 +77,7 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({
-      article: articles[0],
+      article: {...articles[0],source_display_name:await publicPublisherLabel(supabaseUrl,supabaseKey,articles[0].source_name)},
       draft: await getArticleDraft(supabaseUrl, supabaseKey, Number(id))
     });
   } catch {
