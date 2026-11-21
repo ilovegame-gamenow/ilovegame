@@ -128,9 +128,21 @@ window.GameArticle = (() => {
       .then(([{officialVideo}, {articleContentSegments}]) => {
         if (!bodyElement.isConnected) return;
         contentParts = articleContentSegments(article).map(part => {
-          const element = part.type === 'video'
-            ? officialVideo(article.title, part.url)
-            : document.createElement('div');
+          let element;
+          if (part.type === 'video') {
+            element = officialVideo(article.title, part.url);
+          } else if (part.type === 'video-link') {
+            element = document.createElement('div');
+            element.className = 'official-video';
+            const link = document.createElement('a');
+            link.href = part.url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = 'YouTubeで公式動画を見る ↗';
+            element.append(link);
+          } else {
+            element = document.createElement('div');
+          }
           if (part.type === 'text') element.className = 'article-text';
           return {...part, element};
         });
