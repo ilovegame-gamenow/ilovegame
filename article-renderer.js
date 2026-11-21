@@ -128,6 +128,25 @@ window.GameArticle = (() => {
     `;
   }
 
+  function officialImage(part, article) {
+    const figure = document.createElement('figure');
+    figure.className = 'official-article-image';
+    const img = document.createElement('img');
+    img.alt = part.caption;
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.referrerPolicy = 'no-referrer';
+    img.addEventListener('error', () => { figure.hidden = true; }, {once:true});
+    img.src = part.url;
+    const caption = document.createElement('figcaption');
+    caption.textContent = part.caption;
+    const source = document.createElement('small');
+    source.textContent = '画像：' + (article.source_name || '公式発表');
+    caption.append(document.createElement('br'), source);
+    figure.append(img, caption);
+    return figure;
+  }
+
   function observeBody(container, article) {
     const bodyElement = container.querySelector(".body");
     if (!bodyElement) return null;
@@ -155,6 +174,8 @@ window.GameArticle = (() => {
           let element;
           if (part.type === 'video') {
             element = officialVideo(article.title, part.url);
+          } else if (part.type === 'image') {
+            element = officialImage(part, article);
           } else if (part.type === 'social-video' || part.type === 'social-link') {
             element = officialSocialVideo(article.title, part, part.type === 'social-link');
           } else if (part.type === 'video-link') {
