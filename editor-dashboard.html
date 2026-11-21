@@ -279,6 +279,7 @@ let pageSize = 20;
 let articleCounts = { pending: 0, published: 0, rejected: 0 };
 let currentSource = urlParams.get("source") || "all";
 let sourceOptions = [];
+let directoryVersion = null;
 let loadVersion = 0;
 let listRequest = null;
     const labels = {
@@ -304,7 +305,11 @@ let listRequest = null;
         });
         if (version !== loadVersion) return;
         currentSource = data.filters.source;
+        directoryVersion = data.directoryVersion;
         sourceOptions = data.sources;
+        const sourceUrl = new URL(location.href);
+        if(currentSource==='all')sourceUrl.searchParams.delete('source');else sourceUrl.searchParams.set('source',currentSource);
+        history.replaceState(null,'',sourceUrl);
         pageSize = data.limit;
         if (currentPage !== data.page) {
           currentPage = data.page;
@@ -531,11 +536,52 @@ function renderSources() {
   select.value = currentSource;
   select.addEventListener("change", () => changeConditions({source:select.value}));
   container.append(select);
+  renderPublisherEditor(container);
   if(wasFocused)select.focus({preventScroll:true});
   const statusLabel = labels[currentFilter] || "すべての掲載状態";
   document.getElementById("sourceCountNote").textContent = `${statusLabel}の情報元別件数`;
   const sourceLabel = sourceOptions.find(option=>option.id===currentSource)?.label;
   document.getElementById("statusCountNote").textContent = `${currentSource === "all" ? "全情報元" : sourceLabel}の掲載状態別件数`;
+}
+
+
+function renderPublisherEditor(container) {
+  const option=sourceOptions.find(o=>o.id===currentSource);
+  if(!option||['all','other'].includes(option.id)||!Number.isSafeInteger(directoryVersion)||!option.aliases?.length)return;
+  const box=document.createElement('details');
+  box.className='publisher-editor';
+  const summary=document.createElement('summary');summary.textContent='情報元の表記・グループを管理';
+  const list=document.createElement('ul');
+  for(const alias of option.aliases){
+    const li=document.createElement('li');
+    const count=(option.observed||[]).filter(x=>String(x.name||'').normalize('NFKC').trim().toLowerCase()===alias.normalize('NFKC').trim().toLowerCase()).reduce((n,x)=>n+x.count,0);
+    li.textContent=alias+'（'+count+'件）';list.append(li);
+  }
+  const observedTitle=document.createElement('p');observedTitle.textContent='含まれる表記（全掲載状態）';
+  const form=document.createElement('form');form.className='publisher-edit-form';
+  const nameLabel=document.createElement('label');nameLabel.textContent='統一表示名（公開記事にも反映）';
+  const name=document.createElement('input');name.maxLength=200;name.required=true;name.value=option.label;nameLabel.append(name);
+  const aliasLabel=document.createElement('label');aliasLabel.textContent='別名（1行に1つ）';
+  const aliases=document.createElement('textarea');aliases.rows=5;aliases.required=true;aliases.value=option.aliases.join('\n');aliasLabel.append(aliases);
+  const hint=document.createElement('p');hint.className='filter-note';hint.textContent='元の記事・URLは変更せず、ここに登録した表記を同じ情報元として集計します。別のグループに所属する表記は重複登録できません。';
+  const save=document.createElement('button');save.type='submit';save.textContent='表記を保存';save.className='publisher-save';
+  const result=document.createElement('p');result.setAttribute('role','status');
+  form.append(nameLabel,aliasLabel,hint,save,result);
+  form.addEventListener('submit',async event=>{
+    event.preventDefault();if(!confirm('情報元の統一表示名と別名を保存しますか？'))return;
+    save.disabled=true;result.textContent='保存中…';
+    try{
+      const response=await fetch('/api/editor-news?action=publisher',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({source:option.id,version:directoryVersion,label:name.value,aliases:aliases.value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean)})});
+      if(response.status===401){GameEditorSession.expire();return;}
+      const data=await response.json();
+      if(!response.ok){result.textContent=data.error||'保存に失敗しました。';return;}
+      currentSource=data.source;currentPage=1;
+      const url=new URL(location.href);url.searchParams.set('source',currentSource);url.searchParams.set('page','1');history.replaceState(null,'',url);
+      await loadArticles();
+    }catch{result.textContent='保存結果を確認できません。再読み込みして確認してください。';}
+    finally{save.disabled=false;}
+  });
+  box.append(summary,observedTitle,list,form);container.append(box);
 }
 
 function changeConditions({ status = currentFilter, source = currentSource }) {
