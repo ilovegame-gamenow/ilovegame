@@ -34,6 +34,12 @@ export function renderWeeklyRoundup(result, entries, toc) {
       detail.append(node('p','発売日と対応機種を掲載しています。遊びの詳しい内容は、公式サイト・ストアをご覧ください。'));
     }
     const sources = card.querySelector('.source-links');
+    card.insertBefore(detail,sources);
+    if (editorial) {
+      sources.remove();
+      section.append(card); entries.append(section);
+      continue;
+    }
     sources.classList.add('source');
     sources.replaceChildren(node('span','情報元：'));
     release.sources.forEach((source,index) => {
@@ -44,7 +50,7 @@ export function renderWeeklyRoundup(result, entries, toc) {
       }
       const link = node('a',name); link.href = source.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; sources.append(link);
     });
-    card.insertBefore(detail,card.querySelector('.source-links')); section.append(card); entries.append(section);
+    section.append(card); entries.append(section);
   }
   if (!releases.length) entries.append(node('p','今週の発売情報はまだ登録されていません。確認できた作品から順次追加します。','empty-calendar'));
 }
