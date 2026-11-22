@@ -1,16 +1,17 @@
 
 /* I LOVE GAME♪ 共通ヘッダー */
 :root {
-  --button-font:16px;
+  --button-font:14px;
+  --pagination-font:13px;
   --button-pad-y:12px;
   --button-pad-x:20px;
   --button-height:48px;
 }
 @media(max-width:1024px){
-  :root{--button-font:14px;--button-pad-y:10px;--button-pad-x:16px;--button-height:44px}
+  :root{--button-font:13px;--pagination-font:12px;--button-pad-y:10px;--button-pad-x:16px;--button-height:44px}
 }
 @media(max-width:600px){
-  :root{--button-font:12px;--button-pad-y:8px;--button-pad-x:12px;--button-height:44px}
+  :root{--button-font:12px;--pagination-font:11px;--button-pad-y:8px;--button-pad-x:12px;--button-height:44px}
 }
 /* Dense grids and icon-only controls retain their own dimensions. */
 
