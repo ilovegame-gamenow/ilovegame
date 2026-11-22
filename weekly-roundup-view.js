@@ -40,7 +40,7 @@ export function renderWeeklyRoundup(result, entries, toc) {
       if(index)sources.append(node('span',' ／ '));
       let name = source.name;
       if(!name){
-        try{const host = new URL(source.url).hostname.replace(/^www\./,'');name = host === 'store.steampowered.com' ? 'Steam' : host;}catch{name = '公式サイト';}
+        try{const host = new URL(source.url).hostname.replace(/^www\./,'');name = host === 'store.steampowered.com' ? 'Steam（公式ストア）' : host === 'prtimes.jp' ? '公式発表（発表元未確認）' : '公式サイト';}catch{name = '公式サイト';}
       }
       const link = node('a',name); link.href = source.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; sources.append(link);
     });
