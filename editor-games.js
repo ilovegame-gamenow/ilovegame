@@ -209,8 +209,9 @@
         back.href=target.origin===location.origin && target.pathname==='/editor-article.html' && target.searchParams.get('id')===articleIdText
           ? target.pathname+target.search : `/editor-article.html?id=${articleId}`;
         back.textContent='← 記事に戻る';
+        GameEditorNavigation.syncBackLinks('catalogBack');
         if (target.origin===location.origin && target.pathname==='/editor-article.html' && target.searchParams.get('id')===articleIdText) {
-          GameEditorNavigation.prepareBack({targetPath:'/editor-article.html',selector:'#catalogBack'});
+          GameEditorNavigation.prepareBack({targetPath:'/editor-article.html',selector:'#catalogBack, [data-back-mirror="catalogBack"]'});
         }
       }
       if (await load()) notify(hasDraft?'入力途中の作品情報を復元しました。登録済みか不明な場合は、同じ入力のまま再試行できます。':'');

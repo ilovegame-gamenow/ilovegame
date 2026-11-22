@@ -7,6 +7,7 @@
  const returnTarget=params.get('return')||'';
  const safeReturn=returnTarget==='/editor-media.html'||returnTarget==='/editor-dashboard.html'||returnTarget.startsWith('/editor-dashboard.html?')?returnTarget:'/editor-dashboard.html';
  if(direct){$('dataBack').href=safeReturn;$('dataBack').textContent='← 元の記事一覧に戻る';}
+ GameEditorNavigation.syncBackLinks('dataBack');
  $('resultBack').href=safeReturn;
  $('resultBack').textContent=direct?'元の記事一覧に戻る':'編集室に戻る';
  let rows=[],selected=new Map(),page=1,totalPages=1,hasMore=false,busy=false,reviewed=[],activeSearch={status:'unpublished',field:'title',q:''};

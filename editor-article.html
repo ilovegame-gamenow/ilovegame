@@ -86,7 +86,7 @@
         document.title =
           `${article.title} | I LOVE GAME♪ 編集室`;
 
-        app.innerHTML = `<aside id="recoveryNoticeBox" class="editor-recovery-notice" ${restored ? "" : "hidden"}>
+        app.innerHTML = `<a class="back" data-editor-back data-back-mirror="editorBackLink" href="/editor-dashboard.html">← 編集室に戻る</a><aside id="recoveryNoticeBox" class="editor-recovery-notice" ${restored ? "" : "hidden"}>
           <p id="recoveryNotice" role="status">${esc(restored?.message || "")}</p>
           <a id="recoveryLogin" href="/editor.html" target="_blank" rel="noopener" hidden>別タブでログインする</a>
         </aside>` + GameArticle.render({ ...article, ...editable }) + `
@@ -181,6 +181,7 @@
         ) {
           backLink.href = returnUrl;
         }
+        GameEditorNavigation.syncBackLinks('editorBackLink');
 
         const editButton = document.getElementById("editArticleButton");
         const editForm = document.getElementById("articleEditForm");
@@ -385,6 +386,7 @@ if (statusText) {
         }
 
         if(mediaReturn){const back=document.getElementById('editorBackLink');back.href='/editor-media.html';back.textContent='← 話題一覧に戻る';}
+        GameEditorNavigation.syncBackLinks('editorBackLink');
         if(new URLSearchParams(location.search).get('edit')==='1'&&!restored?.item){editButton.click();editForm.scrollIntoView({block:'start'});}
         if (restored?.item) {
           editButton.click();

@@ -33,6 +33,16 @@ window.GameEditorNavigation = (() => {
       history.back();
     });
   }
+  // Mirror the resolved destination and label without duplicating element IDs.
+  function syncBackLinks(id) {
+    const source = document.getElementById(id);
+    if (!source) return;
+    document.querySelectorAll('[data-back-mirror]').forEach(link => {
+      if (link.dataset.backMirror !== id) return;
+      link.href = source.href;
+      link.textContent = source.textContent.trim();
+    });
+  }
   function createListState() {
     let loaded = null;
     return {
@@ -44,5 +54,5 @@ window.GameEditorNavigation = (() => {
       }
     };
   }
-  return {openArticle, prepareBack, markChanged, createListState};
+  return {openArticle, prepareBack, markChanged, createListState, syncBackLinks};
 })();

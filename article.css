@@ -455,3 +455,6 @@ body[data-page="editor"] #discardDraftButton:focus-visible {
 .official-article-image figcaption{font-size:13px;line-height:1.5;color:#666;text-align:center;margin-top:8px;overflow-wrap:anywhere}
 .official-article-image figcaption small{font-size:11px;color:#777}
 .official-article-image[hidden]{display:none}
+
+/* Matching return navigation at the bottom of editor pages. */
+body[data-page="editor"] .editor-return-bottom{margin-top:24px}

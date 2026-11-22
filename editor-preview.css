@@ -26,3 +26,5 @@
 .preview-source-option:has(input:disabled) { opacity:.6; cursor:wait; }
 #loadMore { margin-bottom:16px; }
 @media(max-width:600px) { .preview-source-options { grid-template-columns:1fr; } }
+
+.editor-return-bottom{margin-top:24px}.preview-return-link{display:inline-block;margin-bottom:24px;color:#a95012;font-weight:700;text-decoration:none}
