@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>データ管理 | I LOVE GAME♪ 編集室</title><link rel="stylesheet" href="/header.css"><link rel="stylesheet" href="/article.css"><link rel="stylesheet" href="/editor-settings.css"><link rel="stylesheet" href="/editor-data-management.css"></head>
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>データ管理 | I LOVE GAME♪ 編集室</title><link rel="stylesheet" href="/header.css"><link rel="stylesheet" href="/article.css"><link rel="stylesheet" href="/editor-settings.css"><link rel="stylesheet" href="/editor-data-management.css"><link rel="stylesheet" href="/pagination.css"></head>
 <body data-page="editor"><header></header><main class="settings-main data-main">
 <a id="dataBack" class="back" href="/editor-settings.html">← 設定・情報源に戻る</a>
 <div class="settings-heading"><h1>データ管理</h1><p>検証データや誤登録された記事を整理します。</p></div>
@@ -9,9 +9,9 @@
 <p id="publishedWarning" class="data-warning" hidden>掲載中の記事を削除すると、公開ページからも消えます。関連リンクが切れる可能性があります。</p>
 <p id="message" role="status" aria-live="polite">記事を読み込み中…</p>
 <div class="data-actions"><button id="selectAll" type="button" disabled>このページから追加（上限まで）</button><button id="clear" type="button" disabled>全選択を解除</button><span id="count">選択：0件</span></div>
-<div id="articles" class="data-list"></div><div class="data-actions"><button id="prev" type="button" disabled>前のページ</button><span id="page">1ページ</span><button id="next" type="button" disabled>次のページ</button></div>
+<div id="paginationTop"></div><div id="articles" class="data-list"></div><div id="pagination"></div>
 <button id="review" type="button" class="data-danger" disabled>削除対象を確認</button>
 </section>
 <section id="confirmationPanel" class="settings-section data-confirm" hidden aria-labelledby="confirmationTitle"><h2 id="confirmationTitle">完全削除の最終確認</h2><p id="selectedSummary"></p><ul id="selectedList"></ul><p>削除は取り消せません。記事の内容と件数を確認してから、完全削除するボタンを押してください。</p><div class="data-actions"><button id="cancel" type="button">キャンセル</button><button id="delete" type="button" class="data-danger" disabled>完全削除する</button></div><p id="deleteResult" role="status" aria-live="polite"></p></section>
 <dialog id="resultPanel" class="settings-section data-result" aria-labelledby="resultTitle"><h2 id="resultTitle" tabindex="-1"></h2><p id="resultSummary" role="status" aria-live="polite"></p><div class="data-actions"><a id="resultBack" class="data-primary" href="/editor-dashboard.html">編集室に戻る</a><button id="continueData" type="button">続けて記事を整理する</button></div></dialog>
-</main><script src="/editor-navigation.js"></script><script src="/header.js"></script><script src="/editor-session.js"></script><script src="/image-utils.js"></script><script src="/editor-data-management.js"></script></body></html>
+</main><script src="/editor-navigation.js"></script><script src="/header.js"></script><script src="/editor-session.js"></script><script src="/image-utils.js"></script><script src="/pagination.js"></script><script src="/editor-data-management.js"></script></body></html>
