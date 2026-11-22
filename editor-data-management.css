@@ -21,3 +21,8 @@
 #confirmationPanel[data-error=true]{color:#30261e}
 #confirmationPanel #deleteWarning{color:#aa3227}
 #confirmationPanel #selectedList>li>span{min-width:0;overflow-wrap:anywhere}
+
+/* Prevent background scroll and scroll chaining while a native dialog is open. */
+html.data-modal-scroll-locked{overflow:hidden;overscroll-behavior:none;scrollbar-gutter:stable}
+html.data-modal-scroll-locked body{position:fixed;top:var(--data-modal-scroll-top,0px);left:var(--data-modal-scroll-left,0px);width:100%;overflow:hidden;overscroll-behavior:none}
+.data-result{overscroll-behavior:contain}
