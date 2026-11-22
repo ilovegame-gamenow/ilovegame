@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>データ管理 | I LOVE GAME♪ 編集室</title><link rel="stylesheet" href="/header.css"><link rel="stylesheet" href="/article.css"><link rel="stylesheet" href="/editor-settings.css"><link rel="stylesheet" href="/editor-data-management.css"></head>
 <body data-page="editor"><header></header><main class="settings-main data-main">
-<a class="back" href="/editor-settings.html">← 設定・情報源に戻る</a>
+<a id="dataBack" class="back" href="/editor-settings.html">← 設定・情報源に戻る</a>
 <div class="settings-heading"><h1>データ管理</h1><p>検証データや誤登録された記事を整理します。</p></div>
-<section class="settings-section data-warning"><h2>完全削除について</h2><p>削除した記事と関連する下書き・発見経路・掲載枠・作品への記事リンクは復元できません。作品や発売日カレンダーは削除されません。通常の不採用記事は非掲載のまま残すと、同じニュースの再収集を防げます。</p><p>処理中・未処理の記事は削除対象外です。掲載中の記事は初期表示から除外しています。</p></section>
-<section class="settings-section"><h2>対象記事を検索</h2>
+<section id="dataWarning" class="settings-section data-warning"><h2>完全削除について</h2><p>削除した記事と関連する下書き・発見経路・掲載枠・作品への記事リンクは復元できません。作品や発売日カレンダーは削除されません。通常の不採用記事は非掲載のまま残すと、同じニュースの再収集を防げます。</p><p>処理中・未処理の記事は削除対象外です。掲載中の記事は初期表示から除外しています。</p></section>
+<section id="searchPanel" class="settings-section"><h2>対象記事を検索</h2>
 <form id="searchForm" class="data-search"><label>掲載状態<select id="status"><option value="unpublished">非公開（審査待ち・非掲載）</option><option value="pending">審査待ち</option><option value="rejected">非掲載</option><option value="published">掲載中（注意）</option></select></label><label>検索対象<select id="field"><option value="title">記事タイトル</option><option value="source_name">情報元</option><option value="id">記事ID</option></select></label><label>検索キーワード<input id="query" type="search" maxlength="100" placeholder="検証用の記事名など"></label><button type="submit">検索</button></form>
 <p id="publishedWarning" class="data-warning" hidden>掲載中の記事を削除すると、公開ページからも消えます。関連リンクが切れる可能性があります。</p>
 <p id="message" role="status" aria-live="polite">記事を読み込み中…</p>
@@ -13,4 +13,5 @@
 <button id="review" type="button" class="data-danger" disabled>削除対象を確認</button>
 </section>
 <section id="confirmationPanel" class="settings-section data-confirm" hidden aria-labelledby="confirmationTitle"><h2 id="confirmationTitle">完全削除の最終確認</h2><p id="selectedSummary"></p><ul id="selectedList"></ul><p>削除は取り消せません。記事の内容と件数を確認してから、完全削除するボタンを押してください。</p><div class="data-actions"><button id="cancel" type="button">キャンセル</button><button id="delete" type="button" class="data-danger" disabled>完全削除する</button></div><p id="deleteResult" role="status" aria-live="polite"></p></section>
+<section id="resultPanel" class="settings-section data-result" hidden aria-labelledby="resultTitle"><h2 id="resultTitle" tabindex="-1"></h2><p id="resultSummary" role="status" aria-live="polite"></p><div class="data-actions"><a id="resultBack" class="data-primary" href="/editor-dashboard.html">編集室に戻る</a><button id="continueData" type="button">続けて記事を整理する</button></div></section>
 </main><script src="/editor-navigation.js"></script><script src="/header.js"></script><script src="/editor-session.js"></script><script src="/editor-data-management.js"></script></body></html>
