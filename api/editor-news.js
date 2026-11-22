@@ -1,4 +1,5 @@
 import { getEditorNews, parseEditorNewsQuery } from "../lib/editor-news-repository.js";
+import { listDataArticles, deleteDataArticles } from "../lib/editor-data-management.js";
 import { savePublisherDirectory } from "../lib/publisher-directory.js";
 import { getSiteSettings } from "../lib/site-settings.js";
 import {
@@ -19,6 +20,20 @@ export default async function handler(req, res) {
   }
 
   if (!requireEditor(req, res)) return;
+
+  if (req.query.action === "article-data" || req.query.action === "delete-articles") {
+    const deleting = req.query.action === "delete-articles";
+    if (req.method !== (deleting ? "POST" : "GET")) return res.status(405).json({ error:"Method not allowed" });
+    if (deleting && !requireEditorOrigin(req,res)) return;
+    const url=process.env.SUPABASE_URL,key=process.env.SUPABASE_SECRET_KEY;
+    if (!url || !key) return res.status(503).json({error:"データ管理を利用できません。"});
+    try {
+      const result=deleting?await deleteDataArticles(url,key,req.body):await listDataArticles(url,key,req.query);
+      return res.status(result.status).json(result.body);
+    } catch {
+      return res.status(503).json({error:deleting?"削除結果を確認できません。再検索して状態を確認してください。":"記事一覧を取得できませんでした。"});
+    }
+  }
 
   if (req.method === 'POST' && req.query.action === 'publisher') {
     if (!requireEditorOrigin(req,res)) return;
