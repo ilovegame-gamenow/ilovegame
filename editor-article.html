@@ -164,6 +164,13 @@
 
         const returnUrl = params.get("return");
         const backLink = document.getElementById("editorBackLink");
+        function updateArticleDataLink() {
+          const target = mediaReturn ? '/editor-media.html' : (returnUrl && (returnUrl === '/editor-dashboard.html' || returnUrl.startsWith('/editor-dashboard.html?')) ? returnUrl : '/editor-dashboard.html');
+          const dataParams = new URLSearchParams({id:String(Number(article.id)),return:target});
+          if (article.status === 'published') dataParams.set('status','published');
+          document.getElementById('articleDataLink').href = '/editor-data-management.html?' + dataParams;
+        }
+        updateArticleDataLink();
 
         const dashboardPath = "/editor-dashboard.html";
 
@@ -354,7 +361,7 @@ document.getElementById("articleViewActions").hidden = false;
             if (!success) return;
 
             article.status = status;
-            document.getElementById("articleDataLink").href = `/editor-data-management.html?id=${encodeURIComponent(Number(article.id))}${status==='published'?'&status=published':''}`;
+            updateArticleDataLink();
 
             const statusLabel = {
               pending: "審査待ち",
