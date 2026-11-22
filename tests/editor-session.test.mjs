@@ -30,7 +30,9 @@ async function sessionTest(run) {
   if(res.headers['set-cookie'])applyCookie(res.headers['set-cookie']);
   return res;
  };
- const document={hidden:false,addEventListener(type,fn){if(!events.has(type))events.set(type,[]);events.get(type).push(fn);}};
+ const classes=new Set(),elements=new Map();
+ const makeElement=()=>({hidden:false,textContent:'',children:new Map(),contains:()=>false,addEventListener(){},querySelector(tag){if(!this.children.has(tag))this.children.set(tag,makeElement());return this.children.get(tag);}});
+ const document={hidden:false,activeElement:null,documentElement:{classList:{add:name=>classes.add(name),remove:name=>classes.delete(name),contains:name=>classes.has(name)}},head:{append(){}},body:{append(el){elements.set(el.id,el);}},createElement:makeElement,addEventListener(type,fn){if(!events.has(type))events.set(type,[]);events.get(type).push(fn);}};
  const context=vm.createContext({document,Date,console:{warn(){}},location:{replace:url=>redirects.push(url)},window:new EventTarget(),Event,
   setTimeout:(fn,delay)=>{const id=++nextId;timers.set(id,{fn,at:now+delay,interval:0});return id;},
   clearTimeout:id=>timers.delete(id),
@@ -64,7 +66,7 @@ async function sessionTest(run) {
   assert.match(loggedIn.headers['set-cookie'],/HttpOnly; Secure; SameSite=Strict; Path=\/api\/; Max-Age=3600/);
   vm.runInContext(clientScript,context);
   const start=async()=>{vm.runInContext('window.GameEditorSession.start()',context);await settle();};
-  await run({start,event,advance,suspend,dispatch,calls,redirects,document,timers,context,now:()=>now,setFailure:value=>{failure=value;},cookie:()=>cookie});
+  await run({start,event,advance,suspend,dispatch,calls,redirects,document,timers,context,covered:()=>classes.has('editor-session-covered'),cover:()=>elements.get('editor-session-cover'),now:()=>now,setFailure:value=>{failure=value;},cookie:()=>cookie});
  } finally {Date.now=realNow;if(previousSecret===undefined)delete process.env.EDITOR_SECRET;else process.env.EDITOR_SECRET=previousSecret;}
 }
 
@@ -161,5 +163,42 @@ test('history restoration checks expired authentication immediately without fetc
   s.context.window.dispatchEvent(restored);
   for(let i=0;i<8;i++)await Promise.resolve();
   assert.deepEqual(s.redirects,['/editor.html']);
+ });
+});
+
+test('backgrounding conceals the old editor before restoration and expiry redirects while concealed',async()=>{
+ await sessionTest(async s=>{
+  await s.start();assert.equal(s.covered(),false);
+  s.document.hidden=true;await s.event('visibilitychange');assert.equal(s.covered(),true);
+  s.suspend(2*HOUR);s.document.hidden=false;await s.event('visibilitychange');
+  assert.equal(s.covered(),true);assert.deepEqual(s.redirects,['/editor.html']);
+ });
+});
+test('returning while authenticated reveals editor only after verification; offline stays covered',async()=>{
+ await sessionTest(async s=>{
+  await s.start();s.document.hidden=true;await s.event('visibilitychange');s.suspend(MINUTE);
+  s.setFailure('offline');s.document.hidden=false;await s.event('visibilitychange');
+  assert.equal(s.covered(),true);assert.equal(s.cover().querySelector('button').hidden,false);assert.deepEqual(s.redirects,[]);
+  s.setFailure(null);s.context.window.dispatchEvent(new Event('focus'));for(let i=0;i<8;i++)await Promise.resolve();
+  assert.equal(s.covered(),false);
+ });
+});
+test('failed draft recovery keeps the original DOM concealed and offers re-login in a new tab',async()=>{
+ await sessionTest(async s=>{
+  await s.start();s.context.window.addEventListener('editor-session-expired',event=>event.preventDefault());
+  s.document.hidden=true;await s.event('visibilitychange');s.suspend(2*HOUR);
+  s.document.hidden=false;await s.event('visibilitychange');
+  assert.equal(s.covered(),true);assert.deepEqual(s.redirects,[]);assert.equal(s.cover().querySelector('a').hidden,false);
+ });
+});
+
+test('pagehide conceals before bfcache freeze even if visibility has not changed',async()=>{
+ await sessionTest(async s=>{
+  await s.start();s.context.window.dispatchEvent(new Event('pagehide'));
+  assert.equal(s.covered(),true);
+  await s.advance(MINUTE);assert.equal(s.covered(),true);
+  const restored=new Event('pageshow');Object.defineProperty(restored,'persisted',{value:true});
+  s.context.window.dispatchEvent(restored);for(let i=0;i<8;i++)await Promise.resolve();
+  assert.equal(s.covered(),false);
  });
 });
