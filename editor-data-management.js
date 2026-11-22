@@ -82,11 +82,15 @@
   $('deleteResult').textContent='';$('confirmationPanel').hidden=false;controls();$('confirmationPanel').scrollIntoView({block:'start'});
  });
  $('cancel').addEventListener('click',()=>{closeReview();controls();});
- $('delete').addEventListener('click',async()=>{
-  if(busy||!reviewed.length||$('confirmationPanel').hidden)return;
-  const count=reviewed.length;
-  const published=reviewed.some(r=>r.status==='published');
-  if(!window.confirm('本当に'+count+'件の記事を完全削除しますか？\n削除した記事は復元できません。'+(published?'\n掲載中の記事が含まれています。':'')))return;
+ $('delete').addEventListener('click',()=>{
+  if(busy||expiring||!reviewed.length||$('confirmationPanel').hidden)return;
+  $('deleteConfirmMessage').textContent=reviewed.length+'件の記事を完全削除します。削除した記事は復元できません。'+(reviewed.some(r=>r.status==='published')?'\n掲載中の記事が含まれています。':'');
+  $('deleteConfirmDialog').showModal();$('deleteConfirmCancel').focus();
+ });
+ $('deleteConfirmCancel').addEventListener('click',()=>$('deleteConfirmDialog').close());
+ $('deleteConfirmExecute').addEventListener('click',async()=>{
+  if(busy||expiring||!$('deleteConfirmDialog').open||!reviewed.length||$('confirmationPanel').hidden)return;
+  $('deleteConfirmDialog').close();
   const articles=reviewed.map(({id,status,updated_at})=>({id,status,updated_at}));
   const confirmation='完全削除 '+reviewed.length+'件',includePublished=reviewed.some(r=>r.status==='published');
   busy=true;controls();$('deleteResult').textContent='削除結果を確認中…';
@@ -114,7 +118,7 @@
   selected.clear();load(page);
  });
  let expiring=false;
- window.addEventListener('editor-session-expired',()=>{expiring=true;if($('resultPanel').open)$('resultPanel').close();});
+ window.addEventListener('editor-session-expired',()=>{expiring=true;if($('deleteConfirmDialog').open)$('deleteConfirmDialog').close();if($('resultPanel').open)$('resultPanel').close();});
  document.addEventListener('click',async event=>{
   if(!event.target.closest('#logoutButton')||busy)return;
   try{const r=await fetch('/api/editor-logout',{method:'POST',credentials:'same-origin'});if(!r.ok)throw Error('ログアウトできませんでした。');location.replace('/editor.html');}catch(error){status(error.message,true);}
