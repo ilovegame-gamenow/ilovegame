@@ -15,10 +15,9 @@
  function closeReview(){reviewed=[];$('confirmationPanel').hidden=true;$('deleteResult').textContent='';}
  function showResult(title,message,error=false){
   closeReview();
-  $('searchPanel').hidden=true;$('dataWarning').hidden=true;
   $('resultTitle').textContent=title;$('resultSummary').textContent=message;
-  $('resultPanel').dataset.error=String(error);$('resultPanel').hidden=false;
-  $('resultPanel').scrollIntoView({block:'start'});$('resultTitle').focus();
+  $('resultPanel').dataset.error=String(error);
+  $('resultPanel').showModal();$('resultTitle').focus();
  }
  function controls(){
   for(const id of ['status','field','query'])$(id).disabled=busy;
@@ -39,9 +38,12 @@
   for(const row of rows){
    const label=node('label');label.className='data-row';
    const check=node('input');check.type='checkbox';check.checked=selected.has(row.id);
-   const text=node('span');text.append(node('strong',row.title||'（タイトルなし）'),node('small','ID '+row.id+' ／ '+(labels[row.status]||row.status)+' ／ '+(row.source_name||'情報元なし')));
+   const thumb=node('div','画像なし');thumb.className='data-thumb';
+   const imageUrl=GameImage.getUrl(row.thumbnail_url,row.source_name||'');
+   if(imageUrl){const img=node('img');img.src=imageUrl;img.alt='';img.loading='lazy';img.addEventListener('error',()=>{thumb.textContent='画像なし';},{once:true});thumb.replaceChildren(img);}
+   const text=node('span');text.className='data-copy';text.append(node('strong',row.title||'（タイトルなし）'),node('small','ID '+row.id+' ／ '+(labels[row.status]||row.status)+' ／ '+(row.source_name||'情報元なし')));
    check.addEventListener('change',()=>{closeReview();if(check.checked){if(selected.size>=SELECTION_LIMIT){check.checked=false;status('一度に選択できるのは最大'+SELECTION_LIMIT+'件です。',true);}else selected.set(row.id,row);}else selected.delete(row.id);controls();});
-   label.append(check,text);$('articles').append(label);
+   label.append(check,thumb,text);$('articles').append(label);
   }
   if(!rows.length)$('articles').append(node('p','対象の記事はありません。'));
   controls();
@@ -91,7 +93,7 @@
    const result=await request('delete-articles',{body:{articles,confirmation,includePublished}});
    if(result.deletedIds.length)window.GameEditorNavigation?.markChanged();
    const summary='削除済み：'+result.deletedIds.length+'件'+(result.deletedIds.length?'（ID '+result.deletedIds.join('、')+'）':'')+(result.remainingIds.length?'。未削除：'+result.remainingIds.length+'件（ID '+result.remainingIds.join('、')+'）。再検索して確認してください。':'。');
-   selected.clear();rows=[];hasMore=false;
+   selected.clear();rows=rows.filter(r=>!result.deletedIds.includes(r.id));
    showResult(result.remainingIds.length?(result.deletedIds.length?'一部の記事を削除できませんでした':'記事を削除できませんでした'):'✓ 記事を削除しました',summary,result.remainingIds.length>0);
   }catch(error){
    // Never retry a deletion automatically, including a lost response.
@@ -101,11 +103,17 @@
  });
  $('continueData').addEventListener('click',()=>{
   if(busy)return;
-  $('resultPanel').hidden=true;$('dataWarning').hidden=false;$('searchPanel').hidden=false;
-  $('status').value='unpublished';$('field').value='title';$('query').value='';
-  activeSearch={status:'unpublished',field:'title',q:''};
-  selected.clear();load(1);$('searchPanel').scrollIntoView({block:'start'});
+  $('resultPanel').close();
  });
+ $('resultPanel').addEventListener('close',()=>{
+  if(expiring)return;
+  if(direct&&activeSearch.field==='id'&&activeSearch.q===String(id)){
+   $('status').value='unpublished';$('field').value='title';$('query').value='';activeSearch={status:'unpublished',field:'title',q:''};page=1;
+  }
+  selected.clear();load(page);
+ });
+ let expiring=false;
+ window.addEventListener('editor-session-expired',()=>{expiring=true;if($('resultPanel').open)$('resultPanel').close();});
  document.addEventListener('click',async event=>{
   if(!event.target.closest('#logoutButton')||busy)return;
   try{const r=await fetch('/api/editor-logout',{method:'POST',credentials:'same-origin'});if(!r.ok)throw Error('ログアウトできませんでした。');location.replace('/editor.html');}catch(error){status(error.message,true);}
