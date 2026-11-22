@@ -3,12 +3,20 @@ window.GameFeatured = (() => {
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' })[c]);
   function render({ breaking = null, pickup = [] }, { clickable = true } = {}) {
     const box = document.getElementById('breaking');
+    let heading = document.getElementById('breaking-heading');
+    if (!heading) {
+      heading = document.createElement('div');
+      heading.id = 'breaking-heading';
+      heading.className = 'section-title breaking-heading';
+      heading.innerHTML = `<h2><svg class="section-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m13 2-9 12h7l-1 8 10-12h-7l1-8Z"/></svg>BREAKING <span class="section-subtitle">速報</span></h2>`;
+      box.before(heading);
+    }
+    heading.hidden = !breaking;
     box.hidden = !breaking;
     box.replaceChildren();
     if (breaking) {
       const image = GameImage.getUrl(breaking.thumbnail_url, breaking.source_name);
-      box.innerHTML = `<div class="breaking-label"><svg class="section-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m13 2-9 12h7l-1 8 10-12h-7l1-8Z"/></svg>BREAKING <span class="section-subtitle">速報</span></div>
-        ${image ? `<img id="breaking-image" src="${esc(image)}" alt="">` : ''}
+      box.innerHTML = `${image ? `<img id="breaking-image" src="${esc(image)}" alt="">` : ''}
         <h1>${esc(breaking.title)}</h1>
         ${GameDate.renderMeta('', breaking.site_published_at || breaking.published_at || breaking.created_at, {showSource:false})}
         ${GamePlatforms.render(breaking.platforms)}`;
