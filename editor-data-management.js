@@ -22,6 +22,7 @@
  function controls(){
   for(const id of ['status','field','query'])$(id).disabled=busy;
   $('searchForm').querySelector('button').disabled=busy;
+  if($('clearQuery'))$('clearQuery').disabled=busy||(!$('query').value&&!activeSearch.q);
   $('selectAll').disabled=busy||!rows.length||rows.every(r=>selected.has(r.id))||selected.size>=SELECTION_LIMIT;
   $('clear').disabled=busy||!selected.size;
   $('review').disabled=busy||!selected.size;
@@ -69,6 +70,8 @@
  }
  function search(){if(busy)return;activeSearch={status:$('status').value,field:$('field').value,q:$('query').value.trim()};load(1);}
  $('searchForm').addEventListener('submit',event=>{event.preventDefault();search();});
+ $('query').addEventListener('input',()=>{if($('clearQuery'))$('clearQuery').disabled=busy||(!$('query').value&&!activeSearch.q);});
+ $('clearQuery')?.addEventListener('click',()=>{if(busy)return;$('query').value='';search();});
  $('status').addEventListener('change',search);
  $('selectAll').addEventListener('click',()=>{closeReview();for(const row of rows){if(selected.size>=SELECTION_LIMIT)break;if(!selected.has(row.id))selected.set(row.id,row);}render();});
  $('clear').addEventListener('click',()=>{closeReview();selected.clear();render();});
