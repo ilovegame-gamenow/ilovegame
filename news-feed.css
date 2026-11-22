@@ -43,3 +43,6 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #126a
   .feed-filters{gap:2px}
   .feed-filters button{padding-inline:2px}
 }
+
+/* Desktop news headlines: slightly stronger than the navigation controls. */
+@media(min-width:1025px){.news-feed .card h3{font-size:16px}}
