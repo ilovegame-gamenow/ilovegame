@@ -141,9 +141,7 @@ html.public-site-frame{background:#e9dece}
 body.public-site-page{--site-frame-dark:#25211e;--site-frame-line:#b9a992;box-sizing:border-box;min-width:0;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
 body.public-site-page>header{border-top:16px solid var(--site-frame-dark);flex-shrink:0}
 body.public-site-page>main{width:100%;box-sizing:border-box;flex:1 0 auto}
-body.public-site-page>.public-site-footer{background:var(--site-frame-dark);color:#fff;text-align:center;padding:14px 20px;font-size:12px;flex-shrink:0}
-body.public-site-page>.public-site-footer .footer-logo{font-size:20px;font-weight:1000;margin-bottom:5px}
-body.public-site-page>.public-site-footer .footer-logo span{color:#ff9a55}
+body.public-site-page>.public-site-footer{background:#fff;color:#665b51;text-align:center;padding:0;font-size:12px;flex-shrink:0;border-top:3px solid #ff7a2f}
 @media(min-width:1100px){
   html.public-site-frame{padding:24px 32px}
   body.public-site-page{width:100%;max-width:1280px;margin:0 auto;min-height:calc(100vh - 48px);min-height:calc(100dvh - 48px);border:1px solid var(--site-frame-line);box-shadow:0 4px 20px #58442a18}
@@ -177,8 +175,8 @@ body.public-site-page>.public-site-footer .footer-logo span{color:#ff9a55}
 /* Align public headers with the wider news layout. */
 body.public-site-page .header-inner{max-width:1160px}
 
-body.public-site-page>.public-site-footer .footer-nav{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:4px 20px;margin:9px 0 4px}
-body.public-site-page>.public-site-footer .footer-nav a{color:#f4e9dd;font-size:12px;font-weight:600;text-decoration:none;padding:6px 0}
+body.public-site-page>.public-site-footer .footer-nav{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:0 8px;margin:0;min-height:28px;padding:1px 8px}
+body.public-site-page>.public-site-footer .footer-nav a{color:#665b51;font-size:11px;font-weight:400;text-decoration:none;padding:5px 7px;white-space:nowrap}
 body.public-site-page>.public-site-footer .footer-nav a:hover,body.public-site-page>.public-site-footer .footer-nav a[aria-current=page]{text-decoration:underline;text-underline-offset:3px}
 body.public-site-page>.public-site-footer .footer-nav a:focus-visible{outline:2px solid #ff9a55;outline-offset:3px}
-body.public-site-page>.public-site-footer .footer-copyright{display:block;font-size:11px;color:#d0c5bb;line-height:1.5}
+body.public-site-page>.public-site-footer .footer-copyright{display:flex;align-items:center;justify-content:center;min-height:26px;padding:3px 8px;background:var(--site-frame-dark);font-size:11px;color:#f4e9dd;line-height:1.5}
