@@ -135,3 +135,16 @@ header .header-brand-group{padding-right:80px}
   .section-title h2 .section-subtitle,.breaking-label .section-subtitle{font-size:10px}
   .section-icon{width:18px;height:18px;flex-basis:18px}
 }
+
+/* Public site frame: a single continuous panel with matching dark caps. */
+html.public-site-frame{background:#e9dece}
+body.public-site-page{--site-frame-dark:#25211e;--site-frame-line:#b9a992;box-sizing:border-box;min-width:0;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+body.public-site-page>header{border-top:7px solid var(--site-frame-dark);flex-shrink:0}
+body.public-site-page>main{width:100%;box-sizing:border-box;flex:1 0 auto}
+body.public-site-page>.public-site-footer{background:var(--site-frame-dark);color:#fff;text-align:center;padding:30px 20px;font-size:12px;flex-shrink:0}
+body.public-site-page>.public-site-footer .footer-logo{font-size:20px;font-weight:1000;margin-bottom:5px}
+body.public-site-page>.public-site-footer .footer-logo span{color:#ff9a55}
+@media(min-width:1100px){
+  html.public-site-frame{padding:24px 32px}
+  body.public-site-page{width:100%;max-width:1280px;margin:0 auto;min-height:calc(100vh - 48px);min-height:calc(100dvh - 48px);border:1px solid var(--site-frame-line);box-shadow:0 4px 20px #58442a18}
+}
