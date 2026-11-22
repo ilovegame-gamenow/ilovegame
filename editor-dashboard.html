@@ -6,6 +6,7 @@
   <title>I LOVE GAME♪ 編集室</title>
   <link rel="stylesheet" href="/header.css">
   <link rel="stylesheet" href="/news-card.css">
+  <link rel="stylesheet" href="/news-feed.css">
   <link rel="stylesheet" href="/pagination.css">
   <link rel="stylesheet" href="/editor-filters.css">
   <link rel="stylesheet" href="/editor-recovery.css">
@@ -43,7 +44,7 @@
     main {
       max-width: 1200px;
       margin: 24px auto;
-      padding: 0 16px;
+      padding: 0 20px;
     }
      .panel {
       background: transparent;
@@ -121,53 +122,35 @@
       color: white;
     }
     .message { color: #666; font-size: 14px; }
-    /* 編集室の記事カード一覧 */
+    /* 記事のグリッド・画像・文字・機種タグは公開NEWS FEEDと共通。 */
 #articlesList {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
 }
-    @media (max-width: 900px) {
-  #articlesList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 600px) {
-  #articlesList {
-    grid-template-columns: 1fr;
-  }
-}
-
 #articlesList .article {
   min-width: 0;
   padding: 0;
-  overflow: hidden;
+  border-bottom: 0;
   display: flex;
   flex-direction: column;
 }
-/* 記事カードを伸ばし、管理エリアを下に揃える */
 #articlesList .card {
   flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
 }
-/* 編集室専用の管理エリア */
-    #articlesList .article-management {
+/* 編集室専用の操作欄だけをカード末尾に追加する。 */
+#articlesList .article-management {
+  order: 4;
   margin-top: auto;
-  padding: 8px 4px;
+  padding: 8px 12px 12px;
   border-top: 1px solid #eee2d8;
 }
 #articlesList .article-top {
-  margin-top: 8px;
-  padding: 0 4px;
+  margin: 0 0 8px;
   align-items: center;
 }
-
+#articlesList .article-top .meta {
+  margin: 0;
+}
 #articlesList .actions {
-  margin-bottom: 8px;
-  padding: 6px 4px 0;
   gap: 6px;
 }
 #articlesList .actions button {
@@ -179,9 +162,15 @@
   font-weight: 500;
   white-space: nowrap;
 }
+@media (max-width: 600px) {
+  #articlesList .article-management { padding-inline: 10px; }
+}
+@media (max-width: 359px) {
+  #articlesList .article-management { padding-inline: 8px; }
+}
     @media (max-width: 600px) {
       h1 { font-size: 18px; }
-      .article-top { flex-direction: column; }
+      .article-top { flex-wrap: wrap; }
     }
     
   </style>
@@ -232,7 +221,7 @@
 <p class="message" id="message" role="status" aria-live="polite"></p>
 <button id="retryArticles" class="retry-articles" type="button" hidden>もう一度読み込む</button>
 <div id="paginationTop"></div>
-<div id="articlesList"></div>
+<div id="articlesList" class="news-feed"></div>
 <div id="pagination"></div>
     </section>
   </main>
@@ -395,7 +384,8 @@ function renderPagination() {
 
         const card = document.createElement("div");
 card.innerHTML = GameNewsCard.render(article, {
-  clickable: false
+  clickable: false,
+  compact: true
 });
 
 const cardElement = card.querySelector(".card");
