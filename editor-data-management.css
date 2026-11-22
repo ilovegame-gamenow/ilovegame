@@ -3,3 +3,9 @@
 
 .data-list{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.data-row{position:relative;display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden;background:#fff;min-width:0}.data-row input[type=checkbox]{position:absolute;top:9px;left:9px;z-index:1;margin:0;box-shadow:0 0 0 4px #fff;border-radius:5px}.data-thumb{width:100%;aspect-ratio:16/9;background:#f2e6da;display:grid;place-items:center;color:#796b60;font-size:12px;overflow:hidden}.data-thumb img{width:100%;height:100%;object-fit:cover}.data-row .data-copy{padding:10px;line-height:1.45;width:100%}.data-row strong{font-size:14px}.data-row:has(input:checked){outline:2px solid #bd551d;outline-offset:-2px}.data-result{width:min(90vw,480px);max-height:85vh;overflow:auto;margin:auto;border-radius:18px;background:#fff;box-shadow:0 12px 60px #0003;color:#30261e}.data-result::backdrop{background:#0008}.data-result:not([open]){display:none}.data-result .data-actions{gap:12px}.data-result .data-actions>*{flex:1 1 150px;text-align:center}@media(max-width:800px){.data-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 #deleteConfirmMessage{white-space:pre-wrap;line-height:1.8;overflow-wrap:anywhere}
+
+/* Keep removal controls aligned independently of article title length. */
+#selectedList{padding-left:0;list-style:none;display:grid;gap:8px}
+#selectedList>li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #e8ddd1;overflow-wrap:anywhere}
+#selectedList>li:last-child{border-bottom:0}
+#selectedList>li>button{justify-self:end;white-space:nowrap;overflow-wrap:normal}
