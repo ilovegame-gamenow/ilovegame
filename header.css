@@ -148,3 +148,28 @@ body.public-site-page>.public-site-footer .footer-logo span{color:#ff9a55}
   html.public-site-frame{padding:24px 32px}
   body.public-site-page{width:100%;max-width:1280px;margin:0 auto;min-height:calc(100vh - 48px);min-height:calc(100dvh - 48px);border:1px solid var(--site-frame-line);box-shadow:0 4px 20px #58442a18}
 }
+
+/* Keep public navigation aligned with the brand on narrow screens. */
+@media(max-width:600px){
+  body.public-site-page>header{padding:14px 12px 12px}
+  body.public-site-page .header-inner{align-items:center;flex-wrap:nowrap;gap:8px}
+  body.public-site-page .header-brand-group{padding-right:38px;min-width:0;max-width:none}
+  body.public-site-page .brand{gap:7px;white-space:nowrap}
+  body.public-site-page .logo{font-size:clamp(16px,4.6vw,24px)}
+  body.public-site-page .logo-mark{width:34px;height:34px;font-size:20px;flex:none}
+  body.public-site-page .header-mascot{width:34px;height:34px}
+  body.public-site-page .tagline{font-size:10px}
+  body.public-site-page header nav{flex:none;flex-wrap:nowrap;align-items:center;margin-left:auto}
+  body.public-site-page header nav a{padding:8px 9px;line-height:1.3;white-space:nowrap}
+}
+@media(max-width:359px){
+  body.public-site-page>header{padding-inline:10px}
+  body.public-site-page .header-inner{gap:5px}
+  body.public-site-page .header-brand-group{padding-right:30px}
+  body.public-site-page .brand{gap:5px}
+  body.public-site-page .logo{font-size:14px}
+  body.public-site-page .logo-mark{width:29px;height:29px;font-size:17px}
+  body.public-site-page .header-mascot{width:28px;height:28px}
+  body.public-site-page .tagline{font-size:9px}
+  body.public-site-page header nav a{font-size:10px;padding-inline:7px}
+}

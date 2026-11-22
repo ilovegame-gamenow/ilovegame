@@ -28,3 +28,18 @@
   opacity: 0.35;
   cursor: default;
 }
+
+/* Keep both direction buttons on one line; nearby page numbers remain tappable. */
+@media(max-width:600px){
+  body.public-site-page .pagination{gap:5px;flex-wrap:nowrap}
+  body.public-site-page .pagination>.pagination{margin:0;max-width:100%}
+  body.public-site-page .pagination button{white-space:nowrap;min-height:38px;padding:7px 9px;font-size:12px}
+  body.public-site-page .pagination .pagination-number{min-width:32px;padding-inline:6px}
+  body.public-site-page .pagination .pagination-number:not(.pagination-near),
+  body.public-site-page .pagination .pagination-ellipsis{display:none}
+}
+@media(max-width:359px){
+  body.public-site-page .pagination{gap:3px}
+  body.public-site-page .pagination button{font-size:11px;padding-inline:6px}
+  body.public-site-page .pagination .pagination-number{min-width:27px;padding-inline:4px}
+}

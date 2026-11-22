@@ -19,7 +19,11 @@
       const button = document.createElement("button");
       button.textContent = label;
       button.disabled = disabled;
-      if (active) button.className = "active";
+      if (active) button.classList.add("active");
+      if (typeof label === "string" && /^\d+$/.test(label)) {
+        button.classList.add("pagination-number");
+        if (Math.abs(page - current) <= 1) button.classList.add("pagination-near");
+      } else button.classList.add("pagination-direction");
       button.addEventListener("click", () => onPageClick(page));
       container.appendChild(button);
     }
@@ -30,6 +34,7 @@
       if (index > 0 && page - ordered[index - 1] > 1) {
         const dots = document.createElement("span");
         dots.textContent = "…";
+        dots.className = "pagination-ellipsis";
         container.appendChild(dots);
       }
       addButton(String(page), page, false, page === current);
