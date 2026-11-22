@@ -33,17 +33,36 @@
   cursor: default;
 }
 
-/* Keep both direction buttons on one line; nearby page numbers remain tappable. */
+/* The same page numbers are visible on every screen. */
+.pagination > .pagination { margin:0; max-width:100%; }
+.pagination-numbers {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:inherit;
+  min-width:0;
+}
+.pagination-direction { white-space:nowrap; }
+.pagination-ellipsis { flex:none; }
 @media(max-width:600px){
-  :is(body.public-site-page,body[data-page="editor"]) .pagination{gap:5px;flex-wrap:nowrap}
-  :is(body.public-site-page,body[data-page="editor"]) .pagination>.pagination{margin:0;max-width:100%}
-  :is(body.public-site-page,body[data-page="editor"]) .pagination button{white-space:nowrap;min-height:38px;padding:7px 9px;font-size:12px}
-  :is(body.public-site-page,body[data-page="editor"]) .pagination .pagination-number{min-width:32px;padding-inline:6px}
-  :is(body.public-site-page,body[data-page="editor"]) .pagination .pagination-number:not(.pagination-near),
-  :is(body.public-site-page,body[data-page="editor"]) .pagination .pagination-ellipsis{display:none}
+  .pagination { gap:6px; }
+  .pagination.pagination-control {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    width:fit-content;
+    max-width:100%;
+    margin-inline:auto;
+    column-gap:8px;
+    row-gap:8px;
+  }
+  .pagination-numbers { grid-column:1/-1; grid-row:1; gap:5px; }
+  .pagination-direction { grid-row:2; justify-self:stretch; }
+  .pagination button { min-height:44px; padding:7px 9px; font-size:12px; }
+  .pagination .pagination-number { min-width:32px; padding-inline:6px; }
 }
 @media(max-width:359px){
-  :is(body.public-site-page,body[data-page="editor"]) .pagination{gap:3px}
-  :is(body.public-site-page,body[data-page="editor"]) .pagination button{font-size:11px;padding-inline:6px}
-  :is(body.public-site-page,body[data-page="editor"]) .pagination .pagination-number{min-width:27px;padding-inline:4px}
+  .pagination-numbers { gap:3px; }
+  .pagination button { font-size:11px; padding-inline:6px; }
+  .pagination .pagination-number { min-width:27px; padding-inline:4px; }
 }
