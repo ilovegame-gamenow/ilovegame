@@ -2,10 +2,24 @@
  const $=id=>document.getElementById(id);
  const labels={pending:'審査待ち',rejected:'非掲載',published:'掲載中'};
  const SELECTION_LIMIT=20;
+ const params=new URLSearchParams(location.search),id=Number(params.get('id'));
+ const direct=Number.isSafeInteger(id)&&id>0;
+ const returnTarget=params.get('return')||'';
+ const safeReturn=returnTarget==='/editor-media.html'||returnTarget==='/editor-dashboard.html'||returnTarget.startsWith('/editor-dashboard.html?')?returnTarget:'/editor-dashboard.html';
+ if(direct){$('dataBack').href=safeReturn;$('dataBack').textContent='← 元の記事一覧に戻る';}
+ $('resultBack').href=safeReturn;
+ $('resultBack').textContent=direct?'元の記事一覧に戻る':'編集室に戻る';
  let rows=[],selected=new Map(),page=1,hasMore=false,busy=false,reviewed=[],activeSearch={status:'unpublished',field:'title',q:''};
  const node=(tag,text)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;return el;};
  function status(text,error=false){$('message').textContent=text;$('message').dataset.error=String(error);}
  function closeReview(){reviewed=[];$('confirmationPanel').hidden=true;$('deleteResult').textContent='';}
+ function showResult(title,message,error=false){
+  closeReview();
+  $('searchPanel').hidden=true;$('dataWarning').hidden=true;
+  $('resultTitle').textContent=title;$('resultSummary').textContent=message;
+  $('resultPanel').dataset.error=String(error);$('resultPanel').hidden=false;
+  $('resultPanel').scrollIntoView({block:'start'});$('resultTitle').focus();
+ }
  function controls(){
   for(const id of ['status','field','query'])$(id).disabled=busy;
   $('searchForm').querySelector('button').disabled=busy;
@@ -67,6 +81,9 @@
  $('cancel').addEventListener('click',()=>{closeReview();controls();});
  $('delete').addEventListener('click',async()=>{
   if(busy||!reviewed.length||$('confirmationPanel').hidden)return;
+  const count=reviewed.length;
+  const published=reviewed.some(r=>r.status==='published');
+  if(!window.confirm('本当に'+count+'件の記事を完全削除しますか？\n削除した記事は復元できません。'+(published?'\n掲載中の記事が含まれています。':'')))return;
   const articles=reviewed.map(({id,status,updated_at})=>({id,status,updated_at}));
   const confirmation='完全削除 '+reviewed.length+'件',includePublished=reviewed.some(r=>r.status==='published');
   busy=true;controls();$('deleteResult').textContent='削除結果を確認中…';
@@ -74,17 +91,25 @@
    const result=await request('delete-articles',{body:{articles,confirmation,includePublished}});
    if(result.deletedIds.length)window.GameEditorNavigation?.markChanged();
    const summary='削除済み：'+result.deletedIds.length+'件'+(result.deletedIds.length?'（ID '+result.deletedIds.join('、')+'）':'')+(result.remainingIds.length?'。未削除：'+result.remainingIds.length+'件（ID '+result.remainingIds.join('、')+'）。再検索して確認してください。':'。');
-   selected.clear();busy=false;await load(1,summary);
+   selected.clear();rows=[];hasMore=false;
+   showResult(result.remainingIds.length?(result.deletedIds.length?'一部の記事を削除できませんでした':'記事を削除できませんでした'):'✓ 記事を削除しました',summary,result.remainingIds.length>0);
   }catch(error){
    // Never retry a deletion automatically, including a lost response.
-   selected.clear();closeReview();rows=[];hasMore=false;status(error.message+' 状態を確認するため検索し直してください。',true);
+   window.GameEditorNavigation?.markChanged();
+   selected.clear();rows=[];hasMore=false;showResult('削除結果を確認してください',error.message+'\n続けて記事を整理するボタンから、再検索して状態を確認してください。',true);
   }finally{busy=false;render();}
+ });
+ $('continueData').addEventListener('click',()=>{
+  if(busy)return;
+  $('resultPanel').hidden=true;$('dataWarning').hidden=false;$('searchPanel').hidden=false;
+  $('status').value='unpublished';$('field').value='title';$('query').value='';
+  activeSearch={status:'unpublished',field:'title',q:''};
+  selected.clear();load(1);$('searchPanel').scrollIntoView({block:'start'});
  });
  document.addEventListener('click',async event=>{
   if(!event.target.closest('#logoutButton')||busy)return;
   try{const r=await fetch('/api/editor-logout',{method:'POST',credentials:'same-origin'});if(!r.ok)throw Error('ログアウトできませんでした。');location.replace('/editor.html');}catch(error){status(error.message,true);}
  });
  GameEditorSession.start();
- const params=new URLSearchParams(location.search),id=Number(params.get('id'));
- if(Number.isSafeInteger(id)&&id>0){$('field').value='id';$('query').value=String(id);$('status').value=params.get('status')==='published'?'published':'unpublished';activeSearch={status:$('status').value,field:'id',q:String(id)};load(1,'',id);}else load();
+ if(direct){$('field').value='id';$('query').value=String(id);$('status').value=params.get('status')==='published'?'published':'unpublished';activeSearch={status:$('status').value,field:'id',q:String(id)};load(1,'',id);}else load();
 })();
