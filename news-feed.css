@@ -1,7 +1,7 @@
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .feed-tools{margin:0 0 12px}.feed-tools button,.feed-tools input{font:inherit}
 #feed-search{display:flex;gap:8px;margin-bottom:10px}#feed-query{min-width:0;flex:1;border:1px solid var(--line);border-radius:12px;background:white;padding:12px;font-size:14px}
-.feed-tools button{cursor:pointer;min-height:44px;border:1px solid var(--line);border-radius:999px;background:white;color:var(--ink);padding:8px 16px;font-size:13px;font-weight:700}
+.feed-tools button{cursor:pointer;min-height:var(--button-height);border:1px solid var(--line);border-radius:999px;background:white;color:var(--ink);padding:var(--button-pad-y) var(--button-pad-x);font-size:var(--button-font);font-weight:700}
 #feed-search button[type=submit]{background:var(--orange);color:white;border-color:var(--orange)}
 .feed-filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:0;white-space:nowrap;overscroll-behavior-x:contain}
 .feed-filters button{flex:none}.feed-filters button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:white}

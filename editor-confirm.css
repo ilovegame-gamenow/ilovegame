@@ -17,12 +17,13 @@
 .editor-confirm-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 26px; }
 .editor-confirm button {
   min-height: 48px;
-  padding: 12px 8px;
+  padding: var(--button-pad-y) 8px;
   border: 1px solid #dacabb;
   border-radius: 12px;
   background: #fff;
   color: #555;
   font: inherit;
+  font-size: var(--button-font);
   font-weight: 700;
   cursor: pointer;
 }

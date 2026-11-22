@@ -150,12 +150,14 @@ body[data-page="editor"] .editor-actions {
 
 body[data-page="editor"] .editor-actions button,
 body[data-page="editor"] .editor-form-actions button {
-  padding: 12px 18px;
+  padding: var(--button-pad-y) var(--button-pad-x);
+  min-height: var(--button-height);
   border: 1px solid #e7d8ca;
   border-radius: 10px;
   background: #fff7f0;
   color: #a95012;
   font: inherit;
+  font-size: var(--button-font);
   font-weight: 700;
   cursor: pointer;
 }

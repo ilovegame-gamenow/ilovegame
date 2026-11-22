@@ -1,5 +1,18 @@
 
 /* I LOVE GAME♪ 共通ヘッダー */
+:root {
+  --button-font:16px;
+  --button-pad-y:12px;
+  --button-pad-x:20px;
+  --button-height:48px;
+}
+@media(max-width:1024px){
+  :root{--button-font:14px;--button-pad-y:10px;--button-pad-x:16px;--button-height:44px}
+}
+@media(max-width:600px){
+  :root{--button-font:12px;--button-pad-y:8px;--button-pad-x:12px;--button-height:44px}
+}
+/* Dense grids and icon-only controls retain their own dimensions. */
 
 header {
   background: #fff;
@@ -73,10 +86,10 @@ header nav {
 header nav a {
   color: #24201d;
   text-decoration: none;
-  font-size: 12px;
+  font-size: var(--button-font);
   font-weight: 800;
   white-space: nowrap;
-  padding: 8px 11px;
+  padding: var(--button-pad-y) var(--button-pad-x);
   border-radius: 999px;
   background: #fff3e9;
 }
@@ -185,7 +198,7 @@ body.public-site-page .header-inner{max-width:1160px}
 :is(body[data-page="editor"],body.editor-login-page) .header-inner{max-width:1160px}
 :is(body[data-page="editor"],body.editor-login-page) .editor-header-actions{display:flex;align-items:center;gap:12px;flex:none}
 :is(body[data-page="editor"],body.editor-login-page) .editor-header-label{font-size:18px;font-weight:800;white-space:nowrap;color:#24201d}
-body[data-page="editor"] .editor-header-actions .logout{background:#fff3e9;border:1px solid #ff7a2f;color:#b34d12;font:inherit;font-size:13px;font-weight:700;padding:9px 12px;border-radius:9px;white-space:nowrap;cursor:pointer}
+body[data-page="editor"] .editor-header-actions .logout{background:#fff3e9;border:1px solid #ff7a2f;color:#b34d12;font:inherit;font-size:var(--button-font);font-weight:700;padding:var(--button-pad-y) var(--button-pad-x);border-radius:9px;white-space:nowrap;cursor:pointer}
 body.editor-login-page>main{margin:0 auto}
 @media(max-width:600px){
   :is(body[data-page="editor"],body.editor-login-page)>header{padding:14px 12px 12px}
@@ -208,4 +221,8 @@ body.editor-login-page>main{margin:0 auto}
   :is(body[data-page="editor"],body.editor-login-page) .logo-mark{width:29px;height:29px;font-size:17px}
   :is(body[data-page="editor"],body.editor-login-page) .header-mascot{width:28px;height:28px}
   :is(body[data-page="editor"],body.editor-login-page) .tagline{font-size:9px}
+}
+
+@media(min-width:601px){
+  body.public-site-page header nav a,body[data-page="editor"] .editor-header-actions .logout{display:inline-flex;align-items:center;justify-content:center;min-height:var(--button-height);box-sizing:border-box}
 }

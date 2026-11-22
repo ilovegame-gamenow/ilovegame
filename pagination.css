@@ -13,11 +13,15 @@
   border: 0;
   background: #fff3e9;
   color: #24201d;
-  padding: 9px 13px;
+  padding: var(--button-pad-y) var(--button-pad-x);
+  font-size: var(--button-font);
+  min-height: var(--button-height);
   border-radius: 999px;
   font-weight: 800;
   cursor: pointer;
 }
+
+.pagination .pagination-number { min-width:var(--button-height); padding-inline:8px; }
 
 .pagination button.active {
   background: #ff7a2f;
@@ -31,15 +35,15 @@
 
 /* Keep both direction buttons on one line; nearby page numbers remain tappable. */
 @media(max-width:600px){
-  body.public-site-page .pagination{gap:5px;flex-wrap:nowrap}
-  body.public-site-page .pagination>.pagination{margin:0;max-width:100%}
-  body.public-site-page .pagination button{white-space:nowrap;min-height:38px;padding:7px 9px;font-size:12px}
-  body.public-site-page .pagination .pagination-number{min-width:32px;padding-inline:6px}
-  body.public-site-page .pagination .pagination-number:not(.pagination-near),
-  body.public-site-page .pagination .pagination-ellipsis{display:none}
+  :is(body.public-site-page,body[data-page="editor"]) .pagination{gap:5px;flex-wrap:nowrap}
+  :is(body.public-site-page,body[data-page="editor"]) .pagination>.pagination{margin:0;max-width:100%}
+  :is(body.public-site-page,body[data-page="editor"]) .pagination button{white-space:nowrap;min-height:38px;padding:7px 9px;font-size:12px}
+  :is(body.public-site-page,body[data-page="editor"]) .pagination .pagination-number{min-width:32px;padding-inline:6px}
+  :is(body.public-site-page,body[data-page="editor"]) .pagination .pagination-number:not(.pagination-near),
+  :is(body.public-site-page,body[data-page="editor"]) .pagination .pagination-ellipsis{display:none}
 }
 @media(max-width:359px){
-  body.public-site-page .pagination{gap:3px}
-  body.public-site-page .pagination button{font-size:11px;padding-inline:6px}
-  body.public-site-page .pagination .pagination-number{min-width:27px;padding-inline:4px}
+  :is(body.public-site-page,body[data-page="editor"]) .pagination{gap:3px}
+  :is(body.public-site-page,body[data-page="editor"]) .pagination button{font-size:11px;padding-inline:6px}
+  :is(body.public-site-page,body[data-page="editor"]) .pagination .pagination-number{min-width:27px;padding-inline:4px}
 }

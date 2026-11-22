@@ -21,8 +21,10 @@
     button:not(.pagination button) {
       cursor: pointer;
       font: inherit;
+      font-size: var(--button-font);
+      min-height: var(--button-height);
       border-radius: 9px;
-      padding: 10px 14px;
+      padding: var(--button-pad-y) var(--button-pad-x);
     }
     button:disabled { cursor: default; opacity: .65; }
     .logout {
