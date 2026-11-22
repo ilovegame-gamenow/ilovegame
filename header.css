@@ -136,15 +136,15 @@ header .header-brand-group{padding-right:80px}
   .section-icon{width:18px;height:18px;flex-basis:18px}
 }
 
-/* Public site frame: a single continuous panel with matching dark caps. */
+/* Shared site frame: a single continuous panel with matching dark caps. */
 html.public-site-frame{background:#e9dece}
-body.public-site-page{--site-frame-dark:#25211e;--site-frame-line:#b9a992;box-sizing:border-box;min-width:0;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
-body.public-site-page>header{border-top:16px solid var(--site-frame-dark);flex-shrink:0}
-body.public-site-page>main{width:100%;box-sizing:border-box;flex:1 0 auto}
-body.public-site-page>.public-site-footer{background:#fff;color:#665b51;text-align:center;padding:0;font-size:12px;flex-shrink:0;border-top:3px solid #ff7a2f}
+:is(body.public-site-page,body[data-page="editor"],body.editor-login-page){--site-frame-dark:#25211e;--site-frame-line:#b9a992;box-sizing:border-box;min-width:0;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+:is(body.public-site-page,body[data-page="editor"],body.editor-login-page)>header{border-top:16px solid var(--site-frame-dark);flex-shrink:0}
+:is(body.public-site-page,body[data-page="editor"],body.editor-login-page)>main{width:100%;box-sizing:border-box;flex:1 0 auto}
+:is(body.public-site-page,body[data-page="editor"],body.editor-login-page)>.public-site-footer{background:#fff;color:#665b51;text-align:center;padding:0;font-size:12px;flex-shrink:0;border-top:3px solid #ff7a2f}
 @media(min-width:1100px){
   html.public-site-frame{padding:24px 32px}
-  body.public-site-page{width:100%;max-width:1280px;margin:0 auto;min-height:calc(100vh - 48px);min-height:calc(100dvh - 48px);border:1px solid var(--site-frame-line);box-shadow:0 4px 20px #58442a18}
+  :is(body.public-site-page,body[data-page="editor"],body.editor-login-page){width:100%;max-width:1280px;margin:0 auto;min-height:calc(100vh - 48px);min-height:calc(100dvh - 48px);border:1px solid var(--site-frame-line);box-shadow:0 4px 20px #58442a18}
 }
 
 /* Keep public navigation aligned with the brand on narrow screens. */
@@ -175,8 +175,37 @@ body.public-site-page>.public-site-footer{background:#fff;color:#665b51;text-ali
 /* Align public headers with the wider news layout. */
 body.public-site-page .header-inner{max-width:1160px}
 
-body.public-site-page>.public-site-footer .footer-nav{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:0 8px;margin:0;min-height:28px;padding:1px 8px}
-body.public-site-page>.public-site-footer .footer-nav a{color:#665b51;font-size:11px;font-weight:400;text-decoration:none;padding:5px 7px;white-space:nowrap}
-body.public-site-page>.public-site-footer .footer-nav a:hover,body.public-site-page>.public-site-footer .footer-nav a[aria-current=page]{text-decoration:underline;text-underline-offset:3px}
-body.public-site-page>.public-site-footer .footer-nav a:focus-visible{outline:2px solid #ff9a55;outline-offset:3px}
-body.public-site-page>.public-site-footer .footer-copyright{display:flex;align-items:center;justify-content:center;min-height:26px;padding:3px 8px;background:var(--site-frame-dark);font-size:11px;color:#f4e9dd;line-height:1.5}
+:is(body.public-site-page,body[data-page="editor"],body.editor-login-page)>.public-site-footer .footer-nav{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:0 8px;margin:0;min-height:28px;padding:1px 8px}
+:is(body.public-site-page,body[data-page="editor"],body.editor-login-page)>.public-site-footer .footer-nav a{color:#665b51;font-size:11px;font-weight:400;text-decoration:none;padding:5px 7px;white-space:nowrap}
+:is(body.public-site-page,body[data-page="editor"],body.editor-login-page)>.public-site-footer .footer-nav a:hover,:is(body.public-site-page,body[data-page="editor"],body.editor-login-page)>.public-site-footer .footer-nav a[aria-current=page]{text-decoration:underline;text-underline-offset:3px}
+:is(body.public-site-page,body[data-page="editor"],body.editor-login-page)>.public-site-footer .footer-nav a:focus-visible{outline:2px solid #ff9a55;outline-offset:3px}
+:is(body.public-site-page,body[data-page="editor"],body.editor-login-page)>.public-site-footer .footer-copyright{display:flex;align-items:center;justify-content:center;min-height:26px;padding:3px 8px;background:var(--site-frame-dark);font-size:11px;color:#f4e9dd;line-height:1.5}
+
+/* Editorial shell keeps the same frame, with controls sized for editing. */
+:is(body[data-page="editor"],body.editor-login-page) .header-inner{max-width:1160px}
+:is(body[data-page="editor"],body.editor-login-page) .editor-header-actions{display:flex;align-items:center;gap:12px;flex:none}
+:is(body[data-page="editor"],body.editor-login-page) .editor-header-label{font-size:18px;font-weight:800;white-space:nowrap;color:#24201d}
+body[data-page="editor"] .editor-header-actions .logout{background:#fff3e9;border:1px solid #ff7a2f;color:#b34d12;font:inherit;font-size:13px;font-weight:700;padding:9px 12px;border-radius:9px;white-space:nowrap;cursor:pointer}
+body.editor-login-page>main{margin:0 auto}
+@media(max-width:600px){
+  :is(body[data-page="editor"],body.editor-login-page)>header{padding:14px 12px 12px}
+  :is(body[data-page="editor"],body.editor-login-page) .header-inner{align-items:center;gap:8px;flex-wrap:wrap}
+  :is(body[data-page="editor"],body.editor-login-page) .header-brand-group{padding-right:38px;min-width:0;max-width:none}
+  :is(body[data-page="editor"],body.editor-login-page) .brand{gap:7px;white-space:nowrap}
+  :is(body[data-page="editor"],body.editor-login-page) .logo{font-size:clamp(16px,4.6vw,24px)}
+  :is(body[data-page="editor"],body.editor-login-page) .logo-mark{width:34px;height:34px;font-size:20px;flex:none}
+  :is(body[data-page="editor"],body.editor-login-page) .header-mascot{width:34px;height:34px}
+  :is(body[data-page="editor"],body.editor-login-page) .tagline{font-size:10px}
+  :is(body[data-page="editor"],body.editor-login-page) .editor-header-actions{gap:8px;margin-left:auto}
+  :is(body[data-page="editor"],body.editor-login-page) .editor-header-label{font-size:14px}
+  body[data-page="editor"] .editor-header-actions .logout{font-size:11px;padding:8px}
+}
+@media(max-width:520px){body[data-page="editor"] .editor-header-label{display:none}}
+@media(max-width:359px){
+  :is(body[data-page="editor"],body.editor-login-page)>header{padding-inline:10px}
+  :is(body[data-page="editor"],body.editor-login-page) .header-brand-group{padding-right:30px}
+  :is(body[data-page="editor"],body.editor-login-page) .logo{font-size:14px}
+  :is(body[data-page="editor"],body.editor-login-page) .logo-mark{width:29px;height:29px;font-size:17px}
+  :is(body[data-page="editor"],body.editor-login-page) .header-mascot{width:28px;height:28px}
+  :is(body[data-page="editor"],body.editor-login-page) .tagline{font-size:9px}
+}
