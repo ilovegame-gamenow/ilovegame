@@ -12,12 +12,12 @@
  let rows=[],selected=new Map(),page=1,totalPages=1,hasMore=false,busy=false,reviewed=[],activeSearch={status:'unpublished',field:'title',q:''};
  const node=(tag,text)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;return el;};
  function status(text,error=false){$('message').textContent=text;$('message').dataset.error=String(error);}
- function closeReview(){reviewed=[];$('confirmationPanel').hidden=true;$('deleteResult').textContent='';}
+ function closeReview(){reviewed=[];if($('confirmationPanel').open)$('confirmationPanel').close();$('deleteResult').textContent='';}
  function showResult(title,message,error=false){
   closeReview();
   $('resultTitle').textContent=title;$('resultSummary').textContent=message;
   $('resultPanel').dataset.error=String(error);
-  $('resultPanel').showModal();$('resultTitle').focus();
+  if(!expiring){$('resultPanel').showModal();$('resultTitle').focus();}
  }
  function controls(){
   for(const id of ['status','field','query'])$(id).disabled=busy;
@@ -76,21 +76,15 @@
  $('selectAll').addEventListener('click',()=>{closeReview();for(const row of rows){if(selected.size>=SELECTION_LIMIT)break;if(!selected.has(row.id))selected.set(row.id,row);}render();});
  $('clear').addEventListener('click',()=>{closeReview();selected.clear();render();});
  $('review').addEventListener('click',()=>{
-  if(busy||!selected.size)return;
-  reviewed=[...selected.values()];$('selectedList').replaceChildren(...reviewed.map(r=>{const li=node('li','ID '+r.id+' ／ '+(labels[r.status]||r.status)+' ／ '+(r.title||'（タイトルなし）'));const remove=node('button','選択解除');remove.type='button';remove.addEventListener('click',()=>{if(busy)return;selected.delete(r.id);closeReview();render();if(selected.size)$('review').click();});li.append(' ',remove);return li;}));
+  if(busy||expiring||!selected.size)return;
+  reviewed=[...selected.values()];$('selectedList').replaceChildren(...reviewed.map(r=>{const li=node('li');const copy=node('span','ID '+r.id+' ／ '+(labels[r.status]||r.status)+' ／ '+(r.title||'（タイトルなし）'));const remove=node('button','選択解除');remove.type='button';remove.addEventListener('click',()=>{if(busy)return;selected.delete(r.id);render();if(selected.size){$('review').click();$('cancel').focus();}else{closeReview();controls();}});li.append(copy,remove);return li;}));
   $('selectedSummary').textContent=reviewed.length+'件を削除します。'+(reviewed.some(r=>r.status==='published')?' 掲載中の記事を含みます。':'');
-  $('deleteResult').textContent='';$('confirmationPanel').hidden=false;controls();$('confirmationPanel').scrollIntoView({block:'start'});
+  $('deleteResult').textContent='';if(!$('confirmationPanel').open){$('confirmationPanel').showModal();$('cancel').focus();}controls();
  });
  $('cancel').addEventListener('click',()=>{closeReview();controls();});
- $('delete').addEventListener('click',()=>{
-  if(busy||expiring||!reviewed.length||$('confirmationPanel').hidden)return;
-  $('deleteConfirmMessage').textContent=reviewed.length+'件の記事を完全削除します。削除した記事は復元できません。'+(reviewed.some(r=>r.status==='published')?'\n掲載中の記事が含まれています。':'');
-  $('deleteConfirmDialog').showModal();$('deleteConfirmCancel').focus();
- });
- $('deleteConfirmCancel').addEventListener('click',()=>$('deleteConfirmDialog').close());
- $('deleteConfirmExecute').addEventListener('click',async()=>{
-  if(busy||expiring||!$('deleteConfirmDialog').open||!reviewed.length||$('confirmationPanel').hidden)return;
-  $('deleteConfirmDialog').close();
+ $('confirmationPanel').addEventListener('cancel',event=>{event.preventDefault();if(!busy){closeReview();controls();}});
+ $('delete').addEventListener('click',async()=>{
+  if(busy||expiring||!reviewed.length||!$('confirmationPanel').open)return;
   const articles=reviewed.map(({id,status,updated_at})=>({id,status,updated_at}));
   const confirmation='完全削除 '+reviewed.length+'件',includePublished=reviewed.some(r=>r.status==='published');
   busy=true;controls();$('deleteResult').textContent='削除結果を確認中…';
@@ -118,7 +112,7 @@
   selected.clear();load(page);
  });
  let expiring=false;
- window.addEventListener('editor-session-expired',()=>{expiring=true;if($('deleteConfirmDialog').open)$('deleteConfirmDialog').close();if($('resultPanel').open)$('resultPanel').close();});
+ window.addEventListener('editor-session-expired',()=>{expiring=true;closeReview();if($('resultPanel').open)$('resultPanel').close();});
  document.addEventListener('click',async event=>{
   if(!event.target.closest('#logoutButton')||busy)return;
   try{const r=await fetch('/api/editor-logout',{method:'POST',credentials:'same-origin'});if(!r.ok)throw Error('ログアウトできませんでした。');location.replace('/editor.html');}catch(error){status(error.message,true);}
