@@ -45,24 +45,30 @@
 }
 .pagination-direction { white-space:nowrap; }
 .pagination-ellipsis { flex:none; }
+.pagination-direction-arrow { display:none; }
 @media(max-width:600px){
-  .pagination { gap:6px; }
+  .pagination { gap:3px; }
   .pagination.pagination-control {
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    width:fit-content;
+    display:flex;
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+    width:max-content;
     max-width:100%;
+    min-width:0;
     margin-inline:auto;
-    column-gap:8px;
-    row-gap:8px;
+    overflow-x:auto;
+    padding:4px 0;
   }
-  .pagination-numbers { grid-column:1/-1; grid-row:1; gap:5px; }
-  .pagination-direction { grid-row:2; justify-self:stretch; }
-  .pagination button { min-height:44px; padding:7px 9px; font-size:12px; }
-  .pagination .pagination-number { min-width:32px; padding-inline:6px; }
+  .pagination-numbers { flex:none; flex-wrap:nowrap; gap:3px; }
+  .pagination button { flex:none; box-sizing:border-box; min-height:44px; padding:7px 4px; font-size:12px; }
+  .pagination .pagination-number { min-width:clamp(24px,7.5vw,36px); padding-inline:3px; }
+  .pagination .pagination-direction { min-width:clamp(28px,8vw,40px); padding-inline:4px; }
+  .pagination-direction-label { display:none; }
+  .pagination-direction-arrow { display:inline; font-size:20px; line-height:1; }
+  .pagination-ellipsis { font-size:12px; }
 }
 @media(max-width:359px){
-  .pagination-numbers { gap:3px; }
-  .pagination button { font-size:11px; padding-inline:6px; }
-  .pagination .pagination-number { min-width:27px; padding-inline:4px; }
+  .pagination,.pagination-numbers { gap:2px; }
+  .pagination button { font-size:11px; }
+  .pagination .pagination-number { padding-inline:2px; }
 }

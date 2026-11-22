@@ -30,7 +30,18 @@
       if (typeof label === "string" && /^\d+$/.test(label)) {
         button.classList.add("pagination-number");
 
-      } else button.classList.add("pagination-direction");
+      } else {
+        button.classList.add("pagination-direction");
+        button.setAttribute("aria-label", label);
+        const full = document.createElement("span");
+        full.className = "pagination-direction-label";
+        full.textContent = label;
+        const arrow = document.createElement("span");
+        arrow.className = "pagination-direction-arrow";
+        arrow.textContent = page < current ? "‹" : "›";
+        arrow.setAttribute("aria-hidden", "true");
+        button.replaceChildren(full, arrow);
+      }
       button.addEventListener("click", () => onPageClick(page));
       (button.classList.contains("pagination-number") ? numberGroup : container).appendChild(button);
     }
