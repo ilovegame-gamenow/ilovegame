@@ -26,3 +26,21 @@
 html.data-modal-scroll-locked{overflow:hidden;overscroll-behavior:none;scrollbar-gutter:stable}
 html.data-modal-scroll-locked body{position:fixed;top:var(--data-modal-scroll-top,0px);left:var(--data-modal-scroll-left,0px);width:100%;overflow:hidden;overscroll-behavior:none}
 .data-result{overscroll-behavior:contain}
+
+/* All three stages share one dialog and one backdrop. */
+#confirmationPanel .data-modal-content{display:flex;flex-direction:column;gap:12px;min-height:0}
+#confirmationPanel[data-stage=progress],#confirmationPanel[data-stage=result]{text-align:center}
+#confirmationPanel[data-stage=progress]{border-color:#ba5424;min-height:min(240px,85vh);justify-content:center}
+#confirmationPanel[data-stage=result]{border-color:#269267}
+#confirmationPanel[data-stage=result][data-error=true]{border-color:#aa3227}
+#confirmationPanel #confirmationTitle:focus{outline:none}
+#confirmationPanel .data-progress{width:36px;height:36px;border:4px solid #f1dfcf;border-top-color:#ba5424;border-radius:50%;margin:8px auto;animation:data-progress-spin .8s linear infinite}
+@keyframes data-progress-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#confirmationPanel .data-progress{animation:none}}
+#confirmationPanel .data-result-icon{display:grid;place-items:center;margin:0 auto;width:48px;height:48px;border-radius:50%;background:#e5f5ed;color:#247c55;font-size:28px;font-weight:700}
+#confirmationPanel[data-error=true] .data-result-icon{background:#fce9e6;color:#aa3227}
+#confirmationPanel #resultList{list-style:none;margin:0;padding:0;text-align:left;font-size:.9rem}
+#confirmationPanel #resultList>li{padding:9px 4px;border-bottom:1px solid #e8ddd1;overflow-wrap:anywhere}
+#confirmationPanel #resultList>li:last-child{border-bottom:0}
+#confirmationPanel .data-next-prompt{font-size:.9rem;color:#746a60}
+#confirmationPanel .data-actions>a{box-sizing:border-box}

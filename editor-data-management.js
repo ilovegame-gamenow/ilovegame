@@ -23,7 +23,7 @@
   root.classList.add('data-modal-scroll-locked');
  }
  function unlockModalScroll(){
-  if(!modalScroll||$('confirmationPanel').open||$('resultPanel').open)return;
+  if(!modalScroll||$('confirmationPanel').open)return;
   const {x,y}=modalScroll;modalScroll=null;
   const root=document.documentElement;
   root.classList.remove('data-modal-scroll-locked');
@@ -32,12 +32,22 @@
   window.scrollTo({left:x,top:y,behavior:'instant'});
  }
  function openModal(id){lockModalScroll();try{$(id).showModal();}catch(error){unlockModalScroll();throw error;}}
- function closeReview(keepLock=false){reviewed=[];if($('confirmationPanel').open)$('confirmationPanel').close();$('deleteResult').textContent='';if(!keepLock)unlockModalScroll();}
- function showResult(title,message,error=false){
-  closeReview(true);
-  $('resultTitle').textContent=title;$('resultSummary').textContent=message;
-  $('resultPanel').dataset.error=String(error);
-  if(!expiring){openModal('resultPanel');$('resultTitle').focus();}else unlockModalScroll();
+ let stage='review';
+ function setStage(next,error=false){
+  stage=next;
+  const panel=$('confirmationPanel');panel.dataset.stage=next;panel.dataset.error=String(error);
+  $('reviewContent').hidden=next!=='review';$('progressContent').hidden=next!=='progress';$('resultContent').hidden=next!=='result';
+  panel.setAttribute('aria-describedby',next==='review'?'deleteWarning':next==='result'?'resultSummary':'progressContent');
+ }
+ function closeReview(){reviewed=[];if($('confirmationPanel').open)$('confirmationPanel').close();unlockModalScroll();}
+ function showResult(title,message,error=false,details=[]){
+  reviewed=[];
+  if(expiring||!$('confirmationPanel').open)return;
+  $('confirmationTitle').textContent=title;$('resultSummary').textContent=message;
+  $('resultIcon').textContent=error?'!':'✓';
+  $('resultList').replaceChildren(...details.map(text=>node('li',text)));
+  $('resultDetails').hidden=!details.length;
+  setStage('result',error);$('confirmationTitle').focus();
  }
  function controls(){
   for(const id of ['status','field','query'])$(id).disabled=busy;
@@ -99,42 +109,41 @@
   if(busy||expiring||!selected.size)return;
   reviewed=[...selected.values()];$('selectedList').replaceChildren(...reviewed.map(r=>{const li=node('li');const copy=node('span','ID '+r.id+' ／ '+(labels[r.status]||r.status)+' ／ '+(r.title||'（タイトルなし）'));const remove=node('button','選択解除');remove.type='button';remove.addEventListener('click',()=>{if(busy)return;selected.delete(r.id);render();if(selected.size){$('review').click();$('cancel').focus();}else{closeReview();controls();}});li.append(copy,remove);return li;}));
   $('selectedSummary').textContent=reviewed.length+'件を削除します。'+(reviewed.some(r=>r.status==='published')?' 掲載中の記事を含みます。':'');
-  $('deleteResult').textContent='';if(!$('confirmationPanel').open){openModal('confirmationPanel');$('cancel').focus();}controls();
+  $('confirmationTitle').textContent='完全削除の最終確認';setStage('review',true);if(!$('confirmationPanel').open){openModal('confirmationPanel');$('cancel').focus();}controls();
  });
  $('cancel').addEventListener('click',()=>{closeReview();controls();});
  $('confirmationPanel').addEventListener('close',unlockModalScroll);
- $('confirmationPanel').addEventListener('cancel',event=>{event.preventDefault();if(!busy){closeReview();controls();}});
+ $('confirmationPanel').addEventListener('cancel',event=>{event.preventDefault();if(!busy){if(stage==='result')continueAfterResult();else{closeReview();controls();}}});
  $('delete').addEventListener('click',async()=>{
-  if(busy||expiring||!reviewed.length||!$('confirmationPanel').open)return;
+  if(busy||expiring||stage!=='review'||!reviewed.length||!$('confirmationPanel').open)return;
   const articles=reviewed.map(({id,status,updated_at})=>({id,status,updated_at}));
   const confirmation='完全削除 '+reviewed.length+'件',includePublished=reviewed.some(r=>r.status==='published');
-  busy=true;controls();$('deleteResult').textContent='削除結果を確認中…';
+  const targets=[...reviewed];
+  busy=true;controls();$('confirmationTitle').textContent='記事を削除しています';setStage('progress');$('confirmationTitle').focus();
   try{
    const result=await request('delete-articles',{body:{articles,confirmation,includePublished}});
    if(result.deletedIds.length)window.GameEditorNavigation?.markChanged();
-   const summary='削除済み：'+result.deletedIds.length+'件'+(result.deletedIds.length?'（ID '+result.deletedIds.join('、')+'）':'')+(result.remainingIds.length?'。未削除：'+result.remainingIds.length+'件（ID '+result.remainingIds.join('、')+'）。再検索して確認してください。':'。');
+   const summary='削除済み：'+result.deletedIds.length+'件'+(result.remainingIds.length?' ／ 未削除：'+result.remainingIds.length+'件。再検索して確認してください。':'。');
    selected.clear();rows=rows.filter(r=>!result.deletedIds.includes(r.id));
-   showResult(result.remainingIds.length?(result.deletedIds.length?'一部の記事を削除できませんでした':'記事を削除できませんでした'):'✓ 記事を削除しました',summary,result.remainingIds.length>0);
+   const details=targets.map(r=>(result.deletedIds.includes(r.id)?'削除済み':result.remainingIds.includes(r.id)?'未削除':'結果未確認')+' ／ ID '+r.id+' ／ '+(r.title||'（タイトルなし）'));
+   showResult(result.remainingIds.length?(result.deletedIds.length?'一部の記事を削除できませんでした':'記事を削除できませんでした'):'記事を削除しました',summary,result.remainingIds.length>0,details);
   }catch(error){
    // Never retry a deletion automatically, including a lost response.
    window.GameEditorNavigation?.markChanged();
    selected.clear();rows=[];hasMore=false;showResult('削除結果を確認してください',error.message+'\n続けて記事を整理するボタンから、再検索して状態を確認してください。',true);
   }finally{busy=false;render();}
  });
- $('continueData').addEventListener('click',()=>{
-  if(busy)return;
-  $('resultPanel').close();
- });
- $('resultPanel').addEventListener('close',()=>{
-  unlockModalScroll();
-  if(expiring)return;
+ function continueAfterResult(){
+  if(busy||expiring||stage!=='result')return;
+  closeReview();
   if(direct&&activeSearch.field==='id'&&activeSearch.q===String(id)){
    $('status').value='unpublished';$('field').value='title';$('query').value='';activeSearch={status:'unpublished',field:'title',q:''};page=1;
   }
   selected.clear();load(page);
- });
+ }
+ $('continueData').addEventListener('click',continueAfterResult);
  let expiring=false;
- window.addEventListener('editor-session-expired',()=>{expiring=true;closeReview();if($('resultPanel').open)$('resultPanel').close();unlockModalScroll();});
+ window.addEventListener('editor-session-expired',()=>{expiring=true;closeReview();});
  document.addEventListener('click',async event=>{
   if(!event.target.closest('#logoutButton')||busy)return;
   try{const r=await fetch('/api/editor-logout',{method:'POST',credentials:'same-origin'});if(!r.ok)throw Error('ログアウトできませんでした。');location.replace('/editor.html');}catch(error){status(error.message,true);}
