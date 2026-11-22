@@ -9,7 +9,7 @@
  if(direct){$('dataBack').href=safeReturn;$('dataBack').textContent='← 元の記事一覧に戻る';}
  $('resultBack').href=safeReturn;
  $('resultBack').textContent=direct?'元の記事一覧に戻る':'編集室に戻る';
- let rows=[],selected=new Map(),page=1,hasMore=false,busy=false,reviewed=[],activeSearch={status:'unpublished',field:'title',q:''};
+ let rows=[],selected=new Map(),page=1,totalPages=1,hasMore=false,busy=false,reviewed=[],activeSearch={status:'unpublished',field:'title',q:''};
  const node=(tag,text)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;return el;};
  function status(text,error=false){$('message').textContent=text;$('message').dataset.error=String(error);}
  function closeReview(){reviewed=[];$('confirmationPanel').hidden=true;$('deleteResult').textContent='';}
@@ -25,9 +25,8 @@
   $('selectAll').disabled=busy||!rows.length||rows.every(r=>selected.has(r.id))||selected.size>=SELECTION_LIMIT;
   $('clear').disabled=busy||!selected.size;
   $('review').disabled=busy||!selected.size;
-  $('prev').disabled=busy||page===1;$('next').disabled=busy||!hasMore;
+  for(const id of ['paginationTop','pagination']){const box=$(id);box.replaceChildren();if(totalPages>1){const nav=GamePagination.render(page,totalPages,p=>{if(!busy&&p!==page)load(p);});if(busy)nav.querySelectorAll('button').forEach(b=>b.disabled=true);box.append(nav);}}
   $('count').textContent='選択：'+selected.size+'件（全ページ・最大'+SELECTION_LIMIT+'件）';
-  $('page').textContent=page+'ページ';
   $('cancel').disabled=busy;
   $('delete').disabled=busy||!reviewed.length;
   $('articles').querySelectorAll('input').forEach(el=>el.disabled=busy);
@@ -62,7 +61,7 @@
   $('publishedWarning').hidden=activeSearch.status!=='published';
   try{
    const data=await request('article-data',{query:{...activeSearch,page:String(target)}});
-   rows=data.articles;page=data.page;hasMore=data.hasMore;
+   rows=data.articles;page=data.page;hasMore=data.hasMore;totalPages=Math.max(1,Math.ceil(data.total/data.limit));
    if(preselect!==null){const match=rows.find(r=>r.id===preselect);if(match)selected.set(match.id,match);else resultMessage='対象記事は削除対象外か、現在の掲載状態が変わっています。';}
    status(resultMessage||'このページ：'+rows.length+'件（処理済み記事のみ）');
   }catch(error){status(error.message,true);}
@@ -73,7 +72,6 @@
  $('status').addEventListener('change',search);
  $('selectAll').addEventListener('click',()=>{closeReview();for(const row of rows){if(selected.size>=SELECTION_LIMIT)break;if(!selected.has(row.id))selected.set(row.id,row);}render();});
  $('clear').addEventListener('click',()=>{closeReview();selected.clear();render();});
- $('prev').addEventListener('click',()=>load(page-1));$('next').addEventListener('click',()=>load(page+1));
  $('review').addEventListener('click',()=>{
   if(busy||!selected.size)return;
   reviewed=[...selected.values()];$('selectedList').replaceChildren(...reviewed.map(r=>{const li=node('li','ID '+r.id+' ／ '+(labels[r.status]||r.status)+' ／ '+(r.title||'（タイトルなし）'));const remove=node('button','選択解除');remove.type='button';remove.addEventListener('click',()=>{if(busy)return;selected.delete(r.id);closeReview();render();if(selected.size)$('review').click();});li.append(' ',remove);return li;}));
