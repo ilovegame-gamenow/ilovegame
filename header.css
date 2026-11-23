@@ -14,6 +14,7 @@
   --button-pad-x:20px;
   --button-height:48px;
   --button-radius:999px;
+  --button-outline:#ead9ca;
 }
 @media(max-width:1024px){
   :root{--button-font:13px;--pagination-font:12px;--button-pad-y:10px;--button-pad-x:16px;--button-height:44px}
@@ -302,3 +303,6 @@ body[data-page="editor"] header .editor-brand-label.is-tight{bottom:calc(100% - 
 :is(body[data-page="editor"],body.editor-login-page) :is(button:not(.stat):not(.card),input[type="button"],input[type="submit"],a[role="button"],a.data-primary,a.dashboard-settings,a.settings-preview-link,.editor-area-nav a){
   border-radius:var(--button-radius,999px) !important;
 }
+
+/* A fine inset outline preserves the existing responsive button dimensions. */
+header nav a.calendar-link{box-shadow:inset 0 0 0 1px var(--button-outline)}
