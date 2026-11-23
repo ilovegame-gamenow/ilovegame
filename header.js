@@ -45,8 +45,7 @@
           <div class="brand-wordmark">
             ${isEditor ? '<span class="editor-brand-label">編集室</span>' : ''}
             <div class="logo">
-              I <span class="love">LOVE</span>
-              GAME<span class="music">♪</span>
+              ${isEditor ? '<span class="editor-logo-text">I <span class="love">LOVE</span> GAME</span>' : 'I <span class="love">LOVE</span> GAME'}<span class="music">♪</span>
             </div>
             <div class="tagline">ゲームの「今」をお届け♪</div>
           </div>

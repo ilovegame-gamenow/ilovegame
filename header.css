@@ -265,8 +265,12 @@ body[data-page="editor"] .editor-inline-heading h2{margin:0;font-size:var(--edit
 body[data-page="editor"] .editor-inline-heading .section-subtitle{margin:0;font-size:var(--section-title-subtitle);font-weight:400;line-height:1.5;color:#84694f;min-width:0;overflow-wrap:anywhere}
 
 /* Editorial identity belongs with the logo; navigation shares its row when space permits. */
-body[data-page="editor"] header .brand-wordmark{position:relative;min-width:0}
-body[data-page="editor"] header .editor-brand-label{position:absolute;z-index:1;bottom:4px;right:0;padding:3px 7px;background:#fffaf4;border:1px solid #f2cfb1;border-radius:4px;font-size:14px;font-weight:800;line-height:1;color:#a95012;white-space:nowrap;letter-spacing:.06em}
+body[data-page="editor"] header .brand-wordmark{position:relative;min-width:0;display:grid;grid-template-columns:max-content max-content;grid-template-rows:auto auto}
+body[data-page="editor"] header .brand-wordmark .logo{display:contents}
+body[data-page="editor"] header .editor-logo-text{grid-column:1;grid-row:1;white-space:nowrap}
+body[data-page="editor"] header .brand-wordmark .music{grid-column:2;grid-row:1;align-self:center}
+body[data-page="editor"] header .brand-wordmark .tagline{grid-column:1;grid-row:2;justify-self:start}
+body[data-page="editor"] header .editor-brand-label{position:absolute;z-index:1;grid-column:1;grid-row:2;bottom:0;right:0;padding:3px 7px;background:#fffaf4;border:1px solid #f2cfb1;border-radius:4px;font-size:14px;font-weight:800;line-height:1;color:#a95012;white-space:nowrap;letter-spacing:.06em}
 body[data-page="editor"] header .header-inner{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand actions" "nav nav";gap:12px 10px}
 body[data-page="editor"] header .header-brand-group{grid-area:brand;justify-self:start;max-width:100%;min-width:0}
 body[data-page="editor"] header .editor-header-actions{grid-area:actions;justify-self:end;margin:0}
@@ -277,8 +281,10 @@ body[data-page="editor"] header .editor-area-nav{grid-area:nav;max-width:none;ma
 }
 @media(max-width:600px){
   body[data-page="editor"] header .header-inner{gap:10px 8px}
-  body[data-page="editor"] header .editor-brand-label{bottom:4px;right:-3px;padding:2px 5px;font-size:11px}
+  body[data-page="editor"] header .editor-brand-label{padding:2px 4px;font-size:10px}
   body[data-page="editor"] header .editor-area-nav{margin:0}
 }
 
-@media(max-width:359px){body[data-page="editor"] header .editor-brand-label{bottom:6px;right:-3px;padding:1px 4px;font-size:9px}}
+@media(max-width:359px){body[data-page="editor"] header .editor-brand-label{padding:1px 3px;font-size:9px}}
+
+@media(max-width:600px){body[data-page="editor"] header .brand-wordmark .tagline{font-size:clamp(7px,1.9vw,10px)}}
