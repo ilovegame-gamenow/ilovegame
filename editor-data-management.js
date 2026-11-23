@@ -50,20 +50,37 @@
   $('resultDetails').hidden=!details.length;
   setStage('result',error);$('confirmationTitle').focus();
  }
- const selectionBar=$('selectionBar'), selectionSlot=$('selectionBarSlot');
+ const selectionBar=$('selectionBar');
+ const floatingBar=selectionBar.cloneNode(true);
+ floatingBar.id='floatingSelectionBar';
+ floatingBar.classList.add('is-floating');
+ floatingBar.setAttribute('aria-label','画面下部の削除対象の選択操作');
+ floatingBar.hidden=true;
+ const mirrorControls=new Map();
+ for(const el of floatingBar.querySelectorAll('[id]')){
+  const key=el.id;
+  el.removeAttribute('id');
+  el.dataset.mirrorControl=key;
+  if(key==='count'){el.removeAttribute('role');el.removeAttribute('aria-live');}
+  if(el.tagName==='BUTTON')el.addEventListener('click',()=>{const original=$(key);if(!original.disabled)original.click();});
+  mirrorControls.set(key,el);
+ }
+ selectionBar.after(floatingBar);
  function sizeSelectionBar(){
-  if(!selectionBar.classList.contains('is-floating'))return;
-  const height=Math.ceil(selectionBar.getBoundingClientRect().height);
-  selectionSlot.style.minHeight=height+'px';
+  if(floatingBar.hidden)return;
+  const height=Math.ceil(floatingBar.getBoundingClientRect().height);
   document.documentElement.style.setProperty('--data-selection-height',(height+24)+'px');
  }
  function updateSelectionBar(){
-  const floating=selected.size>0;
-  selectionBar.classList.toggle('is-floating',floating);
-  if(floating)sizeSelectionBar();
-  else{selectionSlot.style.minHeight='';document.documentElement.style.removeProperty('--data-selection-height');}
+  for(const [key,mirror] of mirrorControls){
+   const original=$(key);mirror.textContent=original.textContent;
+   if(mirror.tagName==='BUTTON')mirror.disabled=original.disabled;
+  }
+  floatingBar.hidden=selected.size===0;
+  if(!floatingBar.hidden)sizeSelectionBar();
+  else document.documentElement.style.removeProperty('--data-selection-height');
  }
- if(typeof ResizeObserver==='function')new ResizeObserver(sizeSelectionBar).observe(selectionBar);
+ if(typeof ResizeObserver==='function')new ResizeObserver(sizeSelectionBar).observe(floatingBar);
  window.addEventListener('resize',sizeSelectionBar);
  function controls(){
   for(const id of ['status','field','query'])$(id).disabled=busy;
