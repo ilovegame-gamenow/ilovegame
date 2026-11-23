@@ -266,9 +266,8 @@ body[data-page="editor"] .editor-inline-heading{display:flex;align-items:baselin
 body[data-page="editor"] .editor-inline-heading h2{margin:0;font-size:var(--editor-subheading-font);font-weight:800;line-height:1.4;flex:none}
 body[data-page="editor"] .editor-inline-heading .section-subtitle{margin:0;font-size:var(--section-title-subtitle);font-weight:400;line-height:1.5;color:#84694f;min-width:0;overflow-wrap:anywhere}
 
-/* Editorial identity belongs with the logo; navigation shares its row when space permits. */
+/* Editorial navigation shares the brand row when space permits. */
 body[data-page="editor"] header .brand-wordmark{position:relative;min-width:0}
-body[data-page="editor"] header .editor-brand-label{position:absolute;z-index:1;bottom:0;right:var(--editor-badge-right,22px);padding:clamp(1px,.3vw,3px) clamp(3px,.7vw,7px);background:#fffaf4;border:1px solid #f2cfb1;border-radius:4px;font-size:clamp(9px,2vw,14px);font-weight:800;line-height:1;color:#a95012;white-space:nowrap;letter-spacing:.06em}
 body[data-page="editor"] header .header-inner{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand actions" "nav nav";gap:12px 10px}
 body[data-page="editor"] header .header-brand-group{grid-area:brand;justify-self:start;max-width:100%;min-width:0}
 body[data-page="editor"] header .editor-header-actions{grid-area:actions;justify-self:end;margin:0}
@@ -284,9 +283,8 @@ body[data-page="editor"] header .editor-area-nav{grid-area:nav;max-width:none;ma
 
 
 
-/* Identical brand metrics on public and editorial pages; badge never participates in layout. */
+/* Identical brand metrics on public and editorial pages. */
 :is(body.public-site-page,body[data-page="editor"]) header .brand{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:#24201d}
-body[data-page="editor"] header .brand-wordmark .tagline{transform:scale(var(--editor-tagline-scale,1));transform-origin:left bottom}
 @media(max-width:600px){
  body[data-page="editor"] header .header-brand-group{align-self:start}
  body[data-page="editor"] header .editor-header-actions .logout{min-height:0}
@@ -304,3 +302,13 @@ body[data-page="editor"] header .brand-wordmark .tagline{transform:scale(var(--e
 
 /* A fine inset outline preserves the existing responsive button dimensions. */
 header nav a.calendar-link{box-shadow:inset 0 0 0 1px var(--button-outline)}
+
+/* Keep the sign readable on compact headers without moving the wordmark. */
+@media(max-width:600px){
+  body[data-page="editor"] header .header-brand-group{padding-right:52px}
+  body[data-page="editor"] header .editor-mascot{width:48px;height:48px}
+}
+@media(max-width:359px){
+  body[data-page="editor"] header .header-brand-group{padding-right:44px}
+  body[data-page="editor"] header .editor-mascot{width:40px;height:40px}
+}
