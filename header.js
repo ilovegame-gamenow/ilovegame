@@ -65,11 +65,15 @@
         const bounds = wordmark.getBoundingClientRect();
         const edge = text.getBoundingClientRect().right;
         badge.style.setProperty("--editor-badge-right", Math.max(0, bounds.right - edge) + "px");
-        // Keep the logo and tagline unchanged even if the badge needs more room.
+        // Keep the badge at GAME's right edge and the tagline's bottom at every width.
+        // Fit the caption into the remaining space without changing the logo's layout.
+        tagline.style.setProperty("--editor-tagline-scale", "1");
         const range = document.createRange();
         range.selectNodeContents(tagline);
-        const captionEdge = range.getBoundingClientRect().right;
-        badge.classList.toggle("is-tight", edge - captionEdge < badge.offsetWidth + 3);
+        const caption = range.getBoundingClientRect();
+        const available = Math.max(1, edge - badge.offsetWidth - 4 - caption.left);
+        const scale = caption.width > 0 ? Math.min(1, available / caption.width) : 1;
+        tagline.style.setProperty("--editor-tagline-scale", String(scale));
       };
       alignBadge();
       if (typeof ResizeObserver === "function") {
