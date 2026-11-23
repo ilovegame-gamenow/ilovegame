@@ -303,7 +303,7 @@ body[data-page="editor"] header .editor-area-nav{grid-area:nav;max-width:none;ma
 /* A fine inset outline preserves the existing responsive button dimensions. */
 header nav a.calendar-link{box-shadow:inset 0 0 0 1px var(--button-outline)}
 
-/* The editorial mascot peeks over a wide sign; the wordmark stays fixed. */
+/* The editorial mascot has its own reserved space; the wordmark stays fixed. */
 body[data-page="editor"] header .header-brand-group{padding-right:108px}
 body[data-page="editor"] header .editor-mascot{width:100px;height:68px}
 @media(max-width:600px){
