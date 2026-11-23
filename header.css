@@ -7,6 +7,7 @@
   --section-title-padding:9px;
   --section-title-after:12px;
   --section-title-subtitle:12px;
+  --editor-subheading-font:clamp(16px,1.6vw,18px);
   --button-font:14px;
   --pagination-font:13px;
   --button-pad-y:12px;
@@ -249,11 +250,16 @@ body[data-page="editor"] .editor-page-heading{display:flex;align-items:baseline;
 body[data-page="editor"] .editor-page-heading h1{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;margin:0;font-size:var(--section-title-font);font-weight:var(--section-title-weight);line-height:1.4}
 body[data-page="editor"] .editor-page-heading .section-subtitle{font-size:var(--section-title-subtitle);font-weight:400;color:#84694f;line-height:1.6;margin:0}
 body[data-page="editor"] :is(.settings-section,.catalog-panel,.preview-step,.editor-management) > h2,
-body[data-page="editor"] .section-heading h2{font-size:clamp(16px,1.6vw,18px);font-weight:800;line-height:1.5}
+body[data-page="editor"] .section-heading h2{font-size:var(--editor-subheading-font);font-weight:800;line-height:1.5}
 body[data-page="editor"] :is(.settings-section,.catalog-panel,.preview-step,.editor-management) > h2,
 body[data-page="editor"] .section-heading{border-bottom:1px solid var(--section-title-rule);padding-bottom:9px;margin:0 0 14px}
 @media(max-width:600px){body[data-page="editor"] .editor-page-heading{gap:4px 8px}body[data-page="editor"] .editor-page-heading h1{gap:4px}}
 
 body[data-page="editor"] .editor-management-header{border-bottom:1px solid var(--section-title-rule);padding-bottom:9px;margin:0 0 14px}
-body[data-page="editor"] .editor-management-header h2,body[data-page="editor"] #articleEditForm>h2{font-size:clamp(16px,1.6vw,18px);font-weight:800;line-height:1.5}
+body[data-page="editor"] .editor-management-header h2,body[data-page="editor"] #articleEditForm>h2{font-size:var(--editor-subheading-font);font-weight:800;line-height:1.5}
 body[data-page="editor"] #articleEditForm>h2{border-bottom:1px solid var(--section-title-rule);padding-bottom:9px;margin:0 0 14px}
+
+/* Inline secondary headings use the same subtitle scale as public section headings. */
+body[data-page="editor"] .editor-inline-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;margin:0 0 10px;min-width:0}
+body[data-page="editor"] .editor-inline-heading h2{margin:0;font-size:var(--editor-subheading-font);font-weight:800;line-height:1.4;flex:none}
+body[data-page="editor"] .editor-inline-heading .section-subtitle{margin:0;font-size:var(--section-title-subtitle);font-weight:400;line-height:1.5;color:#84694f;min-width:0;overflow-wrap:anywhere}

@@ -3,9 +3,8 @@
 .dashboard-settings { display:inline-flex; gap:8px; align-items:center; min-height:var(--button-height); padding:var(--button-pad-y) var(--button-pad-x); border:1px solid #d9c8b7; border-radius:10px; background:#fff; color:#a95012; font-size:var(--button-font); font-weight:700; text-decoration:none; }
 .dashboard-settings > span { font-size:20px; line-height:1; }
 .dashboard-settings:focus-visible { outline:3px solid #c6530c; outline-offset:3px; }
-.editor-filters-panel { padding:24px; margin:0 0 24px; background:#fff; border:1px solid #eee2d8; border-radius:16px; }
-.editor-filter-group + .editor-filter-group { margin-top:24px; padding-top:22px; border-top:1px solid #eee2d8; }
-.filter-heading { font-size:17px; margin:0 0 8px; }
+.editor-filters-panel { padding:24px; margin:0 0 10px; background:#fff; border:1px solid #eee2d8; border-radius:16px; }
+.editor-filter-group + .editor-filter-group { margin-top:16px; padding-top:14px; border-top:1px solid #eee2d8; }
 .filter-note { color:#77706a; font-size:13px; line-height:1.7; margin:0 0 14px; }
 .stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
 .stats .stat { display:flex; flex-direction:column; align-items:flex-start; text-align:left; width:100%; min-width:0; padding:16px; border:1px solid #eee2d8; border-top:4px solid; border-radius:12px; background:#fff; color:inherit; }
@@ -47,3 +46,8 @@
 #articleSourceSelect{width:100%;max-width:560px;min-height:48px;padding:10px 14px;border:1px solid #d9c8b7;border-radius:10px;background:#fffaf4;color:#51443a;font:inherit}#articleSourceSelect:focus-visible{outline:3px solid #c6530c;outline-offset:3px}
 
 .publisher-editor{width:100%;max-width:100%;padding:12px 14px;border:1px solid #dac9b9;border-radius:12px;background:#fffdfa;margin-top:8px;overflow-wrap:anywhere}.publisher-editor summary{cursor:pointer;color:#a5430a;font-weight:700}.publisher-editor ul{padding-left:22px;font-size:14px}.publisher-edit-form{display:grid;gap:10px}.publisher-edit-form label{display:grid;gap:6px;font-size:14px;font-weight:700}.publisher-edit-form input,.publisher-edit-form textarea{width:100%;min-width:0;border:1px solid #dac9b9;border-radius:8px;padding:10px;font:inherit;background:#fff}.publisher-save{border:1px solid #c6530c;background:#fff0e3;color:#a5430a;font-weight:700}.publisher-edit-form p{margin:0}
+
+/* Compact count summary and the upper pager; do not affect bottom/public pagination. */
+#latest>#message{font-size:var(--section-title-subtitle);line-height:1.5;margin:4px 0 6px;color:#77706a}
+#latest>#message:empty{display:none}
+#latest #paginationTop>.pagination{margin:6px auto 10px}
