@@ -1,6 +1,12 @@
 
 /* I LOVE GAME♪ 共通ヘッダー */
 :root {
+  --section-title-font:21px;
+  --section-title-weight:1000;
+  --section-title-rule:#eee2d7;
+  --section-title-padding:9px;
+  --section-title-after:12px;
+  --section-title-subtitle:12px;
   --button-font:14px;
   --pagination-font:13px;
   --button-pad-y:12px;
@@ -11,7 +17,7 @@
   :root{--button-font:13px;--pagination-font:12px;--button-pad-y:10px;--button-pad-x:16px;--button-height:44px}
 }
 @media(max-width:600px){
-  :root{--button-font:12px;--pagination-font:11px;--button-pad-y:8px;--button-pad-x:12px;--button-height:44px}
+  :root{--section-title-font:18px;--section-title-subtitle:11px;--button-font:12px;--pagination-font:11px;--button-pad-y:8px;--button-pad-x:12px;--button-height:44px}
 }
 /* Dense grids and icon-only controls retain their own dimensions. */
 
@@ -140,13 +146,13 @@ header .header-brand-group{padding-right:80px}
 
 /* Consistent compact section headings on phones. */
 @media(max-width:600px){
-  .section-title h2,.breaking-label{font-size:18px;column-gap:4px}
-  .section-title h2 .section-subtitle,.breaking-label .section-subtitle{font-size:11px}
+  .section-title h2,.breaking-label{font-size:var(--section-title-font);column-gap:4px}
+  .section-title h2 .section-subtitle,.breaking-label .section-subtitle{font-size:var(--section-title-subtitle)}
   .section-icon{width:20px;height:20px;flex-basis:20px}
 }
 @media(max-width:359px){
   .section-title h2,.breaking-label{font-size:15px}
-  .section-title h2 .section-subtitle,.breaking-label .section-subtitle{font-size:10px}
+  .section-title h2 .section-subtitle,.breaking-label .section-subtitle{font-size:var(--section-title-subtitle)}
   .section-icon{width:18px;height:18px;flex-basis:18px}
 }
 
@@ -236,3 +242,18 @@ body[data-page="editor"] header .editor-area-nav a[aria-current="page"]{backgrou
 
 /* Shared editorial workspace width (same as article management). */
 body[data-page="editor"]>main{max-width:1200px;min-width:0;width:100%;margin-inline:auto;padding-inline:20px;box-sizing:border-box}
+
+/* Public section titles and editorial page titles share the same visual scale. */
+body[data-page="editor"]>main.editor-heading-layout{margin-block:0;padding-block:28px}
+body[data-page="editor"] .editor-page-heading{display:flex;align-items:baseline;justify-content:flex-start;flex-wrap:wrap;gap:6px 12px;margin:0 0 var(--section-title-after);border-bottom:2px solid var(--section-title-rule);padding-bottom:var(--section-title-padding);min-width:0;color:#24201d}
+body[data-page="editor"] .editor-page-heading h1{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;margin:0;font-size:var(--section-title-font);font-weight:var(--section-title-weight);line-height:1.4}
+body[data-page="editor"] .editor-page-heading .section-subtitle{font-size:var(--section-title-subtitle);font-weight:400;color:#84694f;line-height:1.6;margin:0}
+body[data-page="editor"] :is(.settings-section,.catalog-panel,.preview-step,.editor-management) > h2,
+body[data-page="editor"] .section-heading h2{font-size:clamp(16px,1.6vw,18px);font-weight:800;line-height:1.5}
+body[data-page="editor"] :is(.settings-section,.catalog-panel,.preview-step,.editor-management) > h2,
+body[data-page="editor"] .section-heading{border-bottom:1px solid var(--section-title-rule);padding-bottom:9px;margin:0 0 14px}
+@media(max-width:600px){body[data-page="editor"] .editor-page-heading{gap:4px 8px}body[data-page="editor"] .editor-page-heading h1{gap:4px}}
+
+body[data-page="editor"] .editor-management-header{border-bottom:1px solid var(--section-title-rule);padding-bottom:9px;margin:0 0 14px}
+body[data-page="editor"] .editor-management-header h2,body[data-page="editor"] #articleEditForm>h2{font-size:clamp(16px,1.6vw,18px);font-weight:800;line-height:1.5}
+body[data-page="editor"] #articleEditForm>h2{border-bottom:1px solid var(--section-title-rule);padding-bottom:9px;margin:0 0 14px}
