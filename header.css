@@ -132,10 +132,10 @@ header nav a:hover {
 
 /* Keep the mascot beside the brand without increasing the header height. */
 .header-brand-group{position:relative;flex:none}
-header .header-brand-group{padding-right:80px}
-.header-mascot{position:absolute;right:0;top:50%;width:68px;height:68px;object-fit:contain;transform:translateY(-50%);pointer-events:none}
+header .header-brand-group{--mascot-space:80px;padding-right:var(--mascot-space)}
+.header-mascot{position:absolute;left:calc(100% - var(--mascot-space,80px) + var(--mascot-center,46px));top:50%;width:68px;height:68px;max-width:calc(var(--mascot-center,46px) + var(--mascot-center,46px));object-fit:contain;object-position:center;transform:translate(-50%,-50%);pointer-events:none}
 @media(max-width:600px){
-  header .header-brand-group{padding-right:48px;max-width:100%}
+  header .header-brand-group{--mascot-space:48px;padding-right:var(--mascot-space);max-width:100%}
   header .logo{font-size:clamp(18px,4.6vw,24px)}
   header .brand{gap:8px}
   .header-mascot{width:44px;height:44px}
@@ -180,7 +180,7 @@ html.public-site-frame{background:#e9dece}
 @media(max-width:600px){
   body.public-site-page>header{padding:14px 12px 12px}
   body.public-site-page .header-inner{align-items:center;flex-wrap:nowrap;gap:8px}
-  body.public-site-page .header-brand-group{padding-right:38px;min-width:0;max-width:none}
+  body.public-site-page .header-brand-group{--mascot-space:46px;padding-right:var(--mascot-space);min-width:0;max-width:none}
   body.public-site-page .brand{gap:7px;white-space:nowrap}
   body.public-site-page .logo{font-size:clamp(16px,4.6vw,24px)}
   body.public-site-page .logo-mark{width:34px;height:34px;font-size:20px;flex:none}
@@ -192,7 +192,7 @@ html.public-site-frame{background:#e9dece}
 @media(max-width:359px){
   body.public-site-page>header{padding-inline:10px}
   body.public-site-page .header-inner{gap:5px}
-  body.public-site-page .header-brand-group{padding-right:30px}
+  body.public-site-page .header-brand-group{--mascot-space:36px;padding-right:var(--mascot-space)}
   body.public-site-page .brand{gap:5px}
   body.public-site-page .logo{font-size:14px}
   body.public-site-page .logo-mark{width:29px;height:29px;font-size:17px}
@@ -219,7 +219,7 @@ body.editor-login-page>main{margin:0 auto}
 @media(max-width:600px){
   :is(body[data-page="editor"],body.editor-login-page)>header{padding:14px 12px 12px}
   :is(body[data-page="editor"],body.editor-login-page) .header-inner{align-items:center;gap:8px;flex-wrap:wrap}
-  :is(body[data-page="editor"],body.editor-login-page) .header-brand-group{padding-right:38px;min-width:0;max-width:none}
+  :is(body[data-page="editor"],body.editor-login-page) .header-brand-group{--mascot-space:46px;padding-right:var(--mascot-space);min-width:0;max-width:none}
   :is(body[data-page="editor"],body.editor-login-page) .brand{gap:7px;white-space:nowrap}
   :is(body[data-page="editor"],body.editor-login-page) .logo{font-size:clamp(16px,4.6vw,24px)}
   :is(body[data-page="editor"],body.editor-login-page) .logo-mark{width:34px;height:34px;font-size:20px;flex:none}
@@ -232,7 +232,7 @@ body.editor-login-page>main{margin:0 auto}
 @media(max-width:520px){body[data-page="editor"] .editor-header-label{display:none}}
 @media(max-width:359px){
   :is(body[data-page="editor"],body.editor-login-page)>header{padding-inline:10px}
-  :is(body[data-page="editor"],body.editor-login-page) .header-brand-group{padding-right:30px}
+  :is(body[data-page="editor"],body.editor-login-page) .header-brand-group{--mascot-space:36px;padding-right:var(--mascot-space)}
   :is(body[data-page="editor"],body.editor-login-page) .logo{font-size:14px}
   :is(body[data-page="editor"],body.editor-login-page) .logo-mark{width:29px;height:29px;font-size:17px}
   :is(body[data-page="editor"],body.editor-login-page) .header-mascot{width:28px;height:28px}
@@ -310,13 +310,18 @@ body[data-page="editor"] header .editor-area-nav{grid-area:nav;max-width:none;ma
 header nav a.calendar-link{box-shadow:inset 0 0 0 1px var(--button-outline)}
 
 /* The editorial mascot has its own reserved space; the wordmark stays fixed. */
-body[data-page="editor"] header .header-brand-group{padding-right:108px}
+body[data-page="editor"] header .header-brand-group{--mascot-space:108px;padding-right:var(--mascot-space)}
 body[data-page="editor"] header .editor-mascot{width:100px;height:68px}
 @media(max-width:600px){
-  body[data-page="editor"] header .header-brand-group{padding-right:68px}
+  body[data-page="editor"] header .header-brand-group{--mascot-space:68px;padding-right:var(--mascot-space)}
   body[data-page="editor"] header .editor-mascot{width:64px;height:46px}
 }
 @media(max-width:359px){
-  body[data-page="editor"] header .header-brand-group{padding-right:56px}
+  body[data-page="editor"] header .header-brand-group{--mascot-space:56px;padding-right:var(--mascot-space)}
   body[data-page="editor"] header .editor-mascot{width:52px;height:38px}
 }
+
+/* A shared center measured from the wordmark, independent of the asset width. */
+.header-brand-group{--mascot-center:46px}
+@media(max-width:600px){.header-brand-group{--mascot-center:26px}}
+@media(max-width:359px){.header-brand-group{--mascot-center:21px}}
