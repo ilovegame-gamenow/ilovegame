@@ -18,7 +18,7 @@
   const filtered=selected?games.filter(g=>g.id===selected):games;
   const totalPages=Math.max(1,Math.ceil(filtered.length/size));
   const currentPage=Math.max(1,Math.min(page,totalPages));
-  return {selectedId:selected,page:currentPage,hasMore:currentPage<totalPages,games:filtered.slice((currentPage-1)*size,currentPage*size)};
+  return {selectedId:selected,page:currentPage,totalPages,hasMore:currentPage<totalPages,games:filtered.slice((currentPage-1)*size,currentPage*size)};
  }
  window.GameSelection={collect,view};
 })();

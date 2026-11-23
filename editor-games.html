@@ -7,12 +7,13 @@
   <link rel="stylesheet" href="/header.css">
   <link rel="stylesheet" href="/article.css">
   <link rel="stylesheet" href="/editor-games.css">
+  <link rel="stylesheet" href="/pagination.css">
 <link rel="stylesheet" href="/platform-display.css">
 </head>
 <body data-page="editor">
   <header></header>
   <main class="catalog-main catalog-workspace">
-    <a class="back" id="catalogBack" href="/editor-dashboard.html">← 編集室に戻る</a>
+    <a class="back" id="catalogBack" href="/editor-dashboard.html" hidden>← 記事に戻る</a>
     <h1>作品リスト</h1>
     <p class="catalog-intro" id="catalogIntro">★ お気に入りは優先追跡、通常は一般ニュース収集、追跡対象外は個別追跡・積極的な独自探索から除外します。重要な新情報は通常ニュースとして扱う場合があります。</p>
     <nav class="catalog-workspace-tabs" aria-label="作品リストの表示" id="workspaceTabs"><button type="button" data-workspace="manage" aria-pressed="true">登録作品</button><button type="button" data-workspace="find" aria-pressed="false">＋ ゲームを探す</button></nav>
@@ -43,12 +44,8 @@
       <label for="gameQuery">ゲームを選ぶ</label>
       <select id="gameQuery" disabled><option value="">すべてのゲーム</option></select>
       <div id="gamesEmpty" hidden><p id="gamesEmptyText">登録済みの作品はありません。</p><button type="button" id="createMissingGame">この作品を新しく登録</button></div>
-      <ul class="catalog-list" id="gamesList"></ul>
-      <nav class="catalog-paging" aria-label="作品一覧のページ送り">
-        <button type="button" id="previousGames" disabled>前へ</button>
-        <span id="gamePage">1ページ</span>
-        <button type="button" id="nextGames" disabled>次へ</button>
-      </nav>
+      <div id="gamesPaginationTop"></div><ul class="catalog-list" id="gamesList"></ul>
+      <div id="gamesPagination"></div>
     </section>
     </div>
     <details class="catalog-panel catalog-create" id="createPanel" hidden>
@@ -81,7 +78,7 @@
         </fieldset>
       </form>
     </details>
-  <div class="editor-return-bottom"><a class="back" data-back-mirror="catalogBack" href="/editor-dashboard.html">← 編集室に戻る</a></div>
+  <div class="editor-return-bottom" id="catalogBackBottom" hidden><a class="back" data-back-mirror="catalogBack" href="/editor-dashboard.html">← 記事に戻る</a></div>
 </main>
   <script src="/platform-display.js"></script>
 <script src="/header.js"></script>
@@ -93,6 +90,7 @@
   <script src="/editor-game-workflow.js"></script>
   <script src="/editor-article-context.js"></script>
   <script src="/editor-game-selection.js"></script>
+  <script src="/pagination.js"></script>
   <script src="/editor-games.js"></script>
   <script src="/editor-game-finder.js"></script>
   <script src="/editor-game-workspace.js"></script>

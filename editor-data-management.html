@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja" class="public-site-frame"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>記事の整理・削除 | I LOVE GAME♪ 編集室</title><link rel="stylesheet" href="/header.css"><link rel="stylesheet" href="/article.css"><link rel="stylesheet" href="/editor-settings.css"><link rel="stylesheet" href="/editor-data-management.css"><link rel="stylesheet" href="/pagination.css"></head>
 <body data-page="editor"><header></header><main class="settings-main data-main">
-<a id="dataBack" class="back" href="/editor-settings.html">← 運用設定に戻る</a>
+<a id="dataBack" class="back" href="/editor-settings.html" hidden>← 運用設定に戻る</a>
 <div class="settings-heading"><h1>記事の整理・削除</h1><p>自動整理と、不要になった記事の手動削除を管理します。</p></div>
 <form id="retentionForm"><fieldset id="retentionFields" disabled style="border:0;padding:0;margin:0">        <section id="retentionSettings" class="settings-section" aria-labelledby="retentionHeading">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="retentionHeading">記事の自動整理</h2><p>審査待ち・非掲載記事の保存期間</p></div></div>
@@ -24,7 +24,7 @@
 <h2 id="confirmationTitle" tabindex="-1">完全削除の最終確認</h2>
 <div id="reviewContent" class="data-modal-content"><p id="selectedSummary"></p><div class="data-review-scroll"><ul id="selectedList"></ul></div><p id="deleteWarning">削除は取り消せません。記事の内容と件数を確認してから、完全削除するボタンを押してください。</p><div class="data-actions"><button id="cancel" type="button" autofocus>キャンセル</button><button id="delete" type="button" class="data-danger" disabled>完全削除する</button></div></div>
 <div id="progressContent" class="data-modal-content" hidden><div class="data-progress" aria-hidden="true"></div><p role="status" aria-live="polite">削除結果を確認中です。しばらくお待ちください。</p></div>
-<div id="resultContent" class="data-modal-content" hidden><div id="resultIcon" class="data-result-icon" aria-hidden="true"></div><p id="resultSummary" role="status" aria-live="polite"></p><div id="resultDetails" class="data-review-scroll" hidden><ul id="resultList"></ul></div><p class="data-next-prompt">次の操作を選択してください。</p><div class="data-actions"><a id="resultBack" class="data-primary" href="/editor-dashboard.html">編集室に戻る</a><button id="continueData" type="button">続けて記事を整理する</button></div></div>
+<div id="resultContent" class="data-modal-content" hidden><div id="resultIcon" class="data-result-icon" aria-hidden="true"></div><p id="resultSummary" role="status" aria-live="polite"></p><div id="resultDetails" class="data-review-scroll" hidden><ul id="resultList"></ul></div><p class="data-next-prompt">次の操作を選択してください。</p><div class="data-actions"><a id="resultBack" class="data-primary" href="/editor-dashboard.html">記事管理へ</a><button id="continueData" type="button">続けて記事を整理する</button></div></div>
 </dialog>
-<div class="editor-return-bottom"><a class="back" data-back-mirror="dataBack" href="/editor-settings.html">← 運用設定に戻る</a></div>
+<div class="editor-return-bottom" id="dataBackBottom" hidden><a class="back" data-back-mirror="dataBack" href="/editor-settings.html">← 運用設定に戻る</a></div>
 </main><script src="/editor-navigation.js"></script><script src="/header.js"></script><script src="/editor-session.js"></script><script src="/image-utils.js"></script><script src="/pagination.js"></script><script src="/editor-data-management.js"></script><script src="/editor-retention-settings.js"></script></body></html>

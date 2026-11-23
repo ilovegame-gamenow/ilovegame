@@ -6,10 +6,10 @@
  const direct=Number.isSafeInteger(id)&&id>0;
  const returnTarget=params.get('return')||'';
  const safeReturn=returnTarget==='/editor-media.html'||returnTarget==='/editor-dashboard.html'||returnTarget.startsWith('/editor-dashboard.html?')?returnTarget:'/editor-dashboard.html';
- if(direct){$('dataBack').href=safeReturn;$('dataBack').textContent='← 元の記事一覧に戻る';}
+ if(direct){$('dataBack').hidden=false;$('dataBackBottom').hidden=false;$('dataBack').href=safeReturn;$('dataBack').textContent='← 元の記事一覧に戻る';}
  GameEditorNavigation.syncBackLinks('dataBack');
  $('resultBack').href=safeReturn;
- $('resultBack').textContent=direct?'元の記事一覧に戻る':'編集室に戻る';
+ $('resultBack').textContent=direct?'元の記事一覧に戻る':'記事管理へ';
  let rows=[],selected=new Map(),page=1,totalPages=1,hasMore=false,busy=false,reviewed=[],activeSearch={status:'unpublished',field:'title',q:''};
  const node=(tag,text)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;return el;};
  function status(text,error=false){$('message').textContent=text;$('message').dataset.error=String(error);}

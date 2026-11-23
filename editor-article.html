@@ -86,7 +86,7 @@
         document.title =
           `${article.title} | I LOVE GAME♪ 編集室`;
 
-        app.innerHTML = `<a class="back" data-editor-back data-back-mirror="editorBackLink" href="/editor-dashboard.html">← 編集室に戻る</a><aside id="recoveryNoticeBox" class="editor-recovery-notice" ${restored ? "" : "hidden"}>
+        app.innerHTML = `<a class="back" data-editor-back data-back-mirror="editorBackLink" href="/editor-dashboard.html">← 記事一覧に戻る</a><aside id="recoveryNoticeBox" class="editor-recovery-notice" ${restored ? "" : "hidden"}>
           <p id="recoveryNotice" role="status">${esc(restored?.message || "")}</p>
           <a id="recoveryLogin" href="/editor.html" target="_blank" rel="noopener" hidden>別タブでログインする</a>
         </aside>` + GameArticle.render({ ...article, ...editable }) + `
@@ -155,7 +155,7 @@
 
   </section>
   <a class="back" data-editor-back id="editorBackLink" href="/editor-dashboard.html">
-    ← 編集室に戻る
+    ← 記事一覧に戻る
   </a>
 
 `;
@@ -406,7 +406,7 @@ if (statusText) {
             <h2>記事を表示できませんでした</h2>
             <p>${esc(error.message)}</p>
             <a data-editor-back href="/editor-dashboard.html">
-              ← 編集室に戻る
+              ← 記事一覧に戻る
             </a>
           </div>
         `;

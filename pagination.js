@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  function render(currentPage, totalPages, onPageClick) {
+  function render(currentPage, totalPages, onPageClick, options = {}) {
     const current = Math.max(1, Math.min(currentPage, totalPages));
     const total = Math.max(1, totalPages);
 
@@ -15,12 +15,13 @@
     const container = document.createElement("div");
     container.className = "pagination pagination-control";
     container.setAttribute("role", "navigation");
-    container.setAttribute("aria-label", "記事のページ送り");
+    container.setAttribute("aria-label", options.ariaLabel || "記事のページ送り");
     const numberGroup = document.createElement("div");
     numberGroup.className = "pagination-numbers";
 
     function addButton(label, page, disabled = false, active = false) {
       const button = document.createElement("button");
+      button.type = "button";
       button.textContent = label;
       button.disabled = disabled;
       if (active) {
@@ -46,7 +47,7 @@
       (button.classList.contains("pagination-number") ? numberGroup : container).appendChild(button);
     }
 
-    addButton("‹ 新しい記事", current - 1, current === 1);
+    addButton(options.previousLabel || "‹ 新しい記事", current - 1, current === 1);
 
     container.appendChild(numberGroup);
 
@@ -60,7 +61,7 @@
       addButton(String(page), page, false, page === current);
     });
 
-    addButton("古い記事 ›", current + 1, current === total);
+    addButton(options.nextLabel || "古い記事 ›", current + 1, current === total);
 
     return container;
   }

@@ -10,13 +10,12 @@
   const followingFilter=document.getElementById('followingFilter');
   if(['managed','favorites','removed','all'].includes(params.get('filter'))) followingFilter.value=params.get('filter');
   const message = document.getElementById('catalogMessage');
-  const previous = document.getElementById('previousGames');
-  const next = document.getElementById('nextGames');
+
   const storageKey = articleId===null?'ilovegame.catalog.create':`ilovegame.catalog.create.article.${articleId}`;
   const createPanel=document.getElementById('createPanel');
   let articleSource=null,baseline=null;
   const names = ['title','original_title','description','source_url','source_type'];
-  let page=1, hasMore=false, ready=false, busy=false, ending=false, pendingRefresh=false;
+  let page=1, totalPages=1, ready=false, busy=false, ending=false, pendingRefresh=false;
   const {createId,node}=GameCatalogClient;
   let allGames=[], games=[], linkedGames=[], requestId=createId(), sent=false;
   const selectedTitle=()=>allGames.find(g=>g.id===query.value)?.title||'';
@@ -38,8 +37,14 @@
     document.getElementById('createMissingGame').disabled=busy||!ready;
     query.disabled=busy || !ready;
     followingFilter.disabled=busy||!ready;
-    previous.disabled=busy || !ready || page===1;
-    next.disabled=busy || !ready || !hasMore;
+    for(const id of ['gamesPaginationTop','gamesPagination']){
+      const box=document.getElementById(id);box.replaceChildren();
+      if(totalPages>1){
+        const nav=GamePagination.render(page,totalPages,p=>{if(!busy&&ready&&p!==page)selectView(p);},{ariaLabel:'作品一覧のページ送り',previousLabel:'‹ 前のページ',nextLabel:'次のページ ›'});
+        if(busy||!ready)nav.querySelectorAll('button').forEach(b=>b.disabled=true);
+        box.append(nav);
+      }
+    }
     document.querySelectorAll('[data-game-action],[data-following]').forEach(button => button.disabled=busy || !ready);
   }
   const request=(path,options={})=>GameCatalogClient.request(path,options,()=>{stash();ending=true;});
@@ -90,12 +95,11 @@
     if(articleId===null&&!selectedTitle()&&followingFilter.value==='favorites')document.getElementById('gamesEmptyText').textContent='お気に入りはまだありません。作品の☆ボタンか「ゲームを探す」から追加できます。';
     if(articleId===null&&!selectedTitle()&&followingFilter.value==='removed')document.getElementById('gamesEmptyText').textContent='追跡対象外の作品はありません。';
     if (page>1 && !games.length) document.getElementById('gamesEmptyText').textContent='このページに作品はありません。「前へ」で戻ってください。';
-    document.getElementById('gamePage').textContent=`${page}ページ`;
     controls();
   }
   function selectView(targetPage=page){
     const selected=GameSelection.view(allGames,query.value,targetPage);
-    query.value=selected.selectedId;games=selected.games;page=selected.page;hasMore=selected.hasMore;
+    query.value=selected.selectedId;games=selected.games;page=selected.page;totalPages=selected.totalPages;
     render();
   }
   async function load() {
@@ -122,8 +126,6 @@
   document.addEventListener('game-selection-request',event=>{preferredTitle=event.detail?.title||'';query.value='';if(busy){pendingRefresh=true;return;}refresh(1);});
   followingFilter.addEventListener('change',()=>refresh(1));
   document.addEventListener('game-following-changed',()=>{if(busy){pendingRefresh=true;return;}refresh(1);});
-  previous.addEventListener('click',()=>selectView(page-1));
-  next.addEventListener('click',()=>selectView(page+1));
   form.addEventListener('input',stash);
   form.addEventListener('change',stash);
   document.getElementById('clearGame').addEventListener('click',()=>{
@@ -204,7 +206,7 @@
         if(articleSource){document.getElementById('gameSourceHint').textContent='この記事の出典を入力済みです。作品の公式ページやストアが分かれば変更できます。';if(!hasDraft)resetForm();}
 
         document.getElementById('articleContext').hidden=false;
-        const back=document.getElementById('catalogBack');
+        const back=document.getElementById('catalogBack');back.hidden=false;document.getElementById('catalogBackBottom').hidden=false;
         const target=new URL(params.get('return') || `/editor-article.html?id=${articleId}`,location.origin);
         back.href=target.origin===location.origin && target.pathname==='/editor-article.html' && target.searchParams.get('id')===articleIdText
           ? target.pathname+target.search : `/editor-article.html?id=${articleId}`;
