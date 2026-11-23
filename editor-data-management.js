@@ -58,7 +58,10 @@
   $('clear').disabled=busy||!selected.size;
   $('review').disabled=busy||!selected.size;
   for(const id of ['paginationTop','pagination']){const box=$(id);box.replaceChildren();if(totalPages>1){const nav=GamePagination.render(page,totalPages,p=>{if(!busy&&p!==page)load(p);});if(busy)nav.querySelectorAll('button').forEach(b=>b.disabled=true);box.append(nav);}}
-  $('count').textContent='選択：'+selected.size+'件（全ページ・最大'+SELECTION_LIMIT+'件）';
+  const remaining=SELECTION_LIMIT-selected.size;
+  const unselected=rows.filter(r=>!selected.has(r.id)).length;
+  $('selectAll').textContent=remaining>0&&unselected>remaining?'このページから残り'+remaining+'件を選択':'このページの全記事を選択';
+  $('count').textContent='選択中：'+selected.size+'件（最大'+SELECTION_LIMIT+'件）';
   $('cancel').disabled=busy;
   $('delete').disabled=busy||!reviewed.length;
   $('articles').querySelectorAll('input').forEach(el=>el.disabled=busy);

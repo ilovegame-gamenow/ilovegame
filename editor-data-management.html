@@ -16,7 +16,7 @@
 <form id="searchForm" class="data-search"><label>掲載状態<select id="status"><option value="unpublished">非公開（審査待ち・非掲載）</option><option value="pending">審査待ち</option><option value="rejected">非掲載</option><option value="published">掲載中（注意）</option></select></label><label>検索対象<select id="field"><option value="title">記事タイトル</option><option value="source_name">情報元</option><option value="id">記事ID</option></select></label><label>検索キーワード<input id="query" type="search" maxlength="100" placeholder="検証用の記事名など"></label><button type="submit">検索</button><button id="clearQuery" type="button">クリア</button></form>
 <p id="publishedWarning" class="data-warning" hidden>掲載中の記事を削除すると、公開ページからも消えます。関連リンクが切れる可能性があります。</p>
 <p id="message" role="status" aria-live="polite">記事を読み込み中…</p>
-<div class="data-actions"><button id="selectAll" type="button" disabled>このページから追加（上限まで）</button><button id="clear" type="button" disabled>全選択を解除</button><span id="count">選択：0件</span></div>
+<div class="data-actions"><button id="selectAll" type="button" disabled>このページの全記事を選択</button><button id="clear" type="button" disabled>選択をすべて解除</button><span id="count">選択中：0件（最大20件）</span></div>
 <div id="paginationTop"></div><div id="articles" class="data-list"></div><div id="pagination"></div>
 <button id="review" type="button" class="data-danger" disabled>削除対象を確認</button>
 </section>
