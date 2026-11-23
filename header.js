@@ -40,6 +40,7 @@
     const editorArea=location.pathname==='/editor-games.html'?'games':/editor-(settings|data-management|preview)\.html$/.test(location.pathname)?'settings':'articles';
     const editorNav=isEditor?`<nav class="editor-area-nav" aria-label="編集室メニュー">${[{key:'articles',label:'記事管理',href:'/editor-dashboard.html'},{key:'games',label:'作品リスト',href:'/editor-games.html'},{key:'settings',label:'運用管理',href:'/editor-settings.html'}].map(item=>`<a href="${item.href}"${item.key===editorArea?' aria-current="page"':''}>${item.label}</a>`).join('')}</nav>`:'';
     header.innerHTML = `
+      <div class="site-topbar" aria-label="SNS（準備中）"><div class="site-topbar-inner"><span>X</span><span>Instagram</span><span>Bluesky</span><span>YouTube</span></div></div>
       <div class="header-inner">
         <div class="header-brand-group">
         <a class="brand" href="${homeUrl}">
