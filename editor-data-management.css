@@ -44,3 +44,25 @@ html.data-modal-scroll-locked body{position:fixed;top:var(--data-modal-scroll-to
 #confirmationPanel #resultList>li:last-child{border-bottom:0}
 #confirmationPanel .data-next-prompt{font-size:.9rem;color:#746a60}
 #confirmationPanel .data-actions>a{box-sizing:border-box}
+
+/* One selection toolbar: in-flow when empty, fixed to the viewport while selected. */
+.data-selection-slot{margin:12px 0}
+.data-main .data-selection-bar{margin:0;gap:8px 12px;min-width:0}
+.data-selection-bar #count{font-size:var(--section-title-subtitle,12px);color:#746a60;line-height:1.5}
+.data-selection-bar #review{margin-left:auto}
+.data-main .data-selection-bar button{font-size:var(--button-font,14px);min-height:44px}
+.data-main .data-selection-bar.is-floating{
+ position:fixed;z-index:20;left:50%;bottom:max(10px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+ width:min(1160px,calc(100% - 32px));box-sizing:border-box;padding:12px 16px;
+ background:#fff;border:1px solid #e8d7c5;border-radius:14px;box-shadow:0 6px 24px #39261926;
+}
+body[data-page="editor"]>main.data-main.editor-heading-layout{padding-bottom:calc(28px + var(--data-selection-height,0px))}
+@media(max-width:600px){
+ .data-main .data-selection-bar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+ .data-selection-bar #review{margin-left:0}
+ .data-selection-bar #count{padding-inline:2px}
+ .data-main .data-selection-bar.is-floating{width:calc(100% - 20px);padding:10px}
+ .data-main .data-selection-bar button{white-space:normal;overflow-wrap:anywhere;padding:7px 6px}
+}
+
+html{scroll-padding-bottom:var(--data-selection-height,0px)}

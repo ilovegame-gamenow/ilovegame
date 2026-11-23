@@ -50,6 +50,21 @@
   $('resultDetails').hidden=!details.length;
   setStage('result',error);$('confirmationTitle').focus();
  }
+ const selectionBar=$('selectionBar'), selectionSlot=$('selectionBarSlot');
+ function sizeSelectionBar(){
+  if(!selectionBar.classList.contains('is-floating'))return;
+  const height=Math.ceil(selectionBar.getBoundingClientRect().height);
+  selectionSlot.style.minHeight=height+'px';
+  document.documentElement.style.setProperty('--data-selection-height',(height+24)+'px');
+ }
+ function updateSelectionBar(){
+  const floating=selected.size>0;
+  selectionBar.classList.toggle('is-floating',floating);
+  if(floating)sizeSelectionBar();
+  else{selectionSlot.style.minHeight='';document.documentElement.style.removeProperty('--data-selection-height');}
+ }
+ if(typeof ResizeObserver==='function')new ResizeObserver(sizeSelectionBar).observe(selectionBar);
+ window.addEventListener('resize',sizeSelectionBar);
  function controls(){
   for(const id of ['status','field','query'])$(id).disabled=busy;
   $('searchForm').querySelector('button').disabled=busy;
@@ -62,6 +77,7 @@
   const unselected=rows.filter(r=>!selected.has(r.id)).length;
   $('selectAll').textContent=remaining>0&&unselected>remaining?'このページから残り'+remaining+'件を選択':'このページの全記事を選択';
   $('count').textContent='選択中：'+selected.size+'件（最大'+SELECTION_LIMIT+'件）';
+  updateSelectionBar();
   $('cancel').disabled=busy;
   $('delete').disabled=busy||!reviewed.length;
   $('articles').querySelectorAll('input').forEach(el=>el.disabled=busy);
