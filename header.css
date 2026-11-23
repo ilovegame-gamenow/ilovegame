@@ -263,3 +263,21 @@ body[data-page="editor"] #articleEditForm>h2{border-bottom:1px solid var(--secti
 body[data-page="editor"] .editor-inline-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;margin:0 0 10px;min-width:0}
 body[data-page="editor"] .editor-inline-heading h2{margin:0;font-size:var(--editor-subheading-font);font-weight:800;line-height:1.4;flex:none}
 body[data-page="editor"] .editor-inline-heading .section-subtitle{margin:0;font-size:var(--section-title-subtitle);font-weight:400;line-height:1.5;color:#84694f;min-width:0;overflow-wrap:anywhere}
+
+/* Editorial identity belongs with the logo; navigation shares its row when space permits. */
+body[data-page="editor"] header .brand-wordmark{position:relative;min-width:0;padding-top:15px}
+body[data-page="editor"] header .editor-brand-label{position:absolute;top:0;left:0;font-size:12px;font-weight:800;line-height:1;color:#a95012;white-space:nowrap;letter-spacing:.08em}
+body[data-page="editor"] header .header-inner{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand actions" "nav nav";gap:12px 10px}
+body[data-page="editor"] header .header-brand-group{grid-area:brand;justify-self:start;max-width:100%;min-width:0}
+body[data-page="editor"] header .editor-header-actions{grid-area:actions;justify-self:end;margin:0}
+body[data-page="editor"] header .editor-area-nav{grid-area:nav;max-width:none;margin:0;min-width:0}
+@media(min-width:960px){
+  body[data-page="editor"] header .header-inner{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"brand nav actions";column-gap:16px}
+  body[data-page="editor"] header .editor-area-nav{justify-content:flex-end;align-items:center;flex-wrap:nowrap}
+}
+@media(max-width:600px){
+  body[data-page="editor"] header .header-inner{gap:10px 8px}
+  body[data-page="editor"] header .brand-wordmark{padding-top:12px}
+  body[data-page="editor"] header .editor-brand-label{font-size:10px}
+  body[data-page="editor"] header .editor-area-nav{margin:0}
+}
