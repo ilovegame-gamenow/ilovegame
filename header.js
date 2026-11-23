@@ -16,7 +16,7 @@
       if (!document.querySelector("body > footer")) {
         const footer = document.createElement("footer");
         footer.className = "public-site-footer";
-        footer.innerHTML = `<nav class="footer-nav" aria-label="サイト情報"><a href="/">公開サイト</a><a href="/about.html">サイトについて</a><a href="/privacy.html">プライバシーポリシー</a></nav><small class="footer-copyright">© 2026 I LOVE GAME♪</small>`;
+        footer.innerHTML = `<nav class="footer-nav" aria-label="サイト情報"><a href="/">公開サイト</a><a href="/about.html">サイトについて</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><small class="footer-copyright">© 2026 I LOVE GAME♪</small>`;
         document.body.append(footer);
       }
     }
