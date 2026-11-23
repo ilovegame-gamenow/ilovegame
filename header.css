@@ -303,12 +303,14 @@ body[data-page="editor"] header .editor-area-nav{grid-area:nav;max-width:none;ma
 /* A fine inset outline preserves the existing responsive button dimensions. */
 header nav a.calendar-link{box-shadow:inset 0 0 0 1px var(--button-outline)}
 
-/* Keep the sign readable on compact headers without moving the wordmark. */
+/* The editorial mascot peeks over a wide sign; the wordmark stays fixed. */
+body[data-page="editor"] header .header-brand-group{padding-right:108px}
+body[data-page="editor"] header .editor-mascot{width:100px;height:68px}
 @media(max-width:600px){
-  body[data-page="editor"] header .header-brand-group{padding-right:52px}
-  body[data-page="editor"] header .editor-mascot{width:48px;height:48px}
+  body[data-page="editor"] header .header-brand-group{padding-right:68px}
+  body[data-page="editor"] header .editor-mascot{width:64px;height:46px}
 }
 @media(max-width:359px){
-  body[data-page="editor"] header .header-brand-group{padding-right:44px}
-  body[data-page="editor"] header .editor-mascot{width:40px;height:40px}
+  body[data-page="editor"] header .header-brand-group{padding-right:56px}
+  body[data-page="editor"] header .editor-mascot{width:52px;height:38px}
 }

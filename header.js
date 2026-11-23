@@ -34,7 +34,7 @@
         : `<nav>${links}</nav>`;
 
     const mascot = isEditor
-      ? '<img class="header-mascot editor-mascot" src="/assets/cosmochi_editor_sign.webp" width="68" height="68" decoding="async" alt="編集室">'
+      ? '<img class="header-mascot editor-mascot" src="/assets/cosmochi_editor_peek.webp" width="100" height="68" decoding="async" alt="編集室">'
       : '<img class="header-mascot" src="/assets/cosmochi_welcome_mitten.png" width="68" height="68" decoding="async" alt="">';
 
     const editorArea=location.pathname==='/editor-games.html'?'games':/editor-(settings|data-management|preview)\.html$/.test(location.pathname)?'settings':'articles';
