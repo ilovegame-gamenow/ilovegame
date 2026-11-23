@@ -21,7 +21,11 @@ window.GameEditorSession = (() => {
     covered = true;
     if (!cover) {
       const style = document.createElement('style');
-      style.textContent = `html.editor-session-covered body > :not(#editor-session-cover), html.editor-session-covered body > :not(#editor-session-cover) * { visibility:hidden !important; pointer-events:none !important; } #editor-session-cover { position:fixed; inset:0; z-index:2147483647; background:#fff8f1; color:#333; display:grid; place-items:center; padding:24px; font:inherit; } #editor-session-cover[hidden] { display:none !important; } #editor-session-cover div { max-width:420px; width:100%; padding:28px; border-radius:18px; background:white; text-align:center; box-shadow:0 4px 20px #0000000d; } #editor-session-cover button, #editor-session-cover a { display:block; margin:16px auto 0; font:inherit; color:#a14a10; } #editor-session-cover [hidden] { display:none !important; }`;
+      style.textContent = `html.editor-session-covered body > :not(#editor-session-cover), html.editor-session-covered body > :not(#editor-session-cover) * { visibility:hidden !important; pointer-events:none !important; }
+      /* Preserve only the static brand; all editorial data and controls stay concealed and inert. */
+      html.editor-session-covered body > header:not(#editor-session-cover) { visibility:visible !important; position:relative; z-index:2147483647; }
+      html.editor-session-covered body > header:not(#editor-session-cover) > .header-inner > .header-brand-group, html.editor-session-covered body > header:not(#editor-session-cover) > .header-inner > .header-brand-group * { visibility:visible !important; }
+      #editor-session-cover { position:fixed; inset:0; z-index:2147483646; background:#fff8f1; color:#333; display:grid; place-items:center; padding:24px; font:inherit; } #editor-session-cover[hidden] { display:none !important; } #editor-session-cover div { max-width:420px; width:100%; padding:28px; border-radius:18px; background:white; text-align:center; box-shadow:0 4px 20px #0000000d; } #editor-session-cover button, #editor-session-cover a { display:block; margin:16px auto 0; font:inherit; color:#a14a10; } #editor-session-cover [hidden] { display:none !important; }`;
       document.head.append(style);
       cover = document.createElement('section');
       cover.id = 'editor-session-cover';
@@ -31,6 +35,8 @@ window.GameEditorSession = (() => {
       document.body.append(cover);
     }
     document.documentElement.classList.add('editor-session-covered');
+    const header = document.querySelector('body > header');
+    if (header) header.inert = true;
     cover.querySelector('p').textContent = message;
     cover.querySelector('button').hidden = !retry;
     cover.querySelector('a').hidden = !recovery;
@@ -41,6 +47,8 @@ window.GameEditorSession = (() => {
   function hideCover() {
     if (cover) cover.hidden = true;
     document.documentElement.classList.remove('editor-session-covered');
+    const header = document.querySelector('body > header');
+    if (header) header.inert = false;
     covered = false;
   }
 

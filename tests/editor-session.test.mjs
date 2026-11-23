@@ -30,9 +30,9 @@ async function sessionTest(run) {
   if(res.headers['set-cookie'])applyCookie(res.headers['set-cookie']);
   return res;
  };
- const classes=new Set(),elements=new Map();
+ const classes=new Set(),elements=new Map(),header={inert:false};
  const makeElement=()=>({hidden:false,textContent:'',children:new Map(),contains:()=>false,addEventListener(){},querySelector(tag){if(!this.children.has(tag))this.children.set(tag,makeElement());return this.children.get(tag);}});
- const document={hidden:false,activeElement:null,documentElement:{classList:{add:name=>classes.add(name),remove:name=>classes.delete(name),contains:name=>classes.has(name)}},head:{append(){}},body:{append(el){elements.set(el.id,el);}},createElement:makeElement,addEventListener(type,fn){if(!events.has(type))events.set(type,[]);events.get(type).push(fn);}};
+ const document={hidden:false,activeElement:null,documentElement:{classList:{add:name=>classes.add(name),remove:name=>classes.delete(name),contains:name=>classes.has(name)}},head:{append(el){elements.set('cover-style',el);}},querySelector(selector){return selector==='body > header'?header:null;},body:{append(el){elements.set(el.id,el);}},createElement:makeElement,addEventListener(type,fn){if(!events.has(type))events.set(type,[]);events.get(type).push(fn);}};
  const context=vm.createContext({document,Date,console:{warn(){}},location:{replace:url=>redirects.push(url)},window:new EventTarget(),Event,
   setTimeout:(fn,delay)=>{const id=++nextId;timers.set(id,{fn,at:now+delay,interval:0});return id;},
   clearTimeout:id=>timers.delete(id),
@@ -66,7 +66,7 @@ async function sessionTest(run) {
   assert.match(loggedIn.headers['set-cookie'],/HttpOnly; Secure; SameSite=Strict; Path=\/api\/; Max-Age=3600/);
   vm.runInContext(clientScript,context);
   const start=async()=>{vm.runInContext('window.GameEditorSession.start()',context);await settle();};
-  await run({start,event,advance,suspend,dispatch,calls,redirects,document,timers,context,covered:()=>classes.has('editor-session-covered'),cover:()=>elements.get('editor-session-cover'),now:()=>now,setFailure:value=>{failure=value;},cookie:()=>cookie});
+  await run({start,event,advance,suspend,dispatch,calls,redirects,document,timers,context,header,coverStyle:()=>elements.get('cover-style')?.textContent,covered:()=>classes.has('editor-session-covered'),cover:()=>elements.get('editor-session-cover'),now:()=>now,setFailure:value=>{failure=value;},cookie:()=>cookie});
  } finally {Date.now=realNow;if(previousSecret===undefined)delete process.env.EDITOR_SECRET;else process.env.EDITOR_SECRET=previousSecret;}
 }
 
@@ -200,5 +200,19 @@ test('pagehide conceals before bfcache freeze even if visibility has not changed
   const restored=new Event('pageshow');Object.defineProperty(restored,'persisted',{value:true});
   s.context.window.dispatchEvent(restored);for(let i=0;i<8;i++)await Promise.resolve();
   assert.equal(s.covered(),false);
+ });
+});
+
+
+test('session cover keeps static branding visible but disables header interactions and conceals other content',async()=>{
+ await sessionTest(async s=>{
+  await s.start();assert.equal(s.header.inert,false);
+  s.document.hidden=true;await s.event('visibilitychange');
+  assert.equal(s.covered(),true);assert.equal(s.header.inert,true);
+  const css=s.coverStyle();
+  assert.match(css,/body > :not\(#editor-session-cover\) \* \{ visibility:hidden !important; pointer-events:none !important;/);
+  assert.match(css,/body > header:not\(#editor-session-cover\) > \.header-inner > \.header-brand-group \* \{ visibility:visible !important;/);
+  s.document.hidden=false;await s.event('visibilitychange');
+  assert.equal(s.covered(),false);assert.equal(s.header.inert,false);
  });
 });
