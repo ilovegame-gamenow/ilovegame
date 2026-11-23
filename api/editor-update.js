@@ -1,4 +1,6 @@
-import { requireEditor } from "../lib/editor-auth.js";
+import { requireEditor, requireEditorOrigin } from "../lib/editor-auth.js";
+import { isGameId } from "../lib/game-catalog-input.js";
+import { catalogRequest } from "../lib/catalog-database.js";
 import { getArticleById } from "../lib/article-repository.js";
 import { canPublishArticle } from "../lib/article-publication.js";
 
@@ -12,7 +14,7 @@ export default async function handler(req, res) {
 
   if (!requireEditor(req, res)) return;
 
-  const { id, status } = req.body || {};
+  const { id, status, exclude_game_id } = req.body || {};
 
   const allowedStatuses = ["published", "pending", "rejected"];
 
@@ -30,6 +32,16 @@ export default async function handler(req, res) {
 
   if (!supabaseUrl || !supabaseKey) {
     return res.status(503).json({ error: "Database unavailable" });
+  }
+
+  if (exclude_game_id !== undefined) {
+    if (status !== "rejected" || !isGameId(exclude_game_id)) return res.status(400).json({error:"作品の指定が正しくありません"});
+    if (!requireEditorOrigin(req,res)) return;
+    try {
+      const ok=await catalogRequest(supabaseUrl,supabaseKey,'rpc/reject_article_with_tracking',{method:'POST',body:JSON.stringify({p_article_id:id,p_game_id:exclude_game_id})});
+      if(ok!==true)return res.status(409).json({error:"記事の処理状態または関連作品が変わりました。再読み込みしてください。"});
+      return res.status(200).json({ok:true});
+    } catch { return res.status(502).json({error:"非掲載・追跡対象外の保存に失敗しました"}); }
   }
 
   const url =

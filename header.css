@@ -227,3 +227,9 @@ body.editor-login-page>main{margin:0 auto}
 @media(min-width:601px){
   body.public-site-page header nav a,body[data-page="editor"] .editor-header-actions .logout{display:inline-flex;align-items:center;justify-content:center;min-height:var(--button-height);box-sizing:border-box}
 }
+
+/* Editorial workspace navigation: articles remain the default entry point. */
+body[data-page="editor"] header .editor-area-nav{max-width:1160px;margin:14px auto 0;display:flex;justify-content:flex-start;gap:8px;flex-wrap:wrap}
+body[data-page="editor"] header .editor-area-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 18px;font-size:var(--button-font);font-weight:700;border:1px solid #ead9ca;background:#fffaf4;color:#785039;border-radius:9px;text-decoration:none}
+body[data-page="editor"] header .editor-area-nav a[aria-current="page"]{background:#a95012;color:#fff;border-color:#a95012}
+@media(max-width:600px){body[data-page="editor"] header .editor-area-nav{gap:6px;margin-top:10px}body[data-page="editor"] header .editor-area-nav a{flex:1;min-width:0;padding:8px 4px;min-height:40px}}

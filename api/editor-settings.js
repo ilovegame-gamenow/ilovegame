@@ -1,6 +1,6 @@
 import { getInformationSources } from '../lib/information-sources.js';
 import { requireEditor, requireEditorOrigin } from '../lib/editor-auth.js';
-import { getSiteSettings, saveSiteSettings, validateSettings, settingRules } from '../lib/site-settings.js';
+import { getSiteSettings, saveSiteSettings, validateSettings, settingRules, validateRetentionSettings, saveRetentionSettings } from '../lib/site-settings.js';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -9,15 +9,17 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
   if (!requireEditor(req, res)) return;
+  const retention=req.query?.resource==='retention';
+  if(req.query?.resource!==undefined&&!retention)return res.status(400).json({error:'Invalid resource'});
   if (req.method === 'POST') {
     if (!requireEditorOrigin(req, res)) return;
-    if (!validateSettings(req.body, { allowOmittedCollectionLimits: true })) return res.status(400).json({ error: '設定値の範囲・しきい値の大小関係・評価方針を確認してください' });
+    if (!(retention ? validateRetentionSettings(req.body) : validateSettings(req.body, { allowOmittedCollectionLimits: true }))) return res.status(400).json({ error: '設定値の範囲・しきい値の大小関係・評価方針を確認してください' });
   }
   try {
     const url = process.env.SUPABASE_URL;
     const key = process.env.SUPABASE_SECRET_KEY;
     const settings = req.method === 'POST'
-      ? await saveSiteSettings(url, key, req.body)
+      ? await (retention?saveRetentionSettings(url,key,req.body):saveSiteSettings(url, key, req.body))
       : await getSiteSettings(url, key);
     return res.status(200).json({ settings, rules: settingRules, sources:getInformationSources(settings,process.env) });
   } catch (error) {

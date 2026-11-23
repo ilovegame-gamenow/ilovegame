@@ -64,3 +64,5 @@
 .retention-control{box-sizing:border-box;flex:0 0 128px;width:128px;min-width:0;min-height:48px;padding:10px;border:1px solid #d8c5b2;border-radius:10px;background:#fffdfa;color:#302a25;font:inherit;font-size:18px;font-weight:700;text-align:center}
 .retention-control:focus-visible{outline:3px solid #a95012;outline-offset:3px}
 @media(max-width:480px){.retention-control{flex-basis:114px;width:114px;font-size:16px;padding:8px}}
+
+.retention-save{width:100%;min-height:48px;border:0;border-radius:12px;background:#c6530c;color:#fff;font:inherit;font-size:var(--button-font);font-weight:800;cursor:pointer}.retention-save:disabled{opacity:.6;cursor:default}#retentionMessage{font-size:14px;line-height:1.6;color:#71675e}#retentionMessage[data-error=true]{color:#a52330}

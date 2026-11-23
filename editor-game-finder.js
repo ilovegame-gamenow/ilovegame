@@ -33,7 +33,7 @@
     const body=result&&result.provider!=='steam'?{id,provider:result.provider,external_id:result.externalId}:{id,...(appid?{appid}:{title})};
     const saved=game?await request('/api/editor-games',options({action:'following',game_id:game.id,operation:'favorite_on'})):await request('/api/editor-games?resource=finder',options(body));
     if(!saved)return;
-    button.replaceWith(node('p','★ お気に入りに登録しました'));document.dispatchEvent(new Event('game-following-changed'));message.textContent='登録しました。「管理中のゲーム」で確認できます。次回の定期収集から個別確認の対象になります。';
+    button.replaceWith(node('p','★ お気に入りに登録しました'));document.dispatchEvent(new Event('game-following-changed'));message.textContent='登録しました。「登録作品」で確認できます。次回の定期収集から個別確認の対象になります。';
    }catch(error){message.textContent=error.message;}finally{controls(false);}
   });card.append(button);return card;
  }

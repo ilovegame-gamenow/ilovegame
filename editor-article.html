@@ -348,7 +348,8 @@ document.getElementById("articleViewActions").hidden = false;
         async function changeStatus(status) {
           const action = status === "published" ? "掲載" : "非掲載";
 
-          if (!confirm(`この記事を${action}に変更しますか？`)) return;
+          const choice = await GameEditorStatus.confirmChange(Number(article.id),status,article.processing_status==="completed");
+          if (!choice) return;
 
           publishButton.disabled = true;
           rejectButton.disabled = true;
@@ -356,12 +357,13 @@ document.getElementById("articleViewActions").hidden = false;
           try {
             const success = await GameEditorStatus.update(
               Number(article.id),
-              status
+              status, choice.excludeGameId
             );
 
             if (!success) return;
 
             article.status = status;
+            if(choice.excludeGameId)GameArticleContext.mount(document.getElementById('articleGameContext'),Number(article.id));
             updateArticleDataLink();
 
             const statusLabel = {
@@ -380,7 +382,7 @@ if (statusText) {
             updateButtons();
           } catch (error) {
             console.error("掲載状態の変更エラー:", error);
-            alert("変更に失敗しました。");
+            alert(error.message || "変更に失敗しました。");
             updateButtons();
           }
         }

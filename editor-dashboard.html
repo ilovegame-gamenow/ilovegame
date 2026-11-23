@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/pagination.css">
   <link rel="stylesheet" href="/editor-filters.css">
   <link rel="stylesheet" href="/editor-recovery.css">
+  <link rel="stylesheet" href="/editor-confirm.css">
   <style>
     * { box-sizing: border-box; }
     body {
@@ -184,8 +185,7 @@
     
 <div class="dashboard-toolbar">
   <h1>記事管理</h1>
-  <a class="dashboard-settings" href="/editor-games.html">作品管理</a>
-  <a class="dashboard-settings" href="/editor-settings.html"><span aria-hidden="true">⚙︎</span> 設定・情報源</a>
+
 </div>
 <section id="pendingRecovery" class="editor-recovery-notice" hidden aria-label="中断した記事編集"></section>
 <section class="editor-filters-panel" aria-label="記事の絞り込み">
@@ -481,7 +481,8 @@ list.appendChild(item);
  
 async function updateStatus(article, status, publish, reject) {
   const action = status === "published" ? "掲載" : "非掲載";
-  if (!confirm(`この記事を${action}に変更しますか？`)) return;
+  const choice = await GameEditorStatus.confirmChange(Number(article.id),status,article.processing_status==="completed");
+          if (!choice) return;
 
   publish.disabled = true;
   reject.disabled = true;
@@ -490,15 +491,15 @@ async function updateStatus(article, status, publish, reject) {
   try {
     const success = await GameEditorStatus.update(
       Number(article.id),
-      status
-    );
+              status, choice.excludeGameId
+            );
 
     if (!success) return;
 
     await loadArticles();
   } catch (error) {
     console.error("掲載状態の変更エラー:", error);
-    message.textContent = "変更に失敗しました。";
+    message.textContent = error.message || "変更に失敗しました。";
     render();
   }
 }

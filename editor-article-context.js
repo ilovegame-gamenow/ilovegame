@@ -39,7 +39,9 @@
      const row=node('p'),link=node('a',game.title);link.href=`/editor-games.html?q=${encodeURIComponent(game.title)}&filter=all`;
      const star=node('button',game.is_favorite?'★ お気に入り':'☆ お気に入り');star.type='button';star.setAttribute('aria-pressed',String(Boolean(game.is_favorite)));
      star.addEventListener('click',async()=>{star.disabled=true;status.textContent='保存中…';try{const saved=await request('/api/editor-games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'following',operation:game.is_favorite?'favorite_off':'favorite_on',game_id:game.id})});if(saved)await load();}catch(error){status.textContent=error.message;}finally{star.disabled=false;}});
-     row.append(link,document.createTextNode('　'),star);games.append(row);
+     const exclude=node('button',game.is_managed===false?'追跡対象外を解除':'追跡対象外にする');exclude.type='button';exclude.setAttribute('aria-pressed',String(game.is_managed===false));
+     exclude.addEventListener('click',async()=>{if(game.is_managed!==false&&!confirm('この作品の個別追跡を停止します。記事の掲載状態は変わりません。よろしいですか？'))return;exclude.disabled=star.disabled=true;status.textContent='保存中…';try{const saved=await request('/api/editor-games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'following',operation:game.is_managed===false?'restore':'remove',game_id:game.id})});if(saved)await load();}catch(error){status.textContent=error.message;}finally{exclude.disabled=star.disabled=false;}});
+     row.append(link,document.createTextNode('　'),star,document.createTextNode(' '),exclude);games.append(row);
     }
     reasons(reason,data);status.textContent='';
    }catch(error){status.textContent=error.message;reload.hidden=false;}finally{reload.disabled=false;}

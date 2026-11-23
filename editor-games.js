@@ -49,9 +49,9 @@
     if(articleId===null){
     const actions=node('div',undefined,'following-actions');
     const favorite=node('button',game.is_favorite?'★ お気に入り':'☆ お気に入り');favorite.type='button';favorite.dataset.following=game.is_favorite?'favorite_off':'favorite_on';favorite.dataset.gameId=game.id;favorite.setAttribute('aria-pressed',String(Boolean(game.is_favorite)));actions.append(favorite);
-    const remove=node('button',game.is_managed===false?'管理リストに戻す':'管理リストから外す');remove.type='button';remove.dataset.following=game.is_managed===false?'restore':'remove';remove.dataset.gameId=game.id;actions.append(remove);li.append(actions);
+    const remove=node('button',game.is_managed===false?'追跡対象外を解除':'追跡対象外にする');remove.type='button';remove.dataset.following=game.is_managed===false?'restore':'remove';remove.dataset.gameId=game.id;actions.append(remove);li.append(actions);
     const outcomes={no_change:'新情報なし',news_found:'新情報あり',partial:'一部確認',failed:'確認できず'};
-    li.append(node('p',game.last_checked_at?`最終確認：${GameDate.format(game.last_checked_at)} ／ ${outcomes[game.check_outcome]||'確認済み'}`:game.is_favorite?'定期確認待ち':'通常のニュース収集の対象','following-status'));
+    li.append(node('p',game.is_managed===false?'追跡対象外':game.last_checked_at?`最終確認：${GameDate.format(game.last_checked_at)} ／ ${outcomes[game.check_outcome]||'確認済み'}`:game.is_favorite?'定期確認待ち':'通常のニュース収集の対象','following-status'));
     if(game.check_note)li.append(node('p',game.check_note,'catalog-note'));
     }
 
@@ -88,7 +88,7 @@
     document.getElementById('createMissingGame').textContent=articleId===null?'ゲームを探して追加':'この作品を新しく登録';
     document.getElementById('gamesEmptyText').textContent=selectedTitle()?'選択したゲームは表示条件に含まれていません。':'まだ管理中の作品はありません。「ゲームを探す」から追加できます。';
     if(articleId===null&&!selectedTitle()&&followingFilter.value==='favorites')document.getElementById('gamesEmptyText').textContent='お気に入りはまだありません。作品の☆ボタンか「ゲームを探す」から追加できます。';
-    if(articleId===null&&!selectedTitle()&&followingFilter.value==='removed')document.getElementById('gamesEmptyText').textContent='管理リストから外した作品はありません。';
+    if(articleId===null&&!selectedTitle()&&followingFilter.value==='removed')document.getElementById('gamesEmptyText').textContent='追跡対象外の作品はありません。';
     if (page>1 && !games.length) document.getElementById('gamesEmptyText').textContent='このページに作品はありません。「前へ」で戻ってください。';
     document.getElementById('gamePage').textContent=`${page}ページ`;
     controls();
@@ -147,9 +147,9 @@
   });
   document.addEventListener('click',async event=>{
     const button=event.target.closest('[data-following]');if(!button||busy||!ready)return;
-    if(button.dataset.following==='remove'&&!confirm('管理リストから外し、お気に入りの個別確認を停止します。公開記事・発売情報は残ります。よろしいですか？'))return;
+    if(button.dataset.following==='remove'&&!confirm('この作品を追跡対象外にし、お気に入りの個別確認を停止します。重要ニュース・公開記事・発売情報は残ります。よろしいですか？'))return;
     busy=true;controls();
-    try{const result=await request('/api/editor-games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'following',operation:button.dataset.following,game_id:button.dataset.gameId})});if(result){await load();notify('管理状態を保存しました。');}}
+    try{const result=await request('/api/editor-games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'following',operation:button.dataset.following,game_id:button.dataset.gameId})});if(result){await load();notify('追跡設定を保存しました。');}}
     catch(error){notify(error.message,true);}finally{busy=false;controls();}
   });
   document.addEventListener('click',async event=>{

@@ -36,6 +36,8 @@
 
     const mascot = '<img class="header-mascot" src="/assets/cosmochi_welcome_mitten.png" width="68" height="68" decoding="async" alt="">';
 
+    const editorArea=location.pathname==='/editor-games.html'?'games':/editor-(settings|data-management|preview)\.html$/.test(location.pathname)?'settings':'articles';
+    const editorNav=isEditor?`<nav class="editor-area-nav" aria-label="編集室メニュー">${[{key:'articles',label:'記事管理',href:'/editor-dashboard.html'},{key:'games',label:'作品リスト',href:'/editor-games.html'},{key:'settings',label:'運用設定',href:'/editor-settings.html'}].map(item=>`<a href="${item.href}"${item.key===editorArea?' aria-current="page"':''}>${item.label}</a>`).join('')}</nav>`:'';
     header.innerHTML = `
       <div class="header-inner">
         <div class="header-brand-group">
@@ -53,6 +55,7 @@
         </div>
         ${rightContent}
       </div>
+      ${editorNav}
     `;
   }
 
