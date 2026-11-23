@@ -15,6 +15,11 @@
       "source": "/editor-research.html",
       "destination": "/editor-games.html#find",
       "permanent": false
+    },
+    {
+      "source": "/editorial-policy.html",
+      "destination": "/about.html",
+      "permanent": true
     }
   ],
   "regions": [
