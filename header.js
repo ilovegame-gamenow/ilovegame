@@ -45,7 +45,7 @@
           <div class="brand-wordmark">
             ${isEditor ? '<span class="editor-brand-label">編集室</span>' : ''}
             <div class="logo">
-              ${isEditor ? '<span class="editor-logo-text">I <span class="love">LOVE</span> GAME</span>' : 'I <span class="love">LOVE</span> GAME'}<span class="music">♪</span>
+              <span class="logo-wordmark-text">I <span class="love">LOVE</span> GAME</span><span class="music">♪</span>
             </div>
             <div class="tagline">ゲームの「今」をお届け♪</div>
           </div>
@@ -56,6 +56,29 @@
         ${rightContent}
       </div>
     `;
+    if (isEditor) {
+      const wordmark = header.querySelector(".brand-wordmark");
+      const text = wordmark.querySelector(".logo-wordmark-text");
+      const badge = wordmark.querySelector(".editor-brand-label");
+      const tagline = wordmark.querySelector(".tagline");
+      const alignBadge = () => {
+        const bounds = wordmark.getBoundingClientRect();
+        const edge = text.getBoundingClientRect().right;
+        badge.style.setProperty("--editor-badge-right", Math.max(0, bounds.right - edge) + "px");
+        // Keep the logo and tagline unchanged even if the badge needs more room.
+        const range = document.createRange();
+        range.selectNodeContents(tagline);
+        const captionEdge = range.getBoundingClientRect().right;
+        badge.classList.toggle("is-tight", edge - captionEdge < badge.offsetWidth + 3);
+      };
+      alignBadge();
+      if (typeof ResizeObserver === "function") {
+        const observer = new ResizeObserver(alignBadge);
+        observer.observe(wordmark);
+      }
+      window.addEventListener("resize", alignBadge);
+      document.fonts?.ready.then(alignBadge);
+    }
   }
 
   if (document.readyState === "loading") {
