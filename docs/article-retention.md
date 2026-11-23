@@ -1,6 +1,6 @@
 # 記事の自動整理
 
-毎日03:15 JSTにDB内で実行。新規機能導入時点から既存記事の猶予を計算する。公開歴あり、処理未完了、保存済み下書きは除外。1回100件まで。設定OFFで停止し、既存タスクは変更しない。自動削除されたURLは非公開の記録に保持し再登録を防ぐ。削除は復元不能。
+指定時刻（初期値03:15 JST）にDB内で1日1回実行。設定は1分単位で変更可能。新規機能導入時点から既存記事の猶予を計算する。公開歴あり、処理未完了、保存済み下書きは除外。1回100件まで。設定OFFで停止し、既存タスクは変更しない。自動削除されたURLは非公開の記録に保持し再登録を防ぐ。削除は復元不能。
 
 DB migration: `article_retention_guarded_cleanup`（適用済み）。
 
@@ -65,4 +65,33 @@ begin
 end $$;
 revoke all on function article_retention.run_cleanup(boolean) from public,anon,authenticated,service_role;
 select cron.schedule('ilovegame-article-retention','15 18 * * *','select article_retention.run_cleanup(false);');
+```
+
+## 実行時刻の変更
+
+Migration: `configurable_article_retention_schedule`（適用済み）。既存Cronを更新し、1分ごとに日本時間を照合。対象時刻以外は何もしない。同日実行済みの場合は翌日から適用する。
+
+```sql
+alter table public.site_settings add column auto_cleanup_time_jst text not null default '03:15' check (auto_cleanup_time_jst ~ '^([01][0-9]|2[0-3]):[0-5][0-9]$');
+create table article_retention.schedule_state(id integer primary key check(id=1),last_run_date date);
+alter table article_retention.schedule_state enable row level security;
+insert into article_retention.schedule_state(id,last_run_date)
+select 1,max((d.end_time at time zone 'Asia/Tokyo')::date) from cron.job_run_details d join cron.job j on j.jobid=d.jobid where j.jobname='ilovegame-article-retention' and d.status='succeeded';
+create function article_retention.scheduled_cleanup() returns jsonb language plpgsql security invoker set search_path='' as $$
+declare cfg public.site_settings%rowtype; local_now timestamp:=now() at time zone 'Asia/Tokyo'; previous_date date; result jsonb;
+begin
+ select * into cfg from public.site_settings where id=1 for share;
+ if not found or cfg.auto_cleanup_enabled<>1 then return jsonb_build_object('status','disabled'); end if;
+ if to_char(local_now,'HH24:MI')<>cfg.auto_cleanup_time_jst then return jsonb_build_object('status','not_due'); end if;
+ select last_run_date into previous_date from article_retention.schedule_state where id=1 for update;
+ if not found then raise exception 'Missing retention schedule state'; end if;
+ if previous_date=local_now::date then return jsonb_build_object('status','already_run'); end if;
+ result:=article_retention.run_cleanup(false);
+ if result->>'enabled'='true' and not (result ? 'busy') then
+  update article_retention.schedule_state set last_run_date=local_now::date where id=1;
+ end if;
+ return result;
+end $$;
+revoke all on function article_retention.scheduled_cleanup() from public,anon,authenticated,service_role;
+select cron.alter_job(job_id:=jobid,schedule:='* * * * *',command:='select article_retention.scheduled_cleanup();') from cron.job where jobname='ilovegame-article-retention' and username='postgres';
 ```

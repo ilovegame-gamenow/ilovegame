@@ -82,7 +82,8 @@
         </section>
         <section id="retentionSettings" class="settings-section" aria-labelledby="retentionHeading">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="retentionHeading">記事の自動整理</h2><p>審査待ち・非掲載記事の保存期間</p></div></div>
-          <div class="setting-field"><div class="field-description"><label for="auto_cleanup_enabled">自動整理</label><p>毎日3:15（日本時間）に確認</p></div><select id="auto_cleanup_enabled" name="auto_cleanup_enabled" required><option value="0">OFF</option><option value="1">ON</option></select></div>
+          <div class="setting-field"><div class="field-description"><label for="auto_cleanup_enabled">自動整理</label><p>指定時刻に1日1回確認</p></div><select class="retention-control" id="auto_cleanup_enabled" name="auto_cleanup_enabled" required><option value="0">OFF</option><option value="1">ON</option></select></div>
+          <div class="setting-field"><div class="field-description"><label for="auto_cleanup_time_jst">自動整理の実行時刻</label><p>日本時間（JST）・1分単位</p></div><input class="retention-control" id="auto_cleanup_time_jst" name="auto_cleanup_time_jst" type="time" step="60" required></div>
           <div class="setting-field"><div class="field-description"><label for="pending_retention_days">審査待ちの保持日数</label><p>AI評価完了後、指定日数で非掲載へ</p></div><div class="number-field"><input id="pending_retention_days" name="pending_retention_days" type="number" min="1" max="365" step="1" required><span>日</span></div></div>
           <div class="setting-field"><div class="field-description"><label for="rejected_retention_days">非掲載の保持日数</label><p>非掲載になってから指定日数で完全削除</p></div><div class="number-field"><input id="rejected_retention_days" name="rejected_retention_days" type="number" min="1" max="365" step="1" required><span>日</span></div></div>
           <p class="section-note">完全削除は取り消せません。公開中・公開履歴が確認できる記事、AI未処理・処理中、保存済み下書きは対象外。編集更新があった記事は更新時から保持日数を数え直します。削除した情報元URLは再収集防止用に残します。</p>
