@@ -16,7 +16,7 @@
   padding: var(--button-pad-y) var(--button-pad-x);
   font-size: var(--pagination-font, 13px);
   min-height: var(--button-height);
-  border-radius: 999px;
+  border-radius: var(--button-radius, 999px);
   font-weight: 700;
   cursor: pointer;
 }

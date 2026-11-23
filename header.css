@@ -13,6 +13,7 @@
   --button-pad-y:12px;
   --button-pad-x:20px;
   --button-height:48px;
+  --button-radius:999px;
 }
 @media(max-width:1024px){
   :root{--button-font:13px;--pagination-font:12px;--button-pad-y:10px;--button-pad-x:16px;--button-height:44px}
@@ -98,7 +99,7 @@ header nav a {
   font-weight: 800;
   white-space: nowrap;
   padding: var(--button-pad-y) var(--button-pad-x);
-  border-radius: 999px;
+  border-radius: var(--button-radius);
   background: #fff3e9;
 }
 
@@ -294,4 +295,10 @@ body[data-page="editor"] header .editor-brand-label.is-tight{bottom:calc(100% - 
 @media(max-width:359px){
  body[data-page="editor"] header .brand{gap:5px}
  body[data-page="editor"] header .header-inner{column-gap:5px}
+}
+
+/* Shared button silhouette. Editorial page-local button rules predate this token;
+   override only radius, leaving cards, input fields and action colors untouched. */
+:is(body[data-page="editor"],body.editor-login-page) :is(button:not(.stat):not(.card),input[type="button"],input[type="submit"],a[role="button"],a.data-primary,a.dashboard-settings,a.settings-preview-link,.editor-area-nav a){
+  border-radius:var(--button-radius,999px) !important;
 }
