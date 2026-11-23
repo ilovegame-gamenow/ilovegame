@@ -55,7 +55,9 @@
  floatingBar.id='floatingSelectionBar';
  floatingBar.classList.add('is-floating');
  floatingBar.setAttribute('aria-label','画面下部の削除対象の選択操作');
- floatingBar.hidden=true;
+ floatingBar.hidden=false;
+ floatingBar.inert=true;
+ floatingBar.setAttribute('aria-hidden','true');
  const mirrorControls=new Map();
  for(const el of floatingBar.querySelectorAll('[id]')){
   const key=el.id;
@@ -67,21 +69,42 @@
  }
  selectionBar.after(floatingBar);
  function sizeSelectionBar(){
-  if(floatingBar.hidden)return;
+  if(!selected.size){document.documentElement.style.removeProperty('--data-selection-height');return;}
   const height=Math.ceil(floatingBar.getBoundingClientRect().height);
   document.documentElement.style.setProperty('--data-selection-height',(height+24)+'px');
+ }
+ function syncSelectionVisibility(){
+  const rect=selectionBar.getBoundingClientRect();
+  const viewport=window.visualViewport;
+  const top=viewport?.offsetTop??0;
+  const bottom=top+(viewport?.height??window.innerHeight);
+  const visible=selected.size>0&&(rect.bottom<=top||rect.top>=bottom);
+  floatingBar.classList.toggle('is-visible',visible);
+  floatingBar.inert=!visible;
+  floatingBar.setAttribute('aria-hidden',String(!visible));
+ }
+ let visibilityFrame=0;
+ function queueSelectionVisibility(){
+  if(visibilityFrame)return;
+  visibilityFrame=requestAnimationFrame(()=>{visibilityFrame=0;syncSelectionVisibility();});
  }
  function updateSelectionBar(){
   for(const [key,mirror] of mirrorControls){
    const original=$(key);mirror.textContent=original.textContent;
    if(mirror.tagName==='BUTTON')mirror.disabled=original.disabled;
   }
-  floatingBar.hidden=selected.size===0;
-  if(!floatingBar.hidden)sizeSelectionBar();
-  else document.documentElement.style.removeProperty('--data-selection-height');
+  sizeSelectionBar();
+  syncSelectionVisibility();
  }
- if(typeof ResizeObserver==='function')new ResizeObserver(sizeSelectionBar).observe(floatingBar);
- window.addEventListener('resize',sizeSelectionBar);
+ function resizeSelectionBar(){sizeSelectionBar();queueSelectionVisibility();}
+ if(typeof ResizeObserver==='function'){
+  const observer=new ResizeObserver(resizeSelectionBar);
+  observer.observe(floatingBar);observer.observe(selectionBar);
+ }
+ window.addEventListener('scroll',queueSelectionVisibility,{passive:true});
+ window.addEventListener('resize',resizeSelectionBar);
+ window.visualViewport?.addEventListener('resize',resizeSelectionBar);
+ window.visualViewport?.addEventListener('scroll',queueSelectionVisibility,{passive:true});
  function controls(){
   for(const id of ['status','field','query'])$(id).disabled=busy;
   $('searchForm').querySelector('button').disabled=busy;

@@ -52,9 +52,18 @@ html.data-modal-scroll-locked body{position:fixed;top:var(--data-modal-scroll-to
 .data-selection-bar :is(#review,[data-mirror-control="review"]){margin-left:auto}
 .data-main .data-selection-bar button{font-size:var(--button-font,14px);min-height:44px}
 .data-main .data-selection-bar.is-floating{
- position:fixed;z-index:20;left:50%;bottom:max(10px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+ position:fixed;z-index:20;left:50%;bottom:max(10px,env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);
+ opacity:0;visibility:hidden;pointer-events:none;
+ transition:opacity .18s ease,transform .18s ease,visibility 0s linear .18s;
  width:min(1160px,calc(100% - 32px));box-sizing:border-box;padding:12px 16px;
  background:#fff;border:1px solid #e8d7c5;border-radius:14px;box-shadow:0 6px 24px #39261926;
+}
+.data-main .data-selection-bar.is-floating.is-visible{
+ opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0);
+ transition:opacity .18s ease,transform .18s ease,visibility 0s;
+}
+@media(prefers-reduced-motion:reduce){
+ .data-main .data-selection-bar.is-floating,.data-main .data-selection-bar.is-floating.is-visible{transition:none}
 }
 body[data-page="editor"]>main.data-main.editor-heading-layout{padding-bottom:calc(28px + var(--data-selection-height,0px))}
 @media(max-width:600px){
