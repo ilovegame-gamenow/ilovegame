@@ -15,11 +15,11 @@
   const message = document.getElementById('settingsMessage');
   const button = document.getElementById('saveSettings');
   const saveResult = document.getElementById('saveResult');
-  const inputs = () => [...form.querySelectorAll('input[name], textarea[name]')];
+  const inputs = () => [...form.querySelectorAll('input[name], textarea[name], select[name]')];
   let defaultGuidelines = '';
   let original = null;
   let busy = false;
-  const values = () => Object.fromEntries(inputs().map(input => [input.name, input.type === 'number' ? (input.value === '' ? null : Number(input.value)) : input.value]));
+  const values = () => Object.fromEntries(inputs().map(input => [input.name, (input.type === 'number' || input.type === 'select-one') ? (input.value === '' ? null : Number(input.value)) : input.value]));
   const dirty = () => original && JSON.stringify(values()) !== JSON.stringify(original);
   function notify(text, error = false) { message.textContent = text; message.dataset.error = String(error); }
   async function request(options = {}) {
