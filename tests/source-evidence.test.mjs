@@ -33,6 +33,16 @@ test('Steam detail keeps release date separate from publication date and never i
  };
  try{for(const includeText of [false,true]){const result=await getArticleEvidence('steam','123',{includeText});assert.equal(result.published.value,null);assert.equal(result.evidence_kind,'store_listing');assert.equal(result.release_date.coming_soon,true);assert.equal(result.video.status,'official_page_link');assert.equal(result.body.text,includeText?'Game description':undefined);}}finally{globalThis.fetch=original;}
 });
+test('Steam video evidence verifies exact publisher-provided YouTube links and hands off official website',async()=>{
+ const original=globalThis.fetch;const called=[];
+ globalThis.fetch=async url=>{
+  called.push(String(url));
+  if(String(url).startsWith('https://www.youtube.com/oembed?'))return Response.json({type:'video',html:'<iframe src="https://www.youtube.com/embed/abcdefghijk"></iframe>',title:'Official trailer',author_name:'Developer'});
+  assert.equal(String(url),'https://store.steampowered.com/api/appdetails?appids=123&l=japanese&cc=jp');
+  return Response.json({'123':{success:true,data:{type:'game',steam_appid:123,name:'Game',about_the_game:'<p><a href="https://youtu.be/abcdefghijk">Trailer</a></p>',detailed_description:'<a href="https://www.youtube.com/watch?v=abcdefghijk">Same</a>',website:'https://studio.example/game',developers:['Developer'],publishers:['Publisher'],movies:[{name:'Launch trailer',mp4:{max:'https://cdn.example/movie.mp4?token=demo'}}]}}});
+ };
+ try{const result=await getArticleEvidence('steam','123');assert.equal(result.video.status,'youtube_candidate');assert.equal(result.video.youtubeCandidates.length,1);assert.equal(result.video.youtubeCandidates[0].metadataVerified,true);assert.deepEqual(result.video.officialWebsite,{url:'https://studio.example/game',evidence:'steam_store_website',verification:'editor_check'});assert.equal(result.video.requiresOfficialSiteCheck,true);assert.equal(result.video.nativeTrailers[0].title,'Launch trailer');assert.deepEqual(result.video.developerNames,['Developer']);assert.equal(called.length,2);assert.ok(!JSON.stringify(result).includes('token=demo'));}finally{globalThis.fetch=original;}
+});
 test('Nintendo dynamic player and duplicate video ID',()=>{
  const result=extractVideoEvidence('<div class="okra-youtube-inner"><div id="EpMQe14sTWMwvdaql0s"></div></div><a href="https://youtu.be/EpMQe14sTWM">video</a>','https://www.nintendo.com','Nintendo');
  assert.equal(result.youtubeCandidates.length,1);assert.equal(result.youtubeCandidates[0].id,'EpMQe14sTWM');
