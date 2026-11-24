@@ -18,8 +18,7 @@ window.GameFeatured = (() => {
       const image = GameImage.getUrl(breaking.thumbnail_url, breaking.source_name);
       box.innerHTML = `${image ? `<img id="breaking-image" src="${esc(image)}" alt="">` : ''}
         <h1>${esc(breaking.title)}</h1>
-        ${GameDate.renderMeta('', breaking.site_published_at || breaking.published_at || breaking.created_at, {showSource:false})}
-        ${GamePlatforms.render(breaking.platforms)}`;
+        ${GameNewsCard.renderFooter(breaking)}`;
       if (clickable) {
         const link = document.createElement('a');
         link.href = `/article.html?id=${encodeURIComponent(breaking.id)}`;
@@ -39,7 +38,7 @@ window.GameFeatured = (() => {
         <div class="time">PICK UP</div>
         ${image ? `<img class="thumb" src="${esc(image)}" alt="">` : ''}
         <h3>${esc(article.title)}</h3><p class="meta">${esc(article.ilovegame_point || article.summary)}</p>
-        ${GamePlatforms.render(article.platforms)}
+        ${GameNewsCard.renderFooter(article)}
       </${tag}>`;
     }).join('') || '<p class="meta featured-status">注目の記事は、見つけた作品から順に紹介します♪</p>';
     window.GamePickupCarousel?.refresh();

@@ -12,14 +12,20 @@
     })[char]);
   }
 
+  function renderDate(article) {
+    return GameDate.renderMeta(article.source_name, article.site_published_at || article.created_at || article.published_at, { showSource: false });
+  }
+
+  function renderFooter(article) {
+    return `<div class="news-card-footer">${GamePlatforms.renderCategories(article)}${renderDate(article)}</div>`;
+  }
+
   function render(article, options = {}) {
     const a = article || {};
     const platforms = Array.isArray(a.platforms) ? a.platforms : [];
 
-    const badges = options.compact ? GamePlatforms.renderCategories(a) : GamePlatforms.render(platforms);
+    const badges = options.compact ? "" : GamePlatforms.render(platforms);
 
-    const updateTime =
-      a.site_published_at || a.created_at || a.published_at;
     const imageUrl = a.thumbnail_url
   ? GameImage.getUrl(a.thumbnail_url, a.source_name)
   : "";
@@ -28,7 +34,7 @@
       ? ""
       : `href="/article.html?id=${encodeURIComponent(a.id)}"`;
 
-    const meta = GameDate.renderMeta(a.source_name, updateTime, { showSource: false });
+    const meta = options.compact ? "" : renderDate(a);
     const content = `
       ${imageUrl
         ? `<img class="thumb" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(a.title)}" loading="lazy">`
@@ -36,7 +42,7 @@
       ${options.compact ? "" : meta}
       <h3>${escapeHtml(a.title || "")}</h3>
       ${options.compact ? '' : `<p>${escapeHtml(a.summary || "")}</p>`}
-      ${options.compact ? `<div class="news-card-footer">${badges}${meta}</div>` : badges}
+      ${options.compact ? renderFooter(a) : badges}
     `;
 
     return options.clickable === false
@@ -44,5 +50,5 @@
       : `<a class="card news-card-link${options.compact ? ' card--compact' : ''}" ${destination}>${content}</a>`;
   }
 
-  window.GameNewsCard = { render };
+  window.GameNewsCard = { render, renderFooter };
 })();
