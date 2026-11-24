@@ -56,7 +56,7 @@
            <button type="button" class="logout" id="logoutButton">ログアウト</button>
          </div>`
       : isEditorLogin
-        ? `<div class="editor-header-actions"><span class="editor-header-label">編集室</span></div>`
+        ? ''
         : `<nav>${links}</nav>`;
 
     const mascot = isEditor

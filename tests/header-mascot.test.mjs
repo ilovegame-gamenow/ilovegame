@@ -10,7 +10,7 @@ function renderAt(iso, page = 'public', source = script) {
   const handlers = {};
   const image = { src: '', getAttribute() { return this.src; }, addEventListener(type, fn) { handlers[type] = fn; } };
   const header = {
-    set innerHTML(html) { image.src = html.match(/<img class="header-mascot[^>]*src="([^"]+)"/)[1]; },
+    set innerHTML(html) { this.html=html; image.src = html.match(/<img class="header-mascot[^>]*src="([^"]+)"/)[1]; },
     querySelector() { return image; }
   };
   const document = {
@@ -22,7 +22,7 @@ function renderAt(iso, page = 'public', source = script) {
   };
   const window = { addEventListener(type, fn) { handlers[type] = fn; }, setInterval(fn) { handlers.tick = fn; } };
   vm.runInNewContext(source, { document, window, location: { pathname: '/' }, Date: class extends Date { constructor() { super(now); } } });
-  return { image, handlers, move: iso => { now = new Date(iso); } };
+  return { image, header, handlers, move: iso => { now = new Date(iso); } };
 }
 
 test('season windows use JST dates and return to the default image after each period', () => {
@@ -53,4 +53,10 @@ test('open pages refresh on date changes and fall back if an image fails', () =>
   assert.equal(view.image.src, '/assets/cosmochi_christmas.webp');
   view.handlers.error();
   assert.equal(view.image.src, '/assets/cosmochi_welcome_mitten.png');
+});
+test('login header has no right-side label or navigation',()=>{
+  const date='2027-12-01T00:00:00Z';
+  assert.doesNotMatch(renderAt(date,'login').header.html,/editor-header-actions|editor-header-label|<nav>/);
+  assert.match(renderAt(date,'editor').header.html,/id="logoutButton"/);
+  assert.match(renderAt(date,'public').header.html,/<nav>/);
 });
