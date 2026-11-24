@@ -101,6 +101,7 @@ window.GameArticle = (() => {
         ${thumbnail ? `
           <img
             class="hero"
+            data-news-thumbnail
             src="${esc(thumbnail)}"
             alt="${esc(article.title)}"
           >

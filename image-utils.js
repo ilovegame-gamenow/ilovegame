@@ -9,6 +9,7 @@ const GameImage = {
     }
 
     const value = thumbnailUrl.trim();
+    if (!value) return "";
 
     // 完全な画像URLはそのまま使用する
     if (/^https?:\/\//i.test(value)) {
@@ -16,7 +17,7 @@ const GameImage = {
     }
 
     // 任天堂の記事は画像配信サーバーのURLを補完する
-    if (sourceName.toLowerCase() === "nintendo") {
+    if (String(sourceName ?? "").toLowerCase() === "nintendo") {
       return `https://assets.topics.apps-jp.nintendo.com/image/${value.replace(/^\/+/, "")}`;
     }
 
@@ -24,3 +25,19 @@ const GameImage = {
     return "";
   }
 };
+
+// Image requests may fail after a URL has been saved. Keep news cards intact.
+if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+  document.addEventListener("error", event => {
+    const image = event.target;
+    if (!image?.matches?.("img[data-news-thumbnail]")) return;
+    if (image.classList.contains("thumb")) {
+      const placeholder = document.createElement("div");
+      placeholder.className = "thumb-placeholder";
+      placeholder.textContent = "I LOVE GAME♪";
+      image.replaceWith(placeholder);
+    } else {
+      image.remove();
+    }
+  }, true);
+}

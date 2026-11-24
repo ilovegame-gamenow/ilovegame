@@ -37,7 +37,7 @@
     const meta = options.compact ? "" : renderDate(a);
     const content = `
       ${imageUrl
-        ? `<img class="thumb" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(a.title)}" loading="lazy">`
+        ? `<img class="thumb" data-news-thumbnail src="${escapeHtml(imageUrl)}" alt="${escapeHtml(a.title)}" loading="lazy">`
         : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
       ${options.compact ? "" : meta}
       <h3>${escapeHtml(a.title || "")}</h3>

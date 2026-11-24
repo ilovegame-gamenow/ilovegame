@@ -16,7 +16,7 @@ window.GameFeatured = (() => {
     box.replaceChildren();
     if (breaking) {
       const image = GameImage.getUrl(breaking.thumbnail_url, breaking.source_name);
-      box.innerHTML = `${image ? `<img id="breaking-image" src="${esc(image)}" alt="">` : ''}
+      box.innerHTML = `${image ? `<img id="breaking-image" data-news-thumbnail src="${esc(image)}" alt="">` : ''}
         <h1>${esc(breaking.title)}</h1>
         ${GameNewsCard.renderFooter(breaking)}`;
       if (clickable) {
@@ -36,7 +36,7 @@ window.GameFeatured = (() => {
       const destination = clickable ? ` href="/article.html?id=${encodeURIComponent(article.id)}"` : '';
       return `<${tag} class="card news-card-link"${destination}>
         <div class="time">PICK UP</div>
-        ${image ? `<img class="thumb" src="${esc(image)}" alt="">` : ''}
+        ${image ? `<img class="thumb" data-news-thumbnail src="${esc(image)}" alt="">` : '<div class="thumb-placeholder">I LOVE GAME♪</div>'}
         <h3>${esc(article.title)}</h3><p class="meta">${esc(article.ilovegame_point || article.summary)}</p>
         ${GameNewsCard.renderFooter(article)}
       </${tag}>`;
