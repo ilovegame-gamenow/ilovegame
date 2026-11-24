@@ -5,9 +5,11 @@
 - `/api/news?resource=source-evidence&source=nintendo&page=1`：任天堂の一覧（ページ1〜5）
 - `/api/news?resource=source-evidence&source=playstation`：公式RSS（配信中の項目のみ）
 - `/api/news?resource=source-evidence&source=prtimes`：公式コンシューマーゲームカテゴリ先頭ページ（未採点の発見入口）
+- `/api/news?resource=source-evidence&source=xbox`：日本向けXbox Wire公式RSS
+- `/api/news?resource=source-evidence&source=steam`：日本向けSteam公式ストアの新作・発売予定特集枠（作品発見用、元発表日時なし）
 - `/api/news?resource=source-evidence&source=nintendo&id=一覧のid`：元記事の日時・タイトル・画像・動画の根拠
 
-記事は明示した3ソースの正規IDのみを受け付け、任意URL・リダイレクトは取得しない。画像は登録済みの公式配信ホストのみ実際の応答を確認する。失敗を記事なしと混同しない。公開データはメタ情報のみ。本文全文は認証済みの内部利用向け `include_text=1` のみで返す（専用秘密値 SOURCE_EVIDENCE_SECRET が設定され、適切な認証経路が確立した場合）。秘密値をChatのプロンプトに貼らない。本文はキャッシュしない。公開メタ情報のキャッシュは5分。
+記事は登録済みの情報源の正規IDのみを受け付け、任意URL・リダイレクトは取得しない。画像は登録済みの公式配信ホストのみ実際の応答を確認する。失敗を記事なしと混同しない。公開データはメタ情報のみ。本文全文は認証済みの内部利用向け `include_text=1` のみで返す（専用秘密値 SOURCE_EVIDENCE_SECRET が設定され、適切な認証経路が確立した場合）。秘密値をChatのプロンプトに貼らない。本文はキャッシュしない。公開メタ情報のキャッシュは5分。
 
 PR TIMESの日時は公式の日本時間表記に従い、タイムゾーン未記載の秒精度の値をJSTとして変換する。任天堂のページに日付しかない場合は一覧JSONの日時を利用する。日付だけを時刻に推定しない。
 

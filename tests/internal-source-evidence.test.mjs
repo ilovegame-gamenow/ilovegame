@@ -23,3 +23,14 @@ test('invalid input never reaches upstream',async()=>{
   const res=makeRes();await handler({method:'GET',query},res);assert.equal(res.code,400);
  }
 });
+test('parallel source lists preserve results when one fails',async()=>{
+ const started=[];let release;
+ const gate=new Promise(resolve=>{release=resolve;});
+ const handler=createInternalSourceEvidenceHandler({env:valid,list:async source=>{started.push(source);if(started.length===3)release();await gate;if(source==='xbox')throw Error('Unavailable');return {source,items:[]};}});
+ const res=makeRes();await handler({method:'GET',query:{sources:'nintendo,xbox,steam'}},res);
+ assert.deepEqual(started,['nintendo','xbox','steam']);assert.equal(res.code,200);assert.deepEqual(res.body.results.map(r=>[r.source,r.ok]),[['nintendo',true],['xbox',false],['steam',true]]);
+});
+test('parallel source lists reject invalid and ambiguous inputs',async()=>{
+ const handler=createInternalSourceEvidenceHandler({env:valid,list:()=>assert.fail('must not fetch')});
+ for(const query of [{sources:'nintendo,nintendo'},{sources:'xbox,unknown'},{sources:'steam',id:'123'},{sources:'steam',source:'steam'},{sources:'steam',url:'https://example.com'},{sources:'steam',include_text:'1'},{sources:['steam']},{sources:''}]){const res=makeRes();await handler({method:'GET',query},res);assert.equal(res.code,400);}
+});
