@@ -10,6 +10,8 @@
   const followingFilter=document.getElementById('followingFilter');
   if(['managed','favorites','removed','all'].includes(params.get('filter'))) followingFilter.value=params.get('filter');
   const message = document.getElementById('catalogMessage');
+  const managedDetails=document.getElementById('managedGamesDetails');
+  if(articleId!==null||preferredTitle||params.has('filter'))managedDetails.open=true;
 
   const storageKey = articleId===null?'ilovegame.catalog.create':`ilovegame.catalog.create.article.${articleId}`;
   const createPanel=document.getElementById('createPanel');
@@ -107,6 +109,7 @@
     if(!data)return false;
     const previousSelection=query.value;
     allGames=data.games;linkedGames=data.linkedGames;
+    document.getElementById('managedGameCount').textContent=`（${allGames.length}件）`;
     query.replaceChildren();
     const all=node('option',`すべてのゲーム（${allGames.length}件）`);all.value='';query.append(all);
     const counts=new Map();for(const game of allGames)counts.set(game.title,(counts.get(game.title)||0)+1);
@@ -123,7 +126,7 @@
     finally { busy=false; controls(); }
   }
   query.addEventListener('change',()=>{selectView(1);notify('');});
-  document.addEventListener('game-selection-request',event=>{preferredTitle=event.detail?.title||'';query.value='';if(busy){pendingRefresh=true;return;}refresh(1);});
+  document.addEventListener('game-selection-request',event=>{managedDetails.open=true;preferredTitle=event.detail?.title||'';query.value='';if(busy){pendingRefresh=true;return;}refresh(1);});
   followingFilter.addEventListener('change',()=>refresh(1));
   document.addEventListener('game-following-changed',()=>{if(busy){pendingRefresh=true;return;}refresh(1);});
   form.addEventListener('input',stash);
