@@ -24,7 +24,7 @@ test('home excludes only displayed discovery cards before count/pagination; expi
       if(fail)return new Response('Unavailable',{status:502});
       return Response.json(selected?[
         {article_id:1,slot:'breaking',selected_at:new Date().toISOString()},
-        ...[1,2,3,4].map(article_id=>({article_id,slot:'discovery',selected_at:new Date().toISOString()})),
+        ...[1,2,3,4].map(article_id=>({article_id,slot:'discovery',selected_at:new Date().toISOString(),expires_at:new Date(Date.now()+86400000).toISOString()})),
         {article_id:5,slot:'discovery',selected_at:'2099-01-01T00:00:00Z'}
       ]:[]);
     }
