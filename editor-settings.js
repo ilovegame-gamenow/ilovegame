@@ -36,7 +36,7 @@
     const valid = reject < publish;
     form.elements.no_article_threshold.setCustomValidity(valid ? '' : '記事を生成しない点数は、自動掲載の点数より小さくしてください。');
     document.getElementById('publicationSummary').textContent = valid
-      ? `0〜${reject}点：生成しない ／ ${reject + 1 < publish ? `${reject + 1}〜${publish - 1}点：手動審査 ／ ` : ''}${publish}〜100点：自動掲載`
+      ? `0〜${reject}点：生成しない\n${reject + 1 < publish ? `${reject + 1}〜${publish - 1}点：手動審査\n` : ''}${publish}〜100点：自動掲載`
       : 'しきい値の大小関係を確認してください。';
   }
   function fill(settings) {
