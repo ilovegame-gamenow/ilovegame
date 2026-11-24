@@ -15,6 +15,8 @@
   --button-height:48px;
   --button-radius:999px;
   --button-outline:#ead9ca;
+  --selected-button-bg:#ff7a2f;
+  --selected-button-fg:#fff;
 }
 @media(max-width:1024px){
   :root{--button-font:13px;--pagination-font:12px;--button-pad-y:10px;--button-pad-x:16px;--button-height:44px}
@@ -246,7 +248,7 @@ body.editor-login-page>main{margin:0 auto}
 /* Editorial workspace navigation: articles remain the default entry point. */
 body[data-page="editor"] header .editor-area-nav{max-width:1160px;margin:14px auto 0;display:flex;justify-content:flex-start;gap:8px;flex-wrap:wrap}
 body[data-page="editor"] header .editor-area-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 18px;font-size:var(--button-font);font-weight:700;border:1px solid #ead9ca;background:#fffaf4;color:#785039;border-radius:9px;text-decoration:none}
-body[data-page="editor"] header .editor-area-nav a[aria-current="page"]{background:#a95012;color:#fff;border-color:#a95012}
+body[data-page="editor"] header .editor-area-nav a[aria-current="page"]{background:var(--selected-button-bg);color:var(--selected-button-fg);border-color:var(--selected-button-bg)}
 @media(max-width:600px){body[data-page="editor"] header .editor-area-nav{gap:6px;margin-top:10px}body[data-page="editor"] header .editor-area-nav a{flex:1;min-width:0;padding:8px 4px;min-height:40px}}
 
 /* Shared editorial workspace width (same as article management). */

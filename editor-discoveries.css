@@ -1,5 +1,5 @@
 .discovery-tabs { display:flex; gap:8px; flex-wrap:wrap; }
-.discovery-tabs [aria-pressed="true"] { background:#c6530c; border-color:#c6530c; color:white; }
+.catalog-main .discovery-tabs button[aria-pressed="true"] { background:var(--selected-button-bg); border-color:var(--selected-button-bg); color:var(--selected-button-fg); }
 .discovery-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
 .discovery-match { padding:14px; background:#fff7ed; border-radius:10px; margin:12px 0; }
 .catalog-main summary { cursor:pointer; font-weight:700; font-size:20px; }

@@ -2,9 +2,9 @@
 .feed-tools{margin:0 0 12px}.feed-tools button,.feed-tools input{font:inherit}
 #feed-search{display:flex;gap:8px;margin-bottom:10px}#feed-query{min-width:0;flex:1;border:1px solid var(--line);border-radius:12px;background:white;padding:12px;font-size:14px}
 .feed-tools button{cursor:pointer;min-height:var(--button-height);border:1px solid var(--line);border-radius:999px;background:white;color:var(--ink);padding:var(--button-pad-y) var(--button-pad-x);font-size:var(--button-font);font-weight:700}
-#feed-search button[type=submit]{background:var(--orange);color:white;border-color:var(--orange)}
+#feed-search button[type=submit]{background:var(--selected-button-bg);color:var(--selected-button-fg);border-color:var(--selected-button-bg)}
 .feed-filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:0;white-space:nowrap;overscroll-behavior-x:contain}
-.feed-filters button{flex:0 0 86px;padding-inline:8px}.feed-filters button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:white}
+.feed-filters button{flex:0 0 86px;padding-inline:8px}.feed-filters button[aria-pressed=true]{background:var(--selected-button-bg);border-color:var(--selected-button-bg);color:var(--selected-button-fg)}
 .feed-heading{align-items:baseline;flex-wrap:wrap;gap:0 16px}.feed-heading .feed-options{display:flex;align-items:center;margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}
 .feed-options label{position:relative;display:flex;align-items:center;gap:5px;cursor:pointer}
 .feed-options label::before{content:"";position:absolute;inset:-12px 0;min-height:44px}.feed-options input{width:18px;height:18px;accent-color:var(--orange)}

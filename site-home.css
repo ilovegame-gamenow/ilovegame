@@ -69,7 +69,7 @@ main{max-width:1200px;margin:0 auto;padding:28px 20px 28px}
 .pickup-dots{display:flex;align-items:center;gap:2px}
 .pickup-dots button{display:grid;place-items:center;width:26px;height:44px;border:0;background:transparent;cursor:pointer;padding:0}
 .pickup-dots button::after{content:"";width:6px;height:6px;border-radius:9px;background:#dfd2c7}
-.pickup-dots button[aria-pressed="true"]::after{width:18px;background:var(--orange)}
+.pickup-dots button[aria-pressed="true"]::after{width:18px;background:var(--selected-button-bg)}
 .pickup-hint{margin-left:auto;font-size:10px;color:var(--muted)}
 @media(prefers-reduced-motion:no-preference){.pickup{scroll-behavior:smooth}}
 footer{background:#25211e;color:#fff;padding:30px;text-align:center;font-size:12px}
