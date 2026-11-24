@@ -92,6 +92,14 @@
   <script>
     const form = document.getElementById("loginForm");
     const message = document.getElementById("message");
+    function editorDestination() {
+      try {
+        const target=sessionStorage.getItem('editor:return');
+        sessionStorage.removeItem('editor:return');
+        if (target && /^\/editor-[a-z-]+\.html(?:[?#]|$)/.test(target)) return target;
+      } catch {}
+      return '/editor-dashboard.html';
+    }
 
     // ログイン済みなら編集室へ移動
     async function checkSession() {
@@ -101,7 +109,7 @@
           cache: "no-store"
         });
         if (response.ok) {
-          location.replace("/editor-dashboard.html");
+          location.replace(editorDestination());
         }
       } catch {
         // 通信エラー時はログイン画面を維持
@@ -134,7 +142,7 @@
         }
 
         passwordInput.value = "";
-        location.replace("/editor-dashboard.html");
+        location.replace(editorDestination());
       } catch {
         message.textContent = "通信エラーが発生しました。";
       } finally {

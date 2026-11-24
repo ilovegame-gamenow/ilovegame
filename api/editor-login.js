@@ -1,4 +1,5 @@
 import { setEditorCookie } from "../lib/editor-auth.js";
+import { getEditorSessionSeconds } from "../lib/site-settings.js";
 import crypto from "node:crypto";
 
 function isSame(a, b) {
@@ -63,7 +64,8 @@ export default async function handler(req, res) {
   }
 
   // 共通処理で認証Cookieを発行
-  setEditorCookie(res, secret);
+  try { setEditorCookie(res, secret, await getEditorSessionSeconds()); }
+  catch { return res.status(503).json({error:'Session settings unavailable'}); }
 
   return res.status(200).json({ ok: true });
 }

@@ -14,8 +14,11 @@ const response=()=>({headers:{},setHeader(k,v){this.headers[k.toLowerCase()]=v;}
 
 // Drive the shipped browser script and API handlers together. No live credentials,
 // database calls or real waiting are involved; both sides share the simulated clock.
-async function sessionTest(run) {
+async function sessionTest(run, minutes=10) {
  const realNow=Date.now,previousSecret=process.env.EDITOR_SECRET;
+ const originalFetch=globalThis.fetch, previousUrl=process.env.SUPABASE_URL, previousKey=process.env.SUPABASE_SECRET_KEY;
+ process.env.SUPABASE_URL='https://db.invalid';process.env.SUPABASE_SECRET_KEY='test-only';
+ globalThis.fetch=async url=>{assert.match(url,/select=editor_session_minutes$/);return Response.json([{editor_session_minutes:minutes}]);};
  let now=initialTime,nextId=0,cookie='',cookieExpires=0;
  let failure=null;
  const timers=new Map(),events=new Map(),calls=[],redirects=[];
@@ -63,44 +66,44 @@ async function sessionTest(run) {
  try {
   const loggedIn=response();await login({method:'POST',headers:{host:'site.invalid',origin:'https://site.invalid'},body:{password:secret}},loggedIn);
   assert.equal(loggedIn.code,200);applyCookie(loggedIn.headers['set-cookie']);
-  assert.match(loggedIn.headers['set-cookie'],/HttpOnly; Secure; SameSite=Strict; Path=\/api\/; Max-Age=3600/);
+  assert.ok(loggedIn.headers['set-cookie'].endsWith(`Max-Age=${minutes*60}`));
   vm.runInContext(clientScript,context);
   const start=async()=>{vm.runInContext('window.GameEditorSession.start()',context);await settle();};
   await run({start,event,advance,suspend,dispatch,calls,redirects,document,timers,context,header,coverStyle:()=>elements.get('cover-style')?.textContent,covered:()=>classes.has('editor-session-covered'),cover:()=>elements.get('editor-session-cover'),now:()=>now,setFailure:value=>{failure=value;},cookie:()=>cookie});
- } finally {Date.now=realNow;if(previousSecret===undefined)delete process.env.EDITOR_SECRET;else process.env.EDITOR_SECRET=previousSecret;}
+ } finally {Date.now=realNow;globalThis.fetch=originalFetch;for(const [key,value] of Object.entries({EDITOR_SECRET:previousSecret,SUPABASE_URL:previousUrl,SUPABASE_SECRET_KEY:previousKey})){if(value===undefined)delete process.env[key];else process.env[key]=value;}}
 }
 
-test('untouched session expires after one hour; periodic checks never renew it',async()=>{
+for(const minutes of [5,10,30,60])test(`untouched session expires after ${minutes} minutes; periodic checks never renew it`,async()=>{
  await sessionTest(async s=>{
-  await s.start();await s.advance(HOUR-SECOND);
+  await s.start();await s.advance(minutes*MINUTE-SECOND);
   assert.deepEqual(s.redirects,[]);assert.equal(s.calls.filter(c=>c.auth==='renew').length,0);
   await s.advance(SECOND);assert.deepEqual(s.redirects,['/editor.html']);
- });
+ },minutes);
 });
-test('one minute of inactivity extends once, then expires one hour after that renewal',async()=>{
+test('activity renews once, then expires ten minutes after that renewal',async()=>{
  await sessionTest(async s=>{
-  await s.start();await s.event('pointerdown');await s.advance(MINUTE-1);
+  await s.start();await s.event('pointerdown');await s.advance(SECOND-1);
   assert.equal(s.calls.filter(c=>c.auth==='renew').length,0);
   await s.advance(1);assert.equal(s.calls.filter(c=>c.auth==='renew').length,1);
-  await s.advance(HOUR-SECOND);assert.deepEqual(s.redirects,[]);
+  await s.advance(10*MINUTE-SECOND);assert.deepEqual(s.redirects,[]);
   await s.advance(SECOND);assert.deepEqual(s.redirects,['/editor.html']);
  });
 });
-test('continuous operation for five hours renews every fifteen minutes and remains authenticated',async()=>{
+test('continuous operation for five hours remains authenticated even with five minute lock',async()=>{
  await sessionTest(async s=>{
   await s.start();
   for(let i=0;i<600;i++){await s.advance(30*SECOND);await s.event(i%2?'input':'keydown');}
-  assert.deepEqual(s.redirects,[]);assert.equal(s.calls.filter(c=>c.auth==='renew').length,20);
+  assert.deepEqual(s.redirects,[]);assert.ok(s.calls.filter(c=>c.auth==='renew').length>=590);
   assert.equal((await s.dispatch('GET','check')).code,200);
- });
+ },5);
 });
 test('hidden page does not renew; wake before expiry can resume activity and renew',async()=>{
  await sessionTest(async s=>{
   await s.start();await s.event('pointerdown');s.document.hidden=true;await s.event('visibilitychange');
-  s.suspend(30*MINUTE);s.document.hidden=false;await s.event('visibilitychange');
+  s.suspend(3*MINUTE);s.document.hidden=false;await s.event('visibilitychange');
   assert.deepEqual(s.redirects,[]);assert.equal(s.calls.filter(c=>c.auth==='renew').length,0);
   await s.event('pointerdown');await s.advance(MINUTE);assert.equal((await s.dispatch('GET','check')).code,200);
-  assert.equal(s.calls.filter(c=>c.auth==='renew').length,2);
+  assert.equal(s.calls.filter(c=>c.auth==='renew').length,1);
  });
 });
 test('wake after expiry returns to login immediately and cannot revive expired credentials',async()=>{
@@ -139,7 +142,7 @@ test('token boundary and tampering are checked by the real server implementation
   const token=createEditorToken(secret);const request={headers:{cookie:`ilovegame_editor=${token}`}};
   assert.equal(isEditorAuthenticated(request),true);
   assert.equal(isEditorAuthenticated({headers:{cookie:`ilovegame_editor=${token}x`}}),false);
-  s.suspend(HOUR-SECOND);assert.equal(isEditorAuthenticated(request),true);
+  s.suspend(10*MINUTE-SECOND);assert.equal(isEditorAuthenticated(request),true);
   s.suspend(SECOND);assert.equal(isEditorAuthenticated(request),false);
  });
 });

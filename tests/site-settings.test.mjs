@@ -22,6 +22,10 @@ test('settings enforce independent integer bounds and reject unknown keys', () =
  for (const data of [{...settings,public_page_size:0},{...settings,editor_page_size:0},{...settings,editor_page_size:101},{...settings,nintendo_limit:101},{...settings,playstation_limit:1.5},{...settings,public_page_size:'20'},{...settings,extra:1}]) assert.equal(validateSettings(data),null);
  assert.ok(validateSettings({...settings,public_page_size:100,nintendo_limit:0}));
 });
+test('editor idle lock only permits the four supported durations',()=>{
+ for(const minutes of [5,10,30,60]) assert.ok(validateSettings({...settings,editor_session_minutes:minutes}));
+ for(const minutes of [0,6,20,61,'10']) assert.equal(validateSettings({...settings,editor_session_minutes:minutes}),null);
+});
 test('unauthenticated and cross-origin saves do not touch database', async () => {
  await mockFetch(()=>{throw Error('unexpected fetch');},async()=>{
   for(const [req,code] of [[{method:'GET',headers:{}},401],[{method:'POST',headers:{...headers,origin:'https://evil.invalid'},body:settings},403],[{method:'POST',headers,body:{...settings,nintendo_limit:-1}},400]]){

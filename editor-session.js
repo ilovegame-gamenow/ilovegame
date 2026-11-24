@@ -1,11 +1,11 @@
 window.GameEditorSession = (() => {
-  const IDLE_DELAY = 60 * 1000;
-  // Renew well before the one-hour token expires during continuous activity.
-  const SESSION_REFRESH = 15 * 60 * 1000;
+  const ACTIVITY_DELAY = 1000;
+  const SESSION_REFRESH = 30 * 1000;
 
   let lastEditorActivity = Date.now();
-  let lastSessionRenewal = Date.now();
+  let lastSessionRenewal = Date.now()-1;
   let editorIdleTimer = null;
+  let expiryTimer = null;
   let renewingEditorSession = false;
   let checkingEditorAuth = false;
   let started = false;
@@ -71,7 +71,13 @@ window.GameEditorSession = (() => {
       showCover("ログイン期限が切れました。未保存の入力をこの画面に保持しています。別タブでログインし、戻って再確認してください。", true, true);
       return;
     }
+    try { sessionStorage.setItem('editor:return', location.pathname+location.search+location.hash); } catch {}
     location.replace("/editor.html");
+  }
+
+  function scheduleExpiry(body) {
+    clearTimeout(expiryTimer);
+    if (Number.isFinite(body.remainingSeconds)) expiryTimer=setTimeout(resume, Math.max(1000, body.remainingSeconds*1000));
   }
 
   async function renewEditorSession() {
@@ -99,7 +105,9 @@ window.GameEditorSession = (() => {
         return false;
       }
 
+      const body=await response.json();
       lastSessionRenewal = Date.now();
+      scheduleExpiry(body);
       return true;
     } catch (error) {
       console.warn("ログイン期限の延長に失敗:", error);
@@ -116,8 +124,8 @@ window.GameEditorSession = (() => {
     clearTimeout(editorIdleTimer);
 
     editorIdleTimer = setTimeout(() => {
-      renewEditorSession();
-    }, IDLE_DELAY);
+      if (lastEditorActivity > lastSessionRenewal) renewEditorSession();
+    }, ACTIVITY_DELAY);
 
     if (Date.now() - lastSessionRenewal >= SESSION_REFRESH) {
       renewEditorSession();
@@ -141,6 +149,9 @@ window.GameEditorSession = (() => {
         expire();
         if (recoveryBlocked) showCover("ログイン期限が切れました。未保存の入力を保護しています。別タブでログインし、戻って再確認してください。", true, true);
       } else if (response.ok) {
+        const body=await response.json();
+        if (generation !== checkGeneration || document.hidden || suspended || ending) return;
+        scheduleExpiry(body);
         recoveryBlocked = false;
         hideCover();
       } else if (covered) {
@@ -162,6 +173,9 @@ window.GameEditorSession = (() => {
     document.addEventListener("pointerdown", recordEditorActivity);
     document.addEventListener("keydown", recordEditorActivity);
     document.addEventListener("input", recordEditorActivity);
+    document.addEventListener("wheel", recordEditorActivity, {passive:true});
+    document.addEventListener("touchmove", recordEditorActivity, {passive:true});
+    document.addEventListener("pointermove", recordEditorActivity, {passive:true});
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
@@ -170,12 +184,6 @@ window.GameEditorSession = (() => {
         ++checkGeneration;
         showCover();
       } else {
-        if (Date.now() - lastEditorActivity < IDLE_DELAY) {
-          editorIdleTimer = setTimeout(
-            renewEditorSession,
-            IDLE_DELAY
-          );
-        }
         resume();
       }
     });
@@ -194,5 +202,5 @@ window.GameEditorSession = (() => {
     if (document.hidden) { suspended = true; showCover(); } else resume();
   }
 
-  return { start, expire };
+  return { start, expire, refresh: checkEditorAuth };
 })();

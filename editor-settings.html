@@ -18,6 +18,13 @@
     <p id="settingsMessage" role="status" aria-live="polite">設定を読み込み中…</p>
     <form id="settingsForm" class="settings-save-group" aria-label="表示・掲載・AI評価の設定">
       <fieldset id="settingsFields" disabled style="border:0;padding:0;margin:0">
+        <section class="settings-section" aria-labelledby="sessionHeading">
+          <div class="section-heading"><span class="section-mark" aria-hidden="true">◷</span><div><h2 id="sessionHeading">編集室のログイン</h2><p>無操作時の自動ロック</p></div></div>
+          <div class="setting-field">
+            <div class="field-description"><label for="editor_session_minutes">自動ロックまでの時間</label><p>操作している間はログイン状態を維持します。</p></div>
+            <select class="retention-control" id="editor_session_minutes" name="editor_session_minutes" required><option value="5">5分</option><option value="10">10分</option><option value="30">30分</option><option value="60">60分</option></select>
+          </div>
+        </section>
         <section id="displaySettings" class="settings-section" aria-labelledby="displayHeading">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="displayHeading">一覧の最大表示件数</h2><p>1ページに表示する記事数</p></div><span class="setting-range">1〜100件</span></div>
           <div class="setting-field">

@@ -1,5 +1,5 @@
 import { getInformationSources } from '../lib/information-sources.js';
-import { requireEditor, requireEditorOrigin } from '../lib/editor-auth.js';
+import { requireEditor, requireEditorOrigin, setEditorCookie } from '../lib/editor-auth.js';
 import { getSiteSettings, saveSiteSettings, validateSettings, settingRules, validateRetentionSettings, saveRetentionSettings } from '../lib/site-settings.js';
 
 export default async function handler(req, res) {
@@ -21,6 +21,9 @@ export default async function handler(req, res) {
     const settings = req.method === 'POST'
       ? await (retention?saveRetentionSettings(url,key,req.body):saveSiteSettings(url, key, req.body))
       : await getSiteSettings(url, key);
+    if (req.method === 'POST' && !retention && Object.hasOwn(req.body,'editor_session_minutes')) {
+      setEditorCookie(res, process.env.EDITOR_SECRET, settings.editor_session_minutes*60);
+    }
     return res.status(200).json({ settings, rules: settingRules, sources:getInformationSources(settings,process.env) });
   } catch (error) {
     console.error('Editor settings request failed:', error);

@@ -58,6 +58,7 @@
       const result = await request({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       if (!result) return;
       fill(result.settings);
+      GameEditorSession.refresh();
       notify('');
       button.dataset.saved = 'true';
       saveResult.dataset.error = 'false';

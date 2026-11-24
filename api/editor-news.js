@@ -1,11 +1,10 @@
 import { getEditorNews, parseEditorNewsQuery } from "../lib/editor-news-repository.js";
 import { listDataArticles, deleteDataArticles, listRetention, setRetentionProtection } from "../lib/editor-data-management.js";
 import { savePublisherDirectory } from "../lib/publisher-directory.js";
-import { getSiteSettings } from "../lib/site-settings.js";
+import { getSiteSettings, getEditorSessionSeconds } from "../lib/site-settings.js";
 import {
   requireEditor,
   requireEditorOrigin,
-  SESSION_SECONDS,
   setEditorCookie,
   getEditorSessionRemainingSeconds
 } from "../lib/editor-auth.js";
@@ -85,8 +84,12 @@ export default async function handler(req, res) {
         return res.status(503).json({ error: "Session unavailable" });
       }
 
-      setEditorCookie(res, secret);
-      return res.status(200).json({ renewed: true });
+      try {
+        const remainingSeconds = await getEditorSessionSeconds();
+        if (!requireEditor(req, res)) return;
+        setEditorCookie(res, secret, remainingSeconds);
+        return res.status(200).json({ renewed: true, remainingSeconds });
+      } catch { return res.status(503).json({error:'Session settings unavailable'}); }
     }
 
     return res.status(200).json({ renewed: false });
@@ -95,11 +98,9 @@ export default async function handler(req, res) {
   // Session checks must remain independent of filters and database availability.
   if (req.query.auth === "check") {
     let remainingSeconds = getEditorSessionRemainingSeconds(req);
-    // Adopt the shorter policy for existing three-hour cookies once, without
-    // turning ordinary auth polling into continuous session renewal.
-    if (remainingSeconds > SESSION_SECONDS) {
-      setEditorCookie(res, process.env.EDITOR_SECRET);
-      remainingSeconds = SESSION_SECONDS;
+    if (remainingSeconds > 3600) {
+      remainingSeconds=3600;
+      setEditorCookie(res, process.env.EDITOR_SECRET, remainingSeconds);
     }
     return res.status(200).json({ authenticated:true, remainingSeconds });
   }
