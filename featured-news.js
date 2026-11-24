@@ -29,7 +29,7 @@ window.GameFeatured = (() => {
     }
     const container = document.getElementById('pickup');
     const title = document.getElementById('pickup-heading');
-    title.hidden = false;
+    title.hidden = container.hidden = pickup.length === 0;
     container.innerHTML = pickup.map(article => {
       const image = GameImage.getUrl(article.thumbnail_url, article.source_name);
       const tag = clickable ? 'a' : 'article';
@@ -40,7 +40,7 @@ window.GameFeatured = (() => {
         <h3>${esc(article.title)}</h3><p class="meta">${esc(article.ilovegame_point || article.summary)}</p>
         ${GameNewsCard.renderFooter(article)}
       </${tag}>`;
-    }).join('') || '<p class="meta featured-status">注目の記事は、見つけた作品から順に紹介します♪</p>';
+    }).join('');
     window.GamePickupCarousel?.refresh();
   }
   return { render };

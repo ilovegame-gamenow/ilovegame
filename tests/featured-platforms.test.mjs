@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 test('breaking and pickup share platform badges in public and editor preview rendering',()=>{
- const nodes=Object.fromEntries(['breaking','pickup','pickup-heading'].map(id=>[id,{innerHTML:'',childNodes:[],replaceChildren(){this.innerHTML='';},append(){}}]));
+ const nodes=Object.fromEntries(['breaking','breaking-heading','pickup','pickup-heading'].map(id=>[id,{innerHTML:'',childNodes:[],replaceChildren(){this.innerHTML='';},append(){}}]));
  const context=vm.createContext({window:{},document:{getElementById:id=>nodes[id],createElement:()=>({append(){}})},GameImage:{getUrl:()=>null},GameDate:{renderMeta:()=>'<time>日時</time>'}});
  for(const file of ['platform-display.js','news-card.js','featured-news.js'])vm.runInContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
  context.GameNewsCard=context.window.GameNewsCard;
@@ -17,4 +17,8 @@ test('breaking and pickup share platform badges in public and editor preview ren
  }
  context.window.GameFeatured.render({breaking:{title:'機種未記録'},pickup:[{title:'機種未記録',platforms:[]}]},{clickable:false});
  assert.ok(!nodes.breaking.innerHTML.includes('platform-badge'));assert.ok(!nodes.pickup.innerHTML.includes('platform-badge'));
+ context.window.GameFeatured.render({breaking:null,pickup:[]});
+ assert.equal(nodes['pickup-heading'].hidden,true);assert.equal(nodes.pickup.hidden,true);assert.equal(nodes.pickup.innerHTML,'');
+ context.window.GameFeatured.render({breaking:null,pickup:[{id:3,title:'新着'}]});
+ assert.equal(nodes['pickup-heading'].hidden,false);assert.equal(nodes.pickup.hidden,false);assert.match(nodes.pickup.innerHTML,/新着/);
 });

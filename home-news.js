@@ -37,7 +37,7 @@
    }
    if(run!==revision)return;
    GameFeatured.render(result.featured||{breaking:null,pickup:[]});
-   if(!result.featured){rail.innerHTML='<p class="meta featured-status">PICK UPを読み込めませんでした。再読み込みをお試しください。</p>';retry.hidden=false;}
+   if(!result.featured){rail.innerHTML='<p class="meta featured-status">PICK UPを読み込めませんでした。再読み込みをお試しください。</p>';rail.hidden=false;retry.hidden=false;}
    latest.innerHTML=result.articles.map(a=>GameNewsCard.render(a,{compact:true})).join('')||'<p class="feed-empty">条件に合う記事がありません。フィルターや検索語を変えてお試しください。</p>';
    const url=read();
    if(result.page!==Number(params.get('page')||1)){url.searchParams.set('page',String(result.page));history.replaceState(null,'',url);}
@@ -48,6 +48,7 @@
    if(run!==revision)return;
    GameFeatured.render({breaking:null,pickup:[]});
    rail.innerHTML='<p class="meta featured-status">ニュースを読み込めませんでした。再読み込みをお試しください。</p>';
+   rail.hidden=false;
    latest.innerHTML='<p class="feed-empty">ニュースを読み込めませんでした。</p>';pagination.replaceChildren();retry.hidden=false;
   }finally{clearTimeout(timer);if(run===revision){latest.setAttribute('aria-busy','false');rail.setAttribute('aria-busy','false');}}
  }
