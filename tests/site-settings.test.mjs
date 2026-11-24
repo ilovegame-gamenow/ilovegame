@@ -41,6 +41,22 @@ test('settings save updates only the singleton settings record', async () => {
   return new Response(JSON.stringify([settings]));
  },async()=>{const res=response();await editorSettings({method:'POST',headers,body:settings},res);assert.equal(res.code,200);assert.ok(res.body.sources.some(source=>source.id==='nintendo'));assert.equal(res.body.sources.find(source=>source.id==='playstation').status,'paused');});
 });
+test('group saves patch only their own fields and leave other settings unchanged',async()=>{
+ const groups={basic:{editor_session_minutes:5,public_page_size:30,editor_page_size:12},publication:{publish_threshold:85,no_article_threshold:55,breaking_max_age_hours:12,pickup_max_articles:4,pickup_max_age_hours:48},evaluation:{evaluation_guidelines:'新しい編集方針'}};
+ let saved={...settings};
+ for(const [resource,body] of Object.entries(groups)){
+  await mockFetch(async(url,options)=>{
+   assert.ok(url.includes('/site_settings?id=eq.1'));assert.equal(options.method,'PATCH');
+   const {updated_at,...patch}=JSON.parse(options.body);assert.deepEqual(patch,body);saved={...saved,...patch};return Response.json([saved]);
+  },async()=>{const res=response();await editorSettings({method:'POST',headers,query:{resource},body},res);assert.equal(res.code,200);assert.deepEqual(res.body.settings,saved);});
+ }
+ assert.equal(saved.nintendo_limit,settings.nintendo_limit);assert.equal(saved.pending_retention_days,settings.pending_retention_days);
+ await mockFetch(()=>{throw Error('unexpected fetch');},async()=>{
+  for(const [resource,body] of [['basic',{...groups.basic,auto_cleanup_enabled:1}],['publication',{...groups.publication,no_article_threshold:85}],['evaluation',{evaluation_guidelines:''}],['basic',{public_page_size:20}],['unknown',groups.basic]]){
+   const res=response();await editorSettings({method:'POST',headers,query:{resource},body},res);assert.equal(res.code,400);
+  }
+ });
+});
 test('simplified settings save preserves collector values by omitting them from PATCH', async () => {
  const {nintendo_limit,playstation_limit,...visible}=settings;
  const saved={...settings,nintendo_limit:13,playstation_limit:0};

@@ -13,17 +13,16 @@
   const form = document.getElementById('settingsForm');
   const fields = document.getElementById('settingsFields');
   const message = document.getElementById('settingsMessage');
-  const button = document.getElementById('saveSettings');
-  const saveResult = document.getElementById('saveResult');
-  const inputs = () => [...form.querySelectorAll('input[name], textarea[name], select[name]')];
+  const panels = [...form.querySelectorAll('[data-settings-group]')];
+  const inputs = (scope=form) => [...scope.querySelectorAll('input[name], textarea[name], select[name]')];
   let defaultGuidelines = '';
   let original = null;
   let busy = false;
-  const values = () => Object.fromEntries(inputs().map(input => [input.name, (input.type === 'number' || input.type === 'select-one') ? (input.value === '' ? null : Number(input.value)) : input.value]));
+  const values = (scope=form) => Object.fromEntries(inputs(scope).map(input => [input.name, (input.type === 'number' || input.type === 'select-one') ? (input.value === '' ? null : Number(input.value)) : input.value]));
   const dirty = () => original && JSON.stringify(values()) !== JSON.stringify(original);
   function notify(text, error = false) { message.textContent = text; message.dataset.error = String(error); }
-  async function request(options = {}) {
-    const response = await fetch('/api/editor-settings', { credentials: 'same-origin', cache: 'no-store', ...options });
+  async function request(options = {}, group) {
+    const response = await fetch('/api/editor-settings'+(group?'?resource='+encodeURIComponent(group):''), { credentials: 'same-origin', cache: 'no-store', ...options });
     if (response.status === 401) { location.replace('/editor.html'); return null; }
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || '設定を保存できませんでした');
@@ -49,16 +48,20 @@
     if (event.key === 'Enter' && event.target.matches('input')) event.preventDefault();
   });
   form.addEventListener('submit', event => event.preventDefault());
-  button.addEventListener('click', async () => {
-    if (busy || !form.reportValidity()) return;
-    const data = values();
+  for (const panel of panels) {
+    const group=panel.dataset.settingsGroup,button=panel.querySelector('[data-save-group]'),saveResult=panel.querySelector('.group-save-result'),label=button.textContent;
+    button.addEventListener('click', async () => {
+    if (busy || !original || inputs(panel).some(input=>!input.reportValidity())) return;
+    const data = values(panel);
     busy = true; fields.disabled = true; button.textContent = '保存中…';
     button.dataset.saved = 'false'; saveResult.hidden = true;
     try {
-      const result = await request({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const result = await request({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) },group);
       if (!result) return;
-      fill(result.settings);
-      GameEditorSession.refresh();
+      for(const input of inputs(panel))input.value=result.settings[input.name];
+      Object.assign(original,values(panel));
+      updatePolicySummary();
+      if(group==='basic')GameEditorSession.refresh();
       notify('');
       button.dataset.saved = 'true';
       saveResult.dataset.error = 'false';
@@ -71,18 +74,19 @@
     }
     finally {
       busy = false; fields.disabled = false;
-      button.textContent = button.dataset.saved === 'true' ? '✓ 保存しました' : '設定を保存';
+      button.textContent = button.dataset.saved === 'true' ? '✓ 保存しました' : label;
     }
   });
-  form.addEventListener('input', () => {
+  panel.addEventListener('input', () => {
     updatePolicySummary();
     button.dataset.saved = 'false';
-    button.textContent = '設定を保存';
+    button.textContent = label;
     saveResult.hidden = true;
   });
+  }
   document.getElementById('resetGuidelines').addEventListener('click', () => {
     form.elements.evaluation_guidelines.value = defaultGuidelines;
-    form.dispatchEvent(new Event('input', { bubbles:true }));
+    form.elements.evaluation_guidelines.dispatchEvent(new Event('input', { bubbles:true }));
   });
   window.addEventListener('beforeunload', event => {
     if (busy || dirty()) { event.preventDefault(); event.returnValue = ''; }

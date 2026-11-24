@@ -18,6 +18,8 @@
     <p id="settingsMessage" role="status" aria-live="polite">設定を読み込み中…</p>
     <form id="settingsForm" class="settings-save-group" aria-label="表示・掲載・AI評価の設定">
       <fieldset id="settingsFields" disabled style="border:0;padding:0;margin:0">
+        <section class="settings-panel" data-settings-group="basic" aria-labelledby="basicHeading">
+        <div class="panel-heading"><h2 id="basicHeading">基本設定</h2></div>
         <div class="settings-grid">
         <section class="settings-section" aria-labelledby="sessionHeading">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">◷</span><div><h2 id="sessionHeading">編集室のログイン</h2><p>無操作時の自動ロック</p></div></div>
@@ -38,7 +40,11 @@
           </div>
           <p class="section-note">保存後、一覧の再読み込みで反映。</p>
         </section>
-        <section class="settings-section settings-wide" aria-labelledby="publicationRulesHeading">
+        </div>
+        <div class="settings-actions settings-save-footer"><span class="save-scope">ログイン・一覧表示</span><button class="group-save" type="button" data-save-group="basic">基本設定を保存</button><p class="group-save-result" role="status" aria-live="polite" hidden></p></div>
+        </section>
+        <section class="settings-panel" data-settings-group="publication" aria-labelledby="publicationRulesHeading">
+        <div class="settings-section">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="publicationRulesHeading">記事の掲載・表示ルール</h2></div></div>
           <div class="publication-grid">
           <div class="rule-group" aria-labelledby="newsRuleHeading">
@@ -56,10 +62,6 @@
           </div>
           <div class="rule-group" aria-labelledby="breakingRuleHeading">
             <h3 id="breakingRuleHeading">BREAKING 速報 <span>重要な発表だけを期間限定で表示</span></h3>
-          <div class="setting-field" hidden>
-            <div class="field-description"><label for="breaking_threshold">BREAKINGの最低評価</label><p id="breaking_thresholdHelp">この点数以上の記事を1件表示</p></div>
-            <div class="number-field"><input id="breaking_threshold" name="breaking_threshold" type="number" min="0" max="100" step="1" aria-describedby="breaking_thresholdHelp" required><span>点</span></div>
-          </div>
           <div class="setting-field">
             <div class="field-description"><label for="breaking_max_age_hours">最長掲載時間</label><p id="breaking_max_age_hoursHelp">速報に選定してから</p></div>
             <div class="number-field"><input id="breaking_max_age_hours" name="breaking_max_age_hours" type="number" min="1" max="720" step="1" aria-describedby="breaking_max_age_hoursHelp" required><span>時間</span></div>
@@ -68,10 +70,6 @@
           </div>
           <div class="rule-group" aria-labelledby="pickupRuleHeading">
             <h3 id="pickupRuleHeading">PICK UP 注目記事 <span>遊びの特徴・発見の価値で作品を選定</span></h3>
-          <div class="setting-field" hidden>
-            <div class="field-description"><label for="pickup_threshold">PICK UPの最低評価</label></div>
-            <div class="number-field"><input id="pickup_threshold" name="pickup_threshold" type="number" min="0" max="100" step="1"  required><span>点</span></div>
-          </div>
           <div class="setting-field">
             <div class="field-description"><label for="pickup_max_articles">最大表示件数</label></div>
             <div class="number-field"><input id="pickup_max_articles" name="pickup_max_articles" type="number" min="1" max="12" step="1"  required><span>件</span></div>
@@ -84,25 +82,24 @@
           </div>
           </div>
           <a class="settings-preview-link" href="/editor-preview.html">BREAKING・PICK UPの表示を確認 →</a>
+        </div>
+        <div class="settings-actions settings-save-footer"><span class="save-scope">NEWS・BREAKING・PICK UP</span><button class="group-save" type="button" data-save-group="publication">記事掲載設定を保存</button><p class="group-save-result" role="status" aria-live="polite" hidden></p></div>
         </section>
-        <section id="editorialSettings" class="settings-section settings-wide" aria-labelledby="evaluationHeading">
+        <section class="settings-panel" data-settings-group="evaluation" aria-labelledby="evaluationHeading">
+        <div id="editorialSettings" class="settings-section">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">✎</span><div><h2 id="evaluationHeading">AIの評価基準</h2><p>ニュースの採点で重視する編集方針</p></div></div>
           <label class="evaluation-label" for="evaluation_guidelines">編集方針（1行に1項目・最大6,000文字）</label>
           <textarea id="evaluation_guidelines" name="evaluation_guidelines" rows="7" maxlength="6000" aria-describedby="evaluationHelp" required></textarea>
           <button type="button" id="resetGuidelines" class="settings-secondary">初期の評価方針に戻す</button>
           <p id="evaluationHelp" class="section-note">次回のAI評価（0〜100点）から適用。自動掲載は一次情報・公式素材などの品質条件も必要です。独自発見は手動審査。既存記事の再評価・本文変更は行いません。初期方針への復元も保存で確定します。</p>
+        </div>
+        <div class="settings-actions settings-save-footer"><span class="save-scope">AIの編集方針</span><button class="group-save" type="button" data-save-group="evaluation">AI評価基準を保存</button><p class="group-save-result" role="status" aria-live="polite" hidden></p></div>
         </section>
-        </div>
-
-        <div class="settings-actions settings-save-footer">
-        <span class="save-scope">ログイン・表示・掲載・AI評価の設定</span>
-        <button id="saveSettings" type="button">設定を保存</button>
-        <p id="saveResult" role="status" aria-live="polite" hidden></p>
-        </div>
       </fieldset>
     </form>
 <div class="data-main integrated-data-management" id="dataManagement">
 <a id="dataBack" class="back" href="/editor-settings.html" hidden>← 運用設定に戻る</a>
+<section class="settings-panel cleanup-panel" aria-labelledby="retentionHeading">
 <form id="retentionForm"><fieldset id="retentionFields" disabled style="border:0;padding:0;margin:0">        <section id="retentionSettings" class="settings-section" aria-labelledby="retentionHeading">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="retentionHeading">記事の自動整理</h2><p>審査待ち・非掲載記事の保存期間</p></div></div>
           <div class="retention-grid">
@@ -113,6 +110,7 @@
           </div><p class="section-note cleanup-note"><strong>完全削除は取り消せません。</strong> 公開中・公開履歴のある記事、AI未処理・処理中、保存済み下書きは対象外。編集更新時は保持期間を数え直し、情報元URLは再収集防止用に残します。</p>
         <div class="settings-actions settings-save-footer"><span class="save-scope">自動整理の設定</span><button id="saveRetention" type="submit" class="retention-save">自動整理の設定を保存</button><p id="retentionMessage" role="status" aria-live="polite">設定を読み込み中…</p></div></section></fieldset></form>
 <section class="settings-section" aria-labelledby="retentionUpcomingHeading"><div class="section-heading"><span class="section-mark" aria-hidden="true">◷</span><div><h2 id="retentionUpcomingHeading">自動整理の予定</h2><p>今後7日以内の予定と保護中の記事</p></div></div><p id="retentionAlert" class="data-warning" role="alert" hidden></p><p id="retentionUpcomingStatus" role="status" aria-live="polite">読み込み中…</p><details class="retention-upcoming-details"><summary><span class="retention-show">予定一覧を表示</span><span class="retention-hide">予定一覧を閉じる</span></summary><p class="section-note">審査待ちは非掲載へ移動、非掲載は完全削除。予定は目安です（1日最大100件、更新・設定によって変動）。保護すると自動整理対象から外れます。解除すると解除時から保持期間を数え直します。</p><div id="retentionUpcomingList"></div><div class="data-actions"><button id="retentionPrev" type="button" disabled>前へ</button><span id="retentionPage"></span><button id="retentionNext" type="button" disabled>次へ</button><button id="retentionRefresh" type="button">更新</button></div></details></section>
+</section>
 
 <details class="settings-section manual-deletion" id="manualDeletion"><summary><span class="manual-title">記事の手動削除</span> <span class="manual-subtitle">対象記事を検索・完全削除</span></summary>
 <section id="dataWarning" class="data-warning"><h2>完全削除について</h2><p>削除した記事と関連する下書き・発見経路・掲載枠・作品への記事リンクは復元できません。作品や発売日カレンダーは削除されません。通常の不採用記事は非掲載のまま残すと、同じニュースの再収集を防げます。</p><p>処理中・未処理の記事は削除対象外です。掲載中の記事は初期表示から除外しています。</p></section>

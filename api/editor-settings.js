@@ -1,6 +1,6 @@
 import { getInformationSources } from '../lib/information-sources.js';
 import { requireEditor, requireEditorOrigin, setEditorCookie } from '../lib/editor-auth.js';
-import { getSiteSettings, saveSiteSettings, validateSettings, settingRules, validateRetentionSettings, saveRetentionSettings } from '../lib/site-settings.js';
+import { getSiteSettings, saveSiteSettings, validateSettings, settingRules, validateRetentionSettings, saveRetentionSettings, isSettingsGroup } from '../lib/site-settings.js';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -10,16 +10,17 @@ export default async function handler(req, res) {
   }
   if (!requireEditor(req, res)) return;
   const retention=req.query?.resource==='retention';
-  if(req.query?.resource!==undefined&&!retention)return res.status(400).json({error:'Invalid resource'});
+  const group=req.query?.resource;
+  if(group!==undefined&&!retention&&!isSettingsGroup(group))return res.status(400).json({error:'Invalid resource'});
   if (req.method === 'POST') {
     if (!requireEditorOrigin(req, res)) return;
-    if (!(retention ? validateRetentionSettings(req.body) : validateSettings(req.body, { allowOmittedCollectionLimits: true }))) return res.status(400).json({ error: '設定値の範囲・しきい値の大小関係・評価方針を確認してください' });
+    if (!(retention ? validateRetentionSettings(req.body) : validateSettings(req.body, { allowOmittedCollectionLimits: true, group }))) return res.status(400).json({ error: '設定値の範囲・しきい値の大小関係・評価方針を確認してください' });
   }
   try {
     const url = process.env.SUPABASE_URL;
     const key = process.env.SUPABASE_SECRET_KEY;
     const settings = req.method === 'POST'
-      ? await (retention?saveRetentionSettings(url,key,req.body):saveSiteSettings(url, key, req.body))
+      ? await (retention?saveRetentionSettings(url,key,req.body):saveSiteSettings(url, key, req.body, group))
       : await getSiteSettings(url, key);
     if (req.method === 'POST' && !retention && Object.hasOwn(req.body,'editor_session_minutes')) {
       setEditorCookie(res, process.env.EDITOR_SECRET, settings.editor_session_minutes*60);
