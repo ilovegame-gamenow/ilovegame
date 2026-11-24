@@ -139,22 +139,22 @@
 #articlesList .card {
   flex: 1;
 }
-/* 操作欄を共通の機種・日付フッターの直前に置き、日付を最下部に揃える。 */
+/* 共通の機種・日付フッターを操作欄の直上に揃える。 */
 #articlesList .article-management {
-  order: 1;
-  margin-top: auto;
-  padding: 8px 12px 8px;
-  border-top: 1px solid #eee2d8;
-}
-#articlesList .card .news-card-footer {
+  order: 4;
   margin-top: 0;
+  padding: 8px 12px 12px;
+  border-top: 1px solid #eee2d8;
 }
 #articlesList .article-top {
   margin: 0 0 8px;
   align-items: center;
+  flex-wrap: nowrap;
+  gap: 6px;
 }
 #articlesList .article-top .meta {
   margin: 0;
+  white-space: nowrap;
 }
 #articlesList .actions {
   gap: 6px;
@@ -471,9 +471,7 @@ management.append(top, actions);
 management.addEventListener("click", event => {
   event.stopPropagation();
 });
-const managementHost = cardElement || card;
-const footer = managementHost.querySelector('.news-card-footer');
-managementHost.insertBefore(management, footer && footer.parentNode === managementHost ? footer : null);
+(cardElement || card).appendChild(management);
 list.appendChild(item);
       }
     }

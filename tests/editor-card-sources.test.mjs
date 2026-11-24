@@ -38,8 +38,8 @@ test('interactive maker text does not trigger the parent card click or Enter nav
  callbacks.click({target:{closest:()=>null}});assert.match(context.location.href,/^\/editor-article.html\?id=1&return=/);assert.equal(stored.length,1);
 });
 
-test('editor controls precede the shared footer so the publication date stays at the bottom',()=>{
- assert.match(html,/#articlesList \.article-management\s*\{\s*order: 1;\s*margin-top: auto;/);
- assert.match(html,/#articlesList \.card \.news-card-footer\s*\{\s*margin-top: 0;/);
- assert.match(html,/managementHost\.insertBefore\(management, footer/);
+test('editor controls follow the shared footer with a consistent management height',()=>{
+ assert.match(html,/#articlesList \.article-management\s*\{\s*order: 4;\s*margin-top: 0;/);
+ assert.match(html,/#articlesList \.article-top\s*\{[^}]*flex-wrap: nowrap;/);
+ assert.match(html,/\(cardElement \|\| card\)\.appendChild\(management\)/);
 });
