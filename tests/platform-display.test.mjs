@@ -7,7 +7,7 @@ const display=context.GamePlatforms;
 test('platform aliases, calendar objects and finder names use one ordered set of labels without changing input',()=>{
  const values=['Android',{name:'PlayStation 5',code:'ps5'},'Nintendo Switch','windows','iOS','Switch','PC（Steam）','macOS'];
  const original=JSON.stringify(values);
- assert.deepEqual(Array.from(display.list(values),p=>p.label),['Switch','PS5','Steam','Mac','iOS','Android']);assert.equal(JSON.stringify(values),original);
+ assert.deepEqual(Array.from(display.list(values),p=>p.label),['Switch1','PS5','Steam','Mac','iOS','Android']);assert.equal(JSON.stringify(values),original);
  assert.equal(display.describe('Xbox Series X/S').label,'Xbox Series X|S');
  assert.equal(display.describe('iOS（App Store）').label,'iOS');
 });
@@ -34,4 +34,5 @@ test('compact card categories match filters, deduplicate hardware and support mo
  assert.equal(display.renderCategories({category:'MOVIE',platforms:[]}),'<div class="news-category-badges"><span class="news-category-badge platform-badge--movie">MOVIE</span></div>');
  assert.equal(display.renderCategories({platforms:[]}), '');
  assert.equal(display.matchesFeedCategory({platforms:['Wii U']},'switch'),false);
+ for(const name of ['Switch','Switch1','Nintendo Switch','Nintendo Switch 1']) {assert.equal(display.describe(name).label,'Switch1');assert.equal(display.matchesFeedCategory({platforms:[name]},'switch'),true);}
 });

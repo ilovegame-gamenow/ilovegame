@@ -2,7 +2,7 @@
 globalThis.GamePlatforms = (() => {
  const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
  const definitions=[
-  ['Switch 2','switch',['nintendoswitch2','switch2']],['Switch','switch',['nintendoswitch','switch']],
+  ['Switch 2','switch',['nintendoswitch2','switch2']],['Switch1','switch',['nintendoswitch','switch','nintendoswitch1','switch1']],
   ['Wii U','switch',['wiiu']],['PS5','playstation',['playstation5','ps5']],['PS4','playstation',['playstation4','ps4']],
   ['Xbox Series X|S','xbox',['xboxseriesx|s','xboxseriesx/s','xboxseriesxs','xboxseries','xboxx|s']],
   ['Xbox Series X','xbox',['xboxseriesx','xboxx']],['Xbox Series S','xbox',['xboxseriess','xboxs']],['Xbox One','xbox',['xboxone']],['Xbox','xbox',['xbox']],
@@ -34,7 +34,7 @@ globalThis.GamePlatforms = (() => {
   if(filter==='movie')return String(article?.category).toUpperCase()==='MOVIE';
   return (Array.isArray(article?.platforms)?article.platforms:[]).some(value=>{
    const platform=describe(value);
-   return filter==='switch'?['Switch','Switch 2'].includes(platform.label):platform.color===filter;
+   return filter==='switch'?['Switch1','Switch 2'].includes(platform.label):platform.color===filter;
   });
  }
  function renderCategories(article){
