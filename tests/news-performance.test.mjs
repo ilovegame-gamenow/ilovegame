@@ -100,3 +100,11 @@ test('featured expiry and breaking age cap cache lifetime; private slot fields n
     const r=response();await news({method:'GET',query:{view:'home'}},r);assert.equal(r.code,200);assert.equal(r.headers['Vercel-CDN-Cache-Control'],undefined);
   });
 });
+
+test('daily pickup ranks take priority over newer unranked discoveries',async()=>{
+ const now=Date.now(),expires=new Date(now+86400000).toISOString();
+ const slots=[{article_id:9,slot:'discovery',selected_at:new Date(now-100).toISOString(),expires_at:expires,pickup_rank:null},{article_id:2,slot:'discovery',selected_at:new Date(now-1000).toISOString(),expires_at:expires,pickup_rank:2},{article_id:1,slot:'discovery',selected_at:new Date(now-2000).toISOString(),expires_at:expires,pickup_rank:1}];
+ await withFetch(async url=>new URL(url).pathname.endsWith('/article_feature_slots')?Response.json(slots):Response.json([{id:9},{id:2},{id:1}]),async()=>{
+  const result=await getFeaturedNews('https://example.invalid','public','secret',settings);assert.deepEqual(result.pickup.map(a=>a.id),[1,2]);
+ });
+});
