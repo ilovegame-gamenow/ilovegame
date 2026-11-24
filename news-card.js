@@ -28,14 +28,15 @@
       ? ""
       : `href="/article.html?id=${encodeURIComponent(a.id)}"`;
 
+    const meta = GameDate.renderMeta(a.source_name, updateTime, { showSource: false });
     const content = `
       ${imageUrl
         ? `<img class="thumb" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(a.title)}" loading="lazy">`
         : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
-      ${GameDate.renderMeta(a.source_name, updateTime, { showSource: false })}
+      ${options.compact ? "" : meta}
       <h3>${escapeHtml(a.title || "")}</h3>
       ${options.compact ? '' : `<p>${escapeHtml(a.summary || "")}</p>`}
-      ${badges}
+      ${options.compact ? `<div class="news-card-footer">${badges}${meta}</div>` : badges}
     `;
 
     return options.clickable === false

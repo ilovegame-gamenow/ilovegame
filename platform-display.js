@@ -39,7 +39,7 @@ globalThis.GamePlatforms = (() => {
  }
  function renderCategories(article){
   const labels=feedCategories.filter(([key])=>matchesFeedCategory(article,key));
-  return labels.length?`<div class="news-category-badges">${labels.map(([,label])=>`<span class="news-category-badge">${escape(label)}</span>`).join('')}</div>`:'';
+  return labels.length?`<div class="news-category-badges">${labels.map(([key,label])=>`<span class="news-category-badge platform-badge--${key}">${escape(label)}</span>`).join('')}</div>`:'';
  }
  return {describe,list,render,element,feedCategories,matchesFeedCategory,renderCategories};
 })();
