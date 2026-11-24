@@ -45,7 +45,7 @@ body[data-page="editor"] .settings-main .section-heading { display:flex; align-i
 .settings-secondary { min-height:44px; padding:7px 14px; margin:6px 0 0; background:#fff; color:var(--settings-accent); border:1px solid #d8c5b2; border-radius:999px; font:inherit; font-size:13px; cursor:pointer; }
 .settings-save-footer { display:grid; grid-template-columns:minmax(0,1fr) 190px; position:relative; align-items:center; gap:8px 14px; padding:12px var(--settings-pad); background:#fff3e6; border-top:1px solid var(--settings-line); box-sizing:border-box; }
 .save-scope { grid-column:1; grid-row:1; display:flex; align-items:center; min-height:44px; color:#805334; font-size:13px; font-weight:600; }
-.group-save,.settings-main .settings-save-footer #saveRetention { grid-column:2; grid-row:1; width:100%; box-sizing:border-box; height:44px; min-height:44px; min-width:0; padding:8px 12px; border:0; border-radius:999px; background:#c6530c; color:#fff; font:inherit; font-size:14px; font-weight:800; white-space:nowrap; cursor:pointer; }
+.group-save,.settings-main .settings-save-footer #saveRetention { grid-column:2; grid-row:1; width:100%; box-sizing:border-box; height:44px; min-height:44px; min-width:0; padding:8px 12px; border:0; border-radius:999px; background:var(--selected-button-bg); color:var(--selected-button-fg); font:inherit; font-size:14px; font-weight:800; white-space:nowrap; cursor:pointer; }
 #settingsFields:disabled,#retentionFields:disabled { opacity:.6; }
 .group-save:disabled,#saveRetention:disabled { cursor:default; }
 .group-save[data-saved="true"],.settings-main #saveRetention[data-saved="true"] { background:#278344; }
