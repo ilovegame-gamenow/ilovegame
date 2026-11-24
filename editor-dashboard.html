@@ -139,12 +139,15 @@
 #articlesList .card {
   flex: 1;
 }
-/* 編集室専用の操作欄だけをカード末尾に追加する。 */
+/* 操作欄を共通の機種・日付フッターの直前に置き、日付を最下部に揃える。 */
 #articlesList .article-management {
-  order: 4;
+  order: 1;
   margin-top: auto;
-  padding: 8px 12px 12px;
+  padding: 8px 12px 8px;
   border-top: 1px solid #eee2d8;
+}
+#articlesList .card .news-card-footer {
+  margin-top: 0;
 }
 #articlesList .article-top {
   margin: 0 0 8px;
@@ -468,7 +471,9 @@ management.append(top, actions);
 management.addEventListener("click", event => {
   event.stopPropagation();
 });
-(cardElement || card).appendChild(management);
+const managementHost = cardElement || card;
+const footer = managementHost.querySelector('.news-card-footer');
+managementHost.insertBefore(management, footer && footer.parentNode === managementHost ? footer : null);
 list.appendChild(item);
       }
     }
