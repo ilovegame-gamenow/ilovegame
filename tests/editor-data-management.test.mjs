@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {listDataArticles,deleteDataArticles} from '../lib/editor-data-management.js';
+import {listDataArticles,deleteDataArticles,listRetention,setRetentionProtection} from '../lib/editor-data-management.js';
 const row={id:1,status:'rejected',processing_status:'completed',updated_at:'2026-11-22T04:19:04.709027+00:00'};
 const input=(articles=[row],includePublished=false)=>({articles,includePublished,confirmation:'完全削除 '+articles.length+'件'});
 test('default list excludes published and in-flight rows',async()=>{
@@ -41,3 +41,6 @@ test('explicit published deletion remains subject to exact version and state',as
  });assert.deepEqual(result.body.deletedIds,[1]);
 });
 test('pagination uses exact filtered total and corrects an empty last page',async()=>{let calls=0;const result=await listDataArticles('','',{page:4},async(u,k,path,opts)=>{assert.equal(opts.countExact,true);const q=new URLSearchParams(path.split('?')[1]);assert.equal(q.get('offset'),calls++===0?'60':'20');return {rows:calls===1?[]:[row],total:21};});assert.equal(result.body.page,2);assert.equal(result.body.total,21);assert.equal(result.body.limit,20);assert.equal(result.body.hasMore,false);});
+
+test('retention overview uses the read-only RPC',async()=>{const r=await listRetention('','',{},async(u,k,path,opts)=>{assert.equal(path,'rpc/editor_retention_overview');assert.deepEqual(JSON.parse(opts.body),{p_page:1});return {total:0,articles:[],enabled:true,overdue:false};});assert.equal(r.body.page,1);});
+test('protection changes only the selected current completed article',async()=>{const r=await setRetentionProtection('','',{id:1,status:'rejected',updated_at:row.updated_at,protected:true},async(u,k,path,opts)=>{const q=new URLSearchParams(path.split('?')[1]);assert.equal(q.get('id'),'eq.1');assert.equal(q.get('updated_at'),'eq.'+row.updated_at);assert.equal(q.get('retention_protected'),'eq.false');assert.equal(opts.method,'PATCH');assert.equal(JSON.parse(opts.body).retention_protected,true);return [{id:1,retention_protected:true}];});assert.equal(r.status,200);});

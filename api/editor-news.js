@@ -1,5 +1,5 @@
 import { getEditorNews, parseEditorNewsQuery } from "../lib/editor-news-repository.js";
-import { listDataArticles, deleteDataArticles } from "../lib/editor-data-management.js";
+import { listDataArticles, deleteDataArticles, listRetention, setRetentionProtection } from "../lib/editor-data-management.js";
 import { savePublisherDirectory } from "../lib/publisher-directory.js";
 import { getSiteSettings } from "../lib/site-settings.js";
 import {
@@ -20,6 +20,16 @@ export default async function handler(req, res) {
   }
 
   if (!requireEditor(req, res)) return;
+
+  if (["retention-overview","retention-protection"].includes(req.query.action)) {
+    const writing=req.query.action==="retention-protection";
+    if(req.method!==(writing?"POST":"GET"))return res.status(405).json({error:"Method not allowed"});
+    if(writing&&!requireEditorOrigin(req,res))return;
+    const url=process.env.SUPABASE_URL,key=process.env.SUPABASE_SECRET_KEY;
+    if(!url||!key)return res.status(503).json({error:"自動整理の情報を取得できません。"});
+    try{const result=writing?await setRetentionProtection(url,key,req.body):await listRetention(url,key,req.query);return res.status(result.status).json(result.body);}
+    catch{return res.status(503).json({error:"自動整理の情報を確認できませんでした。"});}
+  }
 
   if (req.query.action === "article-data" || req.query.action === "delete-articles") {
     const deleting = req.query.action === "delete-articles";

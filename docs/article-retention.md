@@ -95,3 +95,71 @@ end $$;
 revoke all on function article_retention.scheduled_cleanup() from public,anon,authenticated,service_role;
 select cron.alter_job(job_id:=jobid,schedule:='* * * * *',command:='select article_retention.scheduled_cleanup();') from cron.job where jobname='ilovegame-article-retention' and username='postgres';
 ```
+
+## 削除予定と保護（2026-11-24）
+既存の再収集防止URL記録は維持し、削除履歴画面・記事本文の複製は追加しない。予定は7日以内と保護中の記事。処理成功の通知は行わず、予定時刻から10分経って完了日が更新されていない場合のみ編集室に警告。保護解除時は保持期間を更新時から再計算する。
+
+Migration: `article_retention_protection_and_overview`（適用済み）。
+```sql
+alter table public.articles add column retention_protected boolean not null default false;
+create or replace function article_retention.run_cleanup(p_preview boolean default true) returns jsonb language plpgsql security invoker set search_path='' as $$
+declare cfg public.site_settings%rowtype; a public.articles%rowtype; moved integer=0; removed integer=0; actual integer;
+begin
+ select * into cfg from public.site_settings where id=1 for share;
+ if not found or (cfg.auto_cleanup_enabled<>1 and not p_preview) then return jsonb_build_object('enabled',false,'moved',0,'deleted',0); end if;
+ if not pg_try_advisory_xact_lock(717021,20261123) then return jsonb_build_object('busy',true); end if;
+ for a in select ar.* from public.articles ar where ar.status in ('pending','rejected') and ar.processing_status='completed'
+ and not ar.retention_protected and not ar.retention_ever_published and ar.published_at is null and ar.site_published_at is null
+ and (ar.status='rejected' or (ar.manually_reviewed=false and ar.importance is not null))
+ and greatest(ar.retention_since,ar.updated_at) <= now()-make_interval(days=>case when ar.status='pending' then cfg.pending_retention_days else cfg.rejected_retention_days end)
+ and not exists(select 1 from public.article_drafts d where d.article_id=ar.id)
+ order by ar.retention_since,ar.id limit 100 for update of ar skip locked
+ loop
+  if exists(select 1 from public.article_drafts d where d.article_id=a.id) then continue; end if;
+  if a.status='pending' then
+   if p_preview then moved=moved+1; else
+    update public.articles set status='rejected',updated_at=now() where id=a.id;
+    get diagnostics actual=row_count; moved=moved+actual;
+   end if;
+  else
+   if p_preview then removed=removed+1; else
+    insert into article_retention.deleted_sources(source_url,article_id) values(a.source_url,a.id) on conflict(source_url) do nothing;
+    delete from public.articles where id=a.id;
+    get diagnostics actual=row_count; removed=removed+actual;
+   end if;
+  end if;
+ end loop;
+ return jsonb_build_object('enabled',cfg.auto_cleanup_enabled=1,'preview',p_preview,'moved',moved,'deleted',removed);
+end $$;
+grant select on article_retention.schedule_state to service_role;
+create function public.editor_retention_overview(p_page integer default 1) returns jsonb language sql stable security invoker set search_path='' as $$
+ with cfg as (select * from public.site_settings where id=1),
+ clock as (select now() at time zone 'Asia/Tokyo' as local_now),
+ state as (select last_run_date from article_retention.schedule_state where id=1),
+ eligible as (
+ select ar.id,ar.title,ar.status,ar.retention_protected,ar.updated_at,
+ greatest(ar.retention_since,ar.updated_at) + make_interval(days=>case when ar.status='pending' then cfg.pending_retention_days else cfg.rejected_retention_days end) as eligible_at
+ from public.articles ar cross join cfg
+ where ar.status in ('pending','rejected') and ar.processing_status='completed'
+ and not ar.retention_ever_published and ar.published_at is null and ar.site_published_at is null
+ and (ar.status='rejected' or (ar.manually_reviewed=false and ar.importance is not null))
+ and not exists(select 1 from public.article_drafts d where d.article_id=ar.id)
+ ),
+ dates as (
+ select e.*, greatest(e.eligible_at,now()) at time zone 'Asia/Tokyo' as base_local from eligible e
+ ),
+ due as (
+ select d.*, ((base_local::date + cfg.auto_cleanup_time_jst::time)
+ + case when base_local > base_local::date + cfg.auto_cleanup_time_jst::time or (select last_run_date from state)=base_local::date then interval '1 day' else interval '0 day' end) at time zone 'Asia/Tokyo' as due_at
+ from dates d cross join cfg
+ ),
+ upcoming as (select id,title,status,retention_protected,updated_at,due_at from due where retention_protected or due_at<=now()+interval '7 days'),
+ page as (select * from upcoming order by retention_protected,due_at,id limit 20 offset (greatest(1,least(p_page,10000))-1)*20)
+ select jsonb_build_object('enabled',cfg.auto_cleanup_enabled=1,'total',(select count(*) from upcoming),'articles',coalesce((select jsonb_agg(to_jsonb(page)) from page),'[]'::jsonb),
+ 'overdue',cfg.auto_cleanup_enabled=1 and clock.local_now >= clock.local_now::date+cfg.auto_cleanup_time_jst::time+interval '10 minutes' and coalesce((select last_run_date from state)<>clock.local_now::date,true))
+ from cfg cross join clock
+$$;
+revoke all on function public.editor_retention_overview(integer) from public,anon,authenticated;
+grant execute on function public.editor_retention_overview(integer) to service_role;
+
+```
