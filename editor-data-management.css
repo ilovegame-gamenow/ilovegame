@@ -86,3 +86,5 @@ html.data-modal-scroll-locked body{position:fixed;top:var(--data-modal-scroll-to
 html{scroll-padding-bottom:var(--data-selection-height,0px)}
 
 .retention-upcoming-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #eee2d7}.retention-upcoming-row>div{min-width:0;overflow-wrap:anywhere}.retention-upcoming-row small{display:block;margin-top:6px;color:#746a60}.retention-upcoming-row button{flex:none;white-space:nowrap}.retention-upcoming-row a{color:inherit;font-weight:600}
+
+.retention-upcoming-details>summary{cursor:pointer;color:var(--ink,#30261e);font-weight:600;padding:10px 0;min-height:44px;box-sizing:border-box}.retention-upcoming-details>summary:focus-visible{outline:2px solid #bd551d;outline-offset:3px}.retention-upcoming-details:not([open]) .retention-hide,.retention-upcoming-details[open] .retention-show{display:none}
