@@ -26,3 +26,12 @@ test('all pages using classic badge consumers load the shared script and stylesh
  }
  for(const file of ['calendar.html','weekly-roundup.html'])assert.ok(readFileSync(new URL('../'+file,import.meta.url),'utf8').includes('/platform-display.css'));
 });
+
+test('compact card categories match filters, deduplicate hardware and support movies',()=>{
+ const a={platforms:['Switch','Switch 2','PS5','PS4','Xbox Series X|S','Xbox One','Steam','PC','Android']};
+ const html=display.renderCategories(a);
+ assert.deepEqual(Array.from(html.matchAll(/class="news-category-badge">([^<]+)/g),m=>m[1]),['Switch','PS','Xbox','PC','Mobile']);
+ assert.equal(display.renderCategories({category:'MOVIE',platforms:[]}),'<div class="news-category-badges"><span class="news-category-badge">MOVIE</span></div>');
+ assert.equal(display.renderCategories({platforms:[]}), '');
+ assert.equal(display.matchesFeedCategory({platforms:['Wii U']},'switch'),false);
+});

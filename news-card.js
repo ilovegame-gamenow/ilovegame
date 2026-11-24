@@ -16,7 +16,7 @@
     const a = article || {};
     const platforms = Array.isArray(a.platforms) ? a.platforms : [];
 
-    const badges = GamePlatforms.render(platforms);
+    const badges = options.compact ? GamePlatforms.renderCategories(a) : GamePlatforms.render(platforms);
 
     const updateTime =
       a.site_published_at || a.created_at || a.published_at;

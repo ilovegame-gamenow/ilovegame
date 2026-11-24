@@ -28,5 +28,18 @@ globalThis.GamePlatforms = (() => {
   for(const p of list(values)){const badge=document.createElement('span');badge.className=`platform-badge platform-badge--${p.color}`;badge.textContent=p.label;group.append(badge);}
   return group;
  }
- return {describe,list,render,element};
+ const feedCategories=[['switch','Switch'],['playstation','PS'],['xbox','Xbox'],['pc','PC'],['mobile','Mobile'],['movie','MOVIE']];
+ function matchesFeedCategory(article,filter){
+  if(filter==='all')return true;
+  if(filter==='movie')return String(article?.category).toUpperCase()==='MOVIE';
+  return (Array.isArray(article?.platforms)?article.platforms:[]).some(value=>{
+   const platform=describe(value);
+   return filter==='switch'?['Switch','Switch 2'].includes(platform.label):platform.color===filter;
+  });
+ }
+ function renderCategories(article){
+  const labels=feedCategories.filter(([key])=>matchesFeedCategory(article,key));
+  return labels.length?`<div class="news-category-badges">${labels.map(([,label])=>`<span class="news-category-badge">${escape(label)}</span>`).join('')}</div>`:'';
+ }
+ return {describe,list,render,element,feedCategories,matchesFeedCategory,renderCategories};
 })();
