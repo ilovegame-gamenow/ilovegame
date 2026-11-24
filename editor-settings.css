@@ -43,18 +43,17 @@ body[data-page="editor"] .settings-main .section-heading { display:flex; align-i
 .evaluation-label { display:block; font-size:13px; font-weight:700; margin:4px 0 7px; }
 #evaluation_guidelines { box-sizing:border-box; display:block; width:100%; resize:vertical; min-height:150px; padding:10px 12px; border:1px solid #d8c5b2; border-radius:9px; font:inherit; font-size:14px; line-height:1.65; background:#fffdfa; color:#302a25; }
 .settings-secondary { min-height:44px; padding:7px 14px; margin:6px 0 0; background:#fff; color:var(--settings-accent); border:1px solid #d8c5b2; border-radius:999px; font:inherit; font-size:13px; cursor:pointer; }
-.settings-save-footer { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px 14px; padding:12px var(--settings-pad); background:#fff3e6; border-top:1px solid var(--settings-line); box-sizing:border-box; }
-.save-scope { color:#805334; font-size:13px; font-weight:600; }
-.group-save,.settings-main #saveRetention { width:auto; min-width:160px; min-height:44px; padding:10px 20px; border:0; border-radius:999px; background:#c6530c; color:#fff; font:inherit; font-size:14px; font-weight:800; cursor:pointer; }
+.settings-save-footer { display:grid; grid-template-columns:minmax(0,1fr) 190px; position:relative; align-items:center; gap:8px 14px; padding:12px var(--settings-pad); background:#fff3e6; border-top:1px solid var(--settings-line); box-sizing:border-box; }
+.save-scope { grid-column:1; grid-row:1; display:flex; align-items:center; min-height:44px; color:#805334; font-size:13px; font-weight:600; }
+.group-save,.settings-main .settings-save-footer #saveRetention { grid-column:2; grid-row:1; width:100%; box-sizing:border-box; height:44px; min-height:44px; min-width:0; padding:8px 12px; border:0; border-radius:999px; background:#c6530c; color:#fff; font:inherit; font-size:14px; font-weight:800; white-space:nowrap; cursor:pointer; }
 #settingsFields:disabled,#retentionFields:disabled { opacity:.6; }
 .group-save:disabled,#saveRetention:disabled { cursor:default; }
-.group-save[data-saved="true"] { background:#278344; }
-.group-save-result,#retentionMessage { grid-column:1/-1; margin:0; font-size:13px; line-height:1.5; }
-.group-save-result { padding:8px 12px; border-radius:8px; background:#e7f6eb; color:#205f34; font-weight:700; }
-.group-save-result[data-error="true"] { background:#fff1f2; color:#a52330; }
+.group-save[data-saved="true"],.settings-main #saveRetention[data-saved="true"] { background:#278344; }
+/* Announce success without adding a new row or shifting the page. */
+.group-save-result,#retentionMessage { position:absolute; width:1px; height:1px; padding:0; margin:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 .group-save-result[hidden],#retentionMessage:empty { display:none; }
-#retentionMessage { color:var(--settings-muted); }
-#retentionMessage[data-error="true"] { color:#a52330; }
+.settings-save-footer:has(:is(.group-save-result,#retentionMessage)[data-error="true"]:not([hidden]):not(:empty)) .save-scope { visibility:hidden; }
+.settings-save-footer :is(.group-save-result,#retentionMessage)[data-error="true"]:not([hidden]):not(:empty) { position:static; grid-column:1; grid-row:1; width:auto; height:44px; box-sizing:border-box; padding:3px 6px; overflow:auto; clip-path:none; white-space:normal; overflow-wrap:anywhere; font-size:13px; line-height:1.4; color:#a52330; }
 .retention-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:22px; }
 .cleanup-note { padding:8px 10px; background:#fff5e8; border-radius:8px; }
 #retentionSettings > .settings-save-footer { margin:12px calc(-1 * var(--settings-pad)) calc(-1 * var(--settings-pad)); }
@@ -77,5 +76,7 @@ body[data-page="editor"] .settings-main .section-heading { display:flex; align-i
   .section-heading h2 { font-size:16px; }
   .setting-field,.rule-group .setting-field { grid-template-columns:minmax(0,1fr) 104px; }
   .settings-save-footer { grid-template-columns:minmax(0,1fr); }
-  .group-save,.settings-main #saveRetention { width:100%; }
+  .save-scope { min-height:28px; }
+  .settings-save-footer :is(.group-save-result,#retentionMessage)[data-error="true"]:not([hidden]):not(:empty) { height:28px; }
+  .group-save,.settings-main .settings-save-footer #saveRetention { grid-column:1; grid-row:2; width:100%; }
 }
