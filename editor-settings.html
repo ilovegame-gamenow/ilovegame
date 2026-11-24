@@ -16,7 +16,7 @@
 
     <div class="editor-page-heading"><h1><svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="8" cy="6" r="2" fill="currentColor"/><circle cx="16" cy="12" r="2" fill="currentColor"/><circle cx="10" cy="18" r="2" fill="currentColor"/></svg>運用設定</h1><p class="section-subtitle">表示・AI評価・掲載ルール</p></div>
     <p id="settingsMessage" role="status" aria-live="polite">設定を読み込み中…</p>
-    <form id="settingsForm">
+    <form id="settingsForm" class="settings-save-group" aria-label="表示・掲載・AI評価の設定">
       <fieldset id="settingsFields" disabled style="border:0;padding:0;margin:0">
         <section id="displaySettings" class="settings-section" aria-labelledby="displayHeading">
           <div class="section-heading"><span class="section-mark" aria-hidden="true">▤</span><div><h2 id="displayHeading">一覧の最大表示件数</h2><p>1ページに表示する記事数</p></div><span class="setting-range">1〜100件</span></div>
@@ -79,7 +79,7 @@
           <p id="evaluationHelp" class="section-note">事実に基づき0〜100点で採点する基本ルールは共通です。この方針は次回のAI評価から使います。自動掲載は上記の点数に加え、一次情報・公式素材などの品質条件も適用します。独自発見は試験中のため自動掲載せず、手動審査とします。既存記事の再評価や記事本文の書き換えは行いません。初期の方針に戻した場合も「設定を保存」で確定します。</p>
         </section>
 
-        <div class="settings-actions">
+        <div class="settings-actions settings-save-footer">
         <button id="saveSettings" type="button">設定を保存</button>
         <p id="saveResult" role="status" aria-live="polite" hidden></p>
         </div>
@@ -94,7 +94,7 @@
           <div class="setting-field"><div class="field-description"><label for="pending_retention_days">審査待ちの保持日数</label><p>AI評価完了後、指定日数で非掲載へ</p></div><div class="number-field"><input id="pending_retention_days" name="pending_retention_days" type="number" min="1" max="365" step="1" required><span>日</span></div></div>
           <div class="setting-field"><div class="field-description"><label for="rejected_retention_days">非掲載の保持日数</label><p>非掲載になってから指定日数で完全削除</p></div><div class="number-field"><input id="rejected_retention_days" name="rejected_retention_days" type="number" min="1" max="365" step="1" required><span>日</span></div></div>
           <p class="section-note">完全削除は取り消せません。公開中・公開履歴が確認できる記事、AI未処理・処理中、保存済み下書きは対象外。編集更新があった記事は更新時から保持日数を数え直します。削除した情報元URLは再収集防止用に残します。</p>
-        </section><button id="saveRetention" type="submit" class="retention-save">自動整理の設定を保存</button><p id="retentionMessage" role="status" aria-live="polite">設定を読み込み中…</p></fieldset></form>
+        <div class="settings-actions settings-save-footer"><button id="saveRetention" type="submit" class="retention-save">自動整理の設定を保存</button><p id="retentionMessage" role="status" aria-live="polite">設定を読み込み中…</p></div></section></fieldset></form>
 <section class="settings-section" aria-labelledby="retentionUpcomingHeading"><div class="section-heading"><span class="section-mark" aria-hidden="true">◷</span><div><h2 id="retentionUpcomingHeading">自動整理の予定</h2><p>今後7日以内の予定と保護中の記事</p></div></div><p id="retentionAlert" class="data-warning" role="alert" hidden></p><p id="retentionUpcomingStatus" role="status" aria-live="polite">読み込み中…</p><details class="retention-upcoming-details"><summary><span class="retention-show">予定一覧を表示</span><span class="retention-hide">予定一覧を閉じる</span></summary><p class="section-note">審査待ちは非掲載へ移動、非掲載は完全削除。予定は目安です（1日最大100件、更新・設定によって変動）。保護すると自動整理対象から外れます。解除すると解除時から保持期間を数え直します。</p><div id="retentionUpcomingList"></div><div class="data-actions"><button id="retentionPrev" type="button" disabled>前へ</button><span id="retentionPage"></span><button id="retentionNext" type="button" disabled>次へ</button><button id="retentionRefresh" type="button">更新</button></div></details></section>
 
 <details class="settings-section manual-deletion" id="manualDeletion"><summary><span class="manual-title">記事の手動削除</span> <span class="manual-subtitle">対象記事を検索・完全削除</span></summary>

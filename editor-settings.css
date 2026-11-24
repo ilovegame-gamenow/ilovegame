@@ -66,3 +66,14 @@
 @media(max-width:480px){.retention-control{flex-basis:114px;width:114px;font-size:16px;padding:8px}}
 
 .retention-save{width:100%;min-height:48px;border:0;border-radius:12px;background:#c6530c;color:#fff;font:inherit;font-size:var(--button-font);font-weight:800;cursor:pointer}.retention-save:disabled{opacity:.6;cursor:default}#retentionMessage{font-size:14px;line-height:1.6;color:#71675e}#retentionMessage[data-error=true]{color:#a52330}
+
+/* A visible frame per independent save action. */
+.settings-save-group{margin:20px 0;background:#fff;border:1px solid #ebdfd3;border-radius:18px;overflow:hidden;min-width:0}
+.settings-save-group>fieldset{min-width:0}
+.settings-save-group>fieldset>.settings-section{margin:0;border:0;border-radius:0}
+.settings-save-group>fieldset>.settings-section+.settings-section{border-top:1px solid #ebdfd3}
+.settings-save-footer{padding:18px 24px;background:#fff3e6;border-top:1px solid #ebdfd3;box-sizing:border-box}
+#retentionSettings>.settings-save-footer{margin:20px -24px -24px}
+#retentionMessage:empty{display:none}
+#retentionMessage{margin:12px 0 0}
+@media(max-width:480px){.settings-save-footer{padding:16px 18px}#retentionSettings>.settings-save-footer{margin:18px -18px -18px}}
