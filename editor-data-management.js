@@ -4,6 +4,8 @@
  const SELECTION_LIMIT=20;
  const params=new URLSearchParams(location.search),id=Number(params.get('id'));
  const direct=Number.isSafeInteger(id)&&id>0;
+ const manualPanel=$('manualDeletion');
+ let loaded=false;
  const returnTarget=params.get('return')||'';
  const safeReturn=returnTarget==='/editor-media.html'||returnTarget==='/editor-dashboard.html'||returnTarget.startsWith('/editor-dashboard.html?')?returnTarget:'/editor-dashboard.html';
  if(direct){$('dataBack').hidden=false;$('dataBackBottom').hidden=false;$('dataBack').href=safeReturn;$('dataBack').textContent='← 元の記事一覧に戻る';}
@@ -69,7 +71,7 @@
  }
  selectionBar.after(floatingBar);
  function sizeSelectionBar(){
-  if(!selected.size){document.documentElement.style.removeProperty('--data-selection-height');return;}
+  if(!selected.size||!manualPanel.open){document.documentElement.style.removeProperty('--data-selection-height');return;}
   const height=Math.ceil(floatingBar.getBoundingClientRect().height);
   document.documentElement.style.setProperty('--data-selection-height',(height+24)+'px');
  }
@@ -78,7 +80,7 @@
   const viewport=window.visualViewport;
   const top=viewport?.offsetTop??0;
   const bottom=top+(viewport?.height??window.innerHeight);
-  const visible=selected.size>0&&(rect.bottom<=top||rect.top>=bottom);
+  const visible=manualPanel.open&&selected.size>0&&(rect.bottom<=top||rect.top>=bottom);
   floatingBar.classList.toggle('is-visible',visible);
   floatingBar.inert=!visible;
   floatingBar.setAttribute('aria-hidden',String(!visible));
@@ -182,7 +184,7 @@
   busy=true;controls();$('confirmationTitle').textContent='記事を削除しています';setStage('progress');$('confirmationTitle').focus();
   try{
    const result=await request('delete-articles',{body:{articles,confirmation,includePublished}});
-   if(result.deletedIds.length)window.GameEditorNavigation?.markChanged();
+   if(result.deletedIds.length){window.GameEditorNavigation?.markChanged();window.dispatchEvent(new Event('retention-settings-saved'));}
    const summary='削除済み：'+result.deletedIds.length+'件'+(result.remainingIds.length?' ／ 未削除：'+result.remainingIds.length+'件。再検索して確認してください。':'。');
    selected.clear();rows=rows.filter(r=>!result.deletedIds.includes(r.id));
    const details=targets.map(r=>(result.deletedIds.includes(r.id)?'削除済み':result.remainingIds.includes(r.id)?'未削除':'結果未確認')+' ／ ID '+r.id+' ／ '+(r.title||'（タイトルなし）'));
@@ -204,10 +206,14 @@
  $('continueData').addEventListener('click',continueAfterResult);
  let expiring=false;
  window.addEventListener('editor-session-expired',()=>{expiring=true;closeReview();});
- document.addEventListener('click',async event=>{
-  if(!event.target.closest('#logoutButton')||busy)return;
-  try{const r=await fetch('/api/editor-logout',{method:'POST',credentials:'same-origin'});if(!r.ok)throw Error('ログアウトできませんでした。');location.replace('/editor.html');}catch(error){status(error.message,true);}
+ window.GameEditorDataManagement={isBusy:()=>busy};
+ window.addEventListener('beforeunload',event=>{if(busy&&stage==='progress'){event.preventDefault();event.returnValue='';}});
+ manualPanel.addEventListener('toggle',()=>{
+  if(manualPanel.open&&!loaded){loaded=true;load();}
+  resizeSelectionBar();
  });
- GameEditorSession.start();
- if(direct){$('field').value='id';$('query').value=String(id);$('status').value=params.get('status')==='published'?'published':'unpublished';activeSearch={status:$('status').value,field:'id',q:String(id)};load(1,'',id);}else load();
+ if(direct){
+  loaded=true;manualPanel.open=true;$('field').value='id';$('query').value=String(id);$('status').value=params.get('status')==='published'?'published':'unpublished';activeSearch={status:$('status').value,field:'id',q:String(id)};load(1,'',id);
+ }else if(location.hash==='#manualDeletion'){manualPanel.open=true;}
+
 })();

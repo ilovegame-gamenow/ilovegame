@@ -2,7 +2,7 @@
   GameEditorSession.start();
   document.addEventListener('click', async event => {
     if (!event.target.closest('#logoutButton')) return;
-    if (busy || (dirty() && !confirm('保存していない設定変更があります。ログアウトしますか？'))) return;
+    if (busy || window.GameEditorDataManagement?.isBusy() || window.GameRetentionSettings?.isBusy() || (window.GameRetentionSettings?.isDirty() && !confirm('自動整理の設定が保存されていません。ログアウトしますか？')) || (dirty() && !confirm('保存していない設定変更があります。ログアウトしますか？'))) return;
     try {
       const response = await fetch('/api/editor-logout', { method: 'POST', credentials: 'same-origin' });
       if (!response.ok) throw new Error('ログアウトできませんでした');

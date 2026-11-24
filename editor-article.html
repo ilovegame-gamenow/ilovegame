@@ -127,7 +127,7 @@
       <button type="button" id="publishButton">掲載する</button>
       <button type="button" id="rejectButton">非掲載にする</button>
     </div>
-    <p><a id="articleDataLink" class="back" href="/editor-data-management.html?id=${encodeURIComponent(Number(article.id))}${article.status==='published'?'&amp;status=published':''}">この記事の削除・データ管理 →</a></p>
+    <p><a id="articleDataLink" class="back" href="/editor-settings.html?id=${encodeURIComponent(Number(article.id))}${article.status==='published'?'&amp;status=published':''}#manualDeletion">この記事の削除・データ管理 →</a></p>
   </div>
 </div>
 
@@ -168,7 +168,7 @@
           const target = mediaReturn ? '/editor-media.html' : (returnUrl && (returnUrl === '/editor-dashboard.html' || returnUrl.startsWith('/editor-dashboard.html?')) ? returnUrl : '/editor-dashboard.html');
           const dataParams = new URLSearchParams({id:String(Number(article.id)),return:target});
           if (article.status === 'published') dataParams.set('status','published');
-          document.getElementById('articleDataLink').href = '/editor-data-management.html?' + dataParams;
+          document.getElementById('articleDataLink').href = '/editor-settings.html?' + dataParams + '#manualDeletion';
         }
         updateArticleDataLink();
 
