@@ -63,9 +63,9 @@ test('public settings transfer only display fields; publication-policy reads sta
   const selects=[];
   await withFetch(async url=>{selects.push(new URL(url).searchParams.get('select'));return Response.json([settings]);},async()=>{
     const display=await getPublicDisplaySettings('https://db.invalid','secret');
-    assert.deepEqual(Object.keys(display),['public_page_size','pickup_max_articles','breaking_max_age_hours','pickup_max_age_days']);
+    assert.deepEqual(Object.keys(display),['public_page_size','pickup_max_articles','breaking_max_age_hours','pickup_max_age_hours']);
     await getSiteSettings('https://db.invalid','secret');await getSiteSettings('https://db.invalid','secret');
-    assert.equal(selects.length,3);assert.equal(selects[0],'public_page_size,pickup_max_articles,breaking_max_age_hours,pickup_max_age_days');assert.ok(selects[1].includes('publish_threshold'));assert.ok(selects[1].includes('evaluation_guidelines'));
+    assert.equal(selects.length,3);assert.equal(selects[0],'public_page_size,pickup_max_articles,breaking_max_age_hours,pickup_max_age_hours');assert.ok(selects[1].includes('publish_threshold'));assert.ok(selects[1].includes('evaluation_guidelines'));
   });
 });
 test('home overlaps settings and slots, publishes timings, caches only successful GETs',async()=>{
@@ -101,17 +101,26 @@ test('featured expiry and breaking age cap cache lifetime; private slot fields n
   });
 });
 
-test('daily pickup ranks take priority over newer unranked discoveries',async()=>{
+test('new pickup candidates replace the oldest irrespective of former daily ranks',async()=>{
  const now=Date.now(),expires=new Date(now+86400000).toISOString();
  const slots=[{article_id:9,slot:'discovery',selected_at:new Date(now-100).toISOString(),expires_at:expires,pickup_rank:null},{article_id:2,slot:'discovery',selected_at:new Date(now-1000).toISOString(),expires_at:expires,pickup_rank:2},{article_id:1,slot:'discovery',selected_at:new Date(now-2000).toISOString(),expires_at:expires,pickup_rank:1}];
  await withFetch(async url=>new URL(url).pathname.endsWith('/article_feature_slots')?Response.json(slots):Response.json([{id:9},{id:2},{id:1}]),async()=>{
-  const result=await getFeaturedNews('https://example.invalid','public','secret',settings);assert.deepEqual(result.pickup.map(a=>a.id),[1,2]);
+  const result=await getFeaturedNews('https://example.invalid','public','secret',settings);assert.deepEqual(result.pickup.map(a=>a.id),[9,2]);
  });
 });
-test('pickup hides expired candidates and prioritizes fresh high-score discoveries',async()=>{
+test('pickup hides expired candidates and prioritizes fresh discoveries',async()=>{
  const now=Date.now(),day=86400000,expires=new Date(now+day).toISOString();
  const slots=[{article_id:1,slot:'discovery',selected_at:new Date(now-4*day).toISOString(),expires_at:expires,pickup_rank:1},{article_id:2,slot:'discovery',selected_at:new Date(now-day).toISOString(),expires_at:expires,pickup_rank:2},{article_id:3,slot:'discovery',selected_at:new Date(now).toISOString(),expires_at:expires,pickup_rank:null}];
  await withFetch(async url=>new URL(url).pathname.endsWith('/article_feature_slots')?Response.json(slots):Response.json([{id:1},{id:2},{id:3,importance:95}]),async()=>{
   const result=await getFeaturedNews('https://example.invalid','public','secret',settings);assert.deepEqual(result.pickup.map(a=>a.id),[3,2]);assert.equal(result.pickup[0].importance,undefined);
+ });
+});
+test('pickup applies hour settings rather than calendar days',async()=>{
+ const now=Date.now(),hour=3600000,expires=new Date(now+hour*100).toISOString();
+ const slots=[73,71,25,23].map((age,i)=>({article_id:i+1,slot:'discovery',selected_at:new Date(now-age*hour).toISOString(),expires_at:expires}));
+ await withFetch(async url=>new URL(url).pathname.endsWith('/article_feature_slots')?Response.json(slots):Response.json(slots.map(s=>({id:s.article_id}))),async()=>{
+  const all={...settings,pickup_max_articles:4};
+  assert.deepEqual((await getFeaturedNews('https://example.invalid','public','secret',all)).pickup.map(a=>a.id),[4,3,2]);
+  assert.deepEqual((await getFeaturedNews('https://example.invalid','public','secret',{...all,pickup_max_age_hours:24})).pickup.map(a=>a.id),[4]);
  });
 });

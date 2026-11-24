@@ -75,10 +75,10 @@
             <div class="number-field"><input id="pickup_max_articles" name="pickup_max_articles" type="number" min="1" max="12" step="1"  required><span>件</span></div>
           </div>
           <div class="setting-field">
-            <div class="field-description"><label for="pickup_max_age_days">PICK UPの最長掲載期間</label><p>候補に選定されてからの日数</p></div>
-            <div class="number-field"><input id="pickup_max_age_days" name="pickup_max_age_days" type="number" min="1" max="14" step="1" required><span>日</span></div>
+            <div class="field-description"><label for="pickup_max_age_hours">PICK UPの最長掲載期間</label><p>候補に選定されてからの最大表示時間</p></div>
+            <div class="number-field"><input id="pickup_max_age_hours" name="pickup_max_age_hours" type="number" min="1" max="336" step="1" required><span>時間</span></div>
           </div>
-            <p class="section-note">毎朝5時（日本時間）に原則1枠を入れ替え、新しい未掲載候補を優先します。評価90点以上の新着候補は定時を待たず優先表示します。期限切れは候補不足でも非表示にし、BREAKINGと重複させません。</p>
+            <p class="section-note">新しい注目候補が追加されたら、古い候補から順に入れ替えます。期限切れは候補不足でも非表示にし、BREAKINGと重複させません。</p>
           </div>
           <a class="settings-preview-link" href="/editor-preview.html">BREAKING・PICK UPの表示を確認 →</a>
         </section>
