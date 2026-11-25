@@ -90,13 +90,14 @@ window.GameArticle = (() => {
       <article class="article-card">
         <h1>${esc(article.title)}</h1>
 
-        ${GameDate.renderMeta(
-          article.source_name,
-          updateTime,
-          { showSource: false }
-        )}
-
-        ${GamePlatforms.render(article.platforms)}
+        <div class="article-meta">
+          ${GamePlatforms.render(article.platforms)}
+          ${GameDate.renderMeta(
+            article.source_name,
+            updateTime,
+            { showSource: false }
+          )}
+        </div>
 
         ${thumbnail ? `
           <img
