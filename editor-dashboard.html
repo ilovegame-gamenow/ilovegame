@@ -478,37 +478,70 @@ edit.addEventListener("click", () => {
 const management = document.createElement("div");
 management.className = "article-management";
 management.append(top, actions);
+if(article.processing_status === "completed"){
 const retryThumbnail = document.createElement("button");
 retryThumbnail.type = "button";
 retryThumbnail.className = "retry-articles thumbnail-retry";
 retryThumbnail.textContent = "サムネイル再取得";
 retryThumbnail.hidden = !!GameImage.getUrl(article.thumbnail_url,article.source_name);
-retryThumbnail.disabled = article.processing_status !== "completed";
+const thumbnailFeedback = document.createElement("p");
+thumbnailFeedback.className = "thumbnail-feedback";
+thumbnailFeedback.setAttribute("role","status");
+thumbnailFeedback.setAttribute("aria-live","polite");
+thumbnailFeedback.hidden = true;
+const feedback = (state,text) => {
+  thumbnailFeedback.dataset.state = state;
+  thumbnailFeedback.textContent = text;
+  thumbnailFeedback.hidden = false;
+};
 retryThumbnail.addEventListener("click", async event => {
   event.stopPropagation();
+  if(retryThumbnail.disabled)return;
   retryThumbnail.disabled = true;
-  retryThumbnail.textContent = "取得中…";
+  retryThumbnail.textContent = "サムネイル取得中…";
+  retryThumbnail.setAttribute("aria-busy","true");
+  feedback("loading","公式画像を確認しています。しばらくお待ちください。");
   try {
     const response = await fetch("/api/editor-news?action=retry-thumbnail",{
       method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({id:Number(article.id)})
     });
     if(response.status===401){GameEditorSession.expire();return;}
-    const result=await response.json();
+    const result=await response.json().catch(()=>({}));
     if(!response.ok)throw Error(result.error||"再取得に失敗しました。");
+    const imageUrl=GameImage.getUrl(result.thumbnail_url,article.source_name);
+    if(!imageUrl)throw Error("画像の更新結果を確認できませんでした。");
+    article.thumbnail_url=result.thumbnail_url;
     GameEditorNavigation.markChanged();
-    await loadArticles();
-    message.textContent="サムネイルを更新しました。";
+    feedback("success","✓ サムネイルを更新しました。");
+    retryThumbnail.hidden=true;
+    const previous=cardElement?.querySelector(".thumb-placeholder, img[data-news-thumbnail]");
+    if(previous){
+      const image=document.createElement("img");
+      image.className="thumb";
+      image.alt=article.title||"";
+      image.setAttribute("data-news-thumbnail","");
+      image.addEventListener("error",()=>{
+        feedback("error","画像は保存されましたが、表示できませんでした。");
+        retryThumbnail.hidden=false;
+      },{once:true});
+      previous.replaceWith(image);
+      image.src=imageUrl;
+    }
+    if(missingThumbnail)feedback("success","✓ 更新しました。次回の一覧更新で絞り込みから外れます。");
   }catch(error){
-    message.textContent=error.message||"再取得に失敗しました。";
+    feedback("error",error.message||"再取得に失敗しました。");
+  }finally{
     retryThumbnail.disabled=false;
     retryThumbnail.textContent="サムネイル再取得";
+    retryThumbnail.setAttribute("aria-busy","false");
   }
 });
-management.append(retryThumbnail);
+management.append(retryThumbnail,thumbnailFeedback);
 cardElement?.addEventListener("error",event=>{
   if(event.target.matches?.("img[data-news-thumbnail]"))retryThumbnail.hidden=false;
 },true);
+}
 management.addEventListener("click", event => {
   event.stopPropagation();
 });

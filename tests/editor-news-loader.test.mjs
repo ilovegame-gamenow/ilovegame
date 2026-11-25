@@ -58,7 +58,7 @@ test('dashboard displays initial articles after a transient failure without page
  const context=vm.createContext({document,window:{addEventListener:(name,fn)=>{pageEvents[name]=fn;},location:{search:'',href:'https://site.invalid/editor-dashboard.html'},history:{replaceState(){}}},location:{search:'',pathname:'/editor-dashboard.html',href:'https://site.invalid/editor-dashboard.html'},history:{replaceState(){}},GameEditorSession:{start(){},expire(){throw Error('Unexpected login redirect');}},GameEditorRecovery:{renderPending(){}},GameNewsCard:{render:()=>'<article></article>'},GamePagination:{render:()=>new Node()},URL,URLSearchParams,AbortController,DOMException,TypeError,SyntaxError,console,sessionStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)},setTimeout:fn=>setTimeout(fn,0),clearTimeout,fetch:async()=>++calls===1?new Response('{}',{status:503}):new Response(JSON.stringify(initial))});
  vm.runInContext(readFileSync(new URL('../editor-navigation.js',import.meta.url),'utf8'),context);
  context.GameEditorNavigation=context.window.GameEditorNavigation;
- context.GameImage={getUrl:()=>''};
+ context.GameImage={getUrl:value=>value||''};
  vm.runInContext(script,context);context.GameEditorNewsLoader=context.window.GameEditorNewsLoader;
  const html=readFileSync(new URL('../editor-dashboard.html',import.meta.url),'utf8');
  vm.runInContext([...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]).join('\n'),context);
@@ -70,4 +70,25 @@ test('dashboard displays initial articles after a transient failure without page
  context.GameEditorNavigation.markChanged();
  pageEvents.pageshow({persisted:true});
  await new Promise(r=>setTimeout(r,5));assert.equal(calls,3,'changed restored list must refresh');
+ // Unevaluated cards never have a retry button; feedback is local to the evaluated card.
+ vm.runInContext("articles.push({id:2,title:'未評価',status:'pending',processing_status:'pending'});render();",context);
+ const descendants=node=>[node,...node.children.flatMap(descendants)];
+ const buttons=descendants(ids.articlesList).filter(node=>node.className==='retry-articles thumbnail-retry');
+ assert.equal(buttons.length,1);
+ const button=buttons[0];
+ const feedback=descendants(ids.articlesList).find(node=>node.className==='thumbnail-feedback');
+ let resolveRequest;
+ context.fetch=()=>new Promise(resolve=>{resolveRequest=resolve;});
+ const clicking=button.listeners.click({stopPropagation(){}});
+ assert.equal(button.disabled,true);
+ assert.equal(feedback.dataset.state,'loading');
+ resolveRequest(Response.json({error:'サムネイルが見つかりませんでした。'},{status:422}));
+ await clicking;
+ assert.equal(button.disabled,false);
+ assert.equal(feedback.dataset.state,'error');
+ assert.equal(feedback.textContent,'サムネイルが見つかりませんでした。');
+ context.fetch=async()=>Response.json({thumbnail_url:'https://example.com/image.jpg'});
+ await button.listeners.click({stopPropagation(){}});
+ assert.equal(button.hidden,true);
+ assert.equal(feedback.dataset.state,'success');
 });
