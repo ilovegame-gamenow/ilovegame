@@ -20,6 +20,9 @@ test("news image errors replace card thumbnails without affecting unrelated imag
   assert.equal(images.getUrl(" ", "nintendo"), "");
   assert.equal(images.getUrl("key", null), "");
   assert.equal(images.getUrl("https://example.com/game.jpg"), "https://example.com/game.jpg");
+  assert.equal(images.getUrl(null,"Nintendo",579),"/assets/editorial-thumbnails/579-racing-illustration.webp");
+  assert.equal(images.getUrl("https://example.com/game.jpg","Nintendo",579),"https://example.com/game.jpg");
+  assert.equal(images.getUrl(null,"Nintendo",580),"");
   let replacement;
   onError({ target: {
     matches: selector => selector === "img[data-news-thumbnail]",

@@ -26,9 +26,7 @@
 
     const badges = options.compact ? "" : GamePlatforms.render(platforms);
 
-    const imageUrl = a.thumbnail_url
-  ? GameImage.getUrl(a.thumbnail_url, a.source_name)
-  : "";
+    const imageUrl = GameImage.getUrl(a.thumbnail_url, a.source_name, a.id);
 
     const destination = options.clickable === false
       ? ""
