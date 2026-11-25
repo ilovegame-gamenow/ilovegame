@@ -17,7 +17,7 @@
 button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #126ac1;outline-offset:3px}
 @media(max-width:900px){.news-feed{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.news-feed{grid-template-columns:minmax(0,1fr);gap:12px}.news-feed .card h3{font-size:14px;margin-inline:10px}.news-feed .card .news-card-footer{margin-inline:10px}.feed-tools button{padding-inline:12px}#feed-query{font-size:16px}}
-@media(max-width:359px){.news-feed{gap:8px}.news-feed .card h3{font-size:13px;margin-inline:8px}.news-feed .thumb-placeholder{font-size:10px}.news-feed .card .news-card-footer{margin-inline:8px}}
+@media(max-width:359px){.news-feed{gap:8px}.news-feed .card h3{font-size:13px;margin-inline:8px}.news-feed .card .news-card-footer{margin-inline:8px}}
 
 .feed-toolbar .feed-filters{min-width:0}
 @media(max-width:600px){
