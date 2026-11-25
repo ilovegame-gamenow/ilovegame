@@ -1,4 +1,5 @@
 import { getEditorNews, parseEditorNewsQuery } from "../lib/editor-news-repository.js";
+import { retryThumbnail } from "../lib/editor-thumbnail.js";
 import { listDataArticles, deleteDataArticles, listRetention, setRetentionProtection } from "../lib/editor-data-management.js";
 import { savePublisherDirectory } from "../lib/publisher-directory.js";
 import { getSiteSettings, getEditorSessionSeconds } from "../lib/site-settings.js";
@@ -19,6 +20,15 @@ export default async function handler(req, res) {
   }
 
   if (!requireEditor(req, res)) return;
+
+  if(req.query.action==='retry-thumbnail'){
+    if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
+    if(!requireEditorOrigin(req,res))return;
+    const url=process.env.SUPABASE_URL,key=process.env.SUPABASE_SECRET_KEY;
+    if(!url||!key)return res.status(503).json({error:'サムネイル再取得を利用できません。'});
+    try{const result=await retryThumbnail(url,key,req.body?.id);return res.status(result.status).json(result.body);}
+    catch{return res.status(502).json({error:'サムネイルの再取得に失敗しました。'});}
+  }
 
   if (["retention-overview","retention-protection"].includes(req.query.action)) {
     const writing=req.query.action==="retention-protection";

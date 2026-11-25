@@ -28,6 +28,9 @@
   "functions": {
     "api/news.js": {
       "maxDuration": 60
+    },
+    "api/editor-news.js": {
+      "maxDuration": 30
     }
   }
 }

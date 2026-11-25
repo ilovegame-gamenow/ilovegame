@@ -216,6 +216,9 @@
     <button type="button" class="source-filter active" data-source="all" aria-pressed="true">すべて</button>
   </div>
   </div>
+  <div class="editor-filter-group">
+    <label class="filter-note"><input type="checkbox" id="missingThumbnail"> サムネイルなし</label>
+  </div>
 </section>
 <section class="panel" id="latest">
 <p class="message" id="message" role="status" aria-live="polite"></p>
@@ -267,6 +270,13 @@ let totalArticles = 0;
 let pageSize = 20;
 let articleCounts = { pending: 0, published: 0, rejected: 0 };
 let currentSource = urlParams.get("source") || "all";
+let missingThumbnail = urlParams.get("thumbnail") === "missing";
+const thumbnailFilter = document.getElementById("missingThumbnail");
+thumbnailFilter.checked = missingThumbnail;
+thumbnailFilter.addEventListener("change", () => {
+  missingThumbnail = thumbnailFilter.checked;
+  changeConditions({});
+});
 let sourceOptions = [];
 let directoryVersion = null;
 let loadVersion = 0;
@@ -289,7 +299,7 @@ let listRequest = null;
 
       try {
         const data = await GameEditorNewsLoader.load({
-          page:currentPage, status:currentFilter, source:currentSource, signal:listRequest.signal,
+          page:currentPage, status:currentFilter, source:currentSource, thumbnail:missingThumbnail?"missing":undefined, signal:listRequest.signal,
           onRetry:()=>{ if(version===loadVersion) message.textContent="記事を読み込み直しています…"; }
         });
         if (version !== loadVersion) return;
@@ -373,7 +383,7 @@ function renderPagination() {
 
       const sourceLabel = sourceOptions.find(option => option.id === currentSource)?.label || "すべて";
       const statusLabel = labels[currentFilter] || "すべての掲載状態";
-      const condition = `${currentSource === "all" ? "全情報元" : sourceLabel} ／ ${statusLabel}`;
+      const condition = `${currentSource === "all" ? "全情報元" : sourceLabel} ／ ${statusLabel}${missingThumbnail?" ／ サムネイルなし":""}`;
       message.textContent = totalArticles
         ? `${condition}：全${totalArticles}件中、${filtered.length}件を表示しています。`
         : `${condition}：該当する記事はありません。`;
@@ -468,6 +478,37 @@ edit.addEventListener("click", () => {
 const management = document.createElement("div");
 management.className = "article-management";
 management.append(top, actions);
+const retryThumbnail = document.createElement("button");
+retryThumbnail.type = "button";
+retryThumbnail.className = "retry-articles thumbnail-retry";
+retryThumbnail.textContent = "サムネイル再取得";
+retryThumbnail.hidden = !!GameImage.getUrl(article.thumbnail_url,article.source_name);
+retryThumbnail.disabled = article.processing_status !== "completed";
+retryThumbnail.addEventListener("click", async event => {
+  event.stopPropagation();
+  retryThumbnail.disabled = true;
+  retryThumbnail.textContent = "取得中…";
+  try {
+    const response = await fetch("/api/editor-news?action=retry-thumbnail",{
+      method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({id:Number(article.id)})
+    });
+    if(response.status===401){GameEditorSession.expire();return;}
+    const result=await response.json();
+    if(!response.ok)throw Error(result.error||"再取得に失敗しました。");
+    GameEditorNavigation.markChanged();
+    await loadArticles();
+    message.textContent="サムネイルを更新しました。";
+  }catch(error){
+    message.textContent=error.message||"再取得に失敗しました。";
+    retryThumbnail.disabled=false;
+    retryThumbnail.textContent="サムネイル再取得";
+  }
+});
+management.append(retryThumbnail);
+cardElement?.addEventListener("error",event=>{
+  if(event.target.matches?.("img[data-news-thumbnail]"))retryThumbnail.hidden=false;
+},true);
 management.addEventListener("click", event => {
   event.stopPropagation();
 });
@@ -590,6 +631,8 @@ function changeConditions({ status = currentFilter, source = currentSource }) {
   if (currentSource === "all") url.searchParams.delete("source");
   else url.searchParams.set("source", currentSource);
   url.searchParams.set("page", "1");
+  if(missingThumbnail)url.searchParams.set("thumbnail","missing");
+  else url.searchParams.delete("thumbnail");
   history.replaceState(null, "", url);
   updateFilterButtons();
   document.querySelectorAll("#sourceFilters [data-source]").forEach(button=>{
