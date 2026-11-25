@@ -94,8 +94,8 @@
     
 <div class="editor-management-header">
   <h2>記事管理</h2>
-  <span class="editor-importance">
-    AI評価：${article.importance == null ? "未評価" : `${article.importance}点`}
+  <span class="editor-importance${article.processing_status !== "completed" ? " ai-unrated-badge" : ""}">
+    ${article.processing_status !== "completed" ? "AI未評価" : `AI評価：${article.importance ?? 0}点`}
   </span>
 </div>
 

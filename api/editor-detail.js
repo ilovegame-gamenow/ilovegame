@@ -43,6 +43,7 @@ export default async function handler(req, res) {
     "created_at",
     "published_at",
     "importance",
+    "processing_status",
     "status",
     "platforms",
     "category"

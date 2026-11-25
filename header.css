@@ -267,6 +267,7 @@ body[data-page="editor"] .section-heading{border-bottom:1px solid var(--section-
 
 body[data-page="editor"] .editor-management-header{border-bottom:1px solid var(--section-title-rule);padding-bottom:9px;margin:0 0 14px}
 body[data-page="editor"] .editor-management-header h2,body[data-page="editor"] #articleEditForm>h2{font-size:var(--editor-subheading-font);font-weight:800;line-height:1.5}
+body[data-page="editor"] :is(.meta,.editor-importance).ai-unrated-badge{display:inline-flex;align-items:center;justify-content:center;padding:5px 9px;border-radius:999px;background:#7042a3;color:#fff;font-size:12px;font-weight:800;line-height:1.3;white-space:nowrap}
 body[data-page="editor"] #articleEditForm>h2{border-bottom:1px solid var(--section-title-rule);padding-bottom:9px;margin:0 0 14px}
 
 /* Inline secondary headings use the same subtitle scale as public section headings. */

@@ -70,4 +70,10 @@ test('dashboard displays initial articles after a transient failure without page
  context.GameEditorNavigation.markChanged();
  pageEvents.pageshow({persisted:true});
  await new Promise(r=>setTimeout(r,5));assert.equal(calls,3,'changed restored list must refresh');
+ vm.runInContext("articles.push({id:2,title:'未評価',status:'pending',processing_status:'chatgpt_queue_probe_pending_v1',importance:0});render();",context);
+ const descendants=node=>[node,...node.children.flatMap(descendants)];
+ assert.equal(ids.articlesList.children[0].dataset.aiState,undefined);
+ assert.equal(ids.articlesList.children[1].dataset.aiState,'unrated');
+ assert.equal(descendants(ids.articlesList).filter(node=>node.className==='meta ai-unrated-badge').length,1);
+ assert.equal(descendants(ids.articlesList).find(node=>node.className==='meta ai-unrated-badge').textContent,'AI未評価');
 });

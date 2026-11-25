@@ -139,6 +139,14 @@
 #articlesList .card {
   flex: 1;
 }
+#articlesList .article[data-ai-state="unrated"] .card {
+  border-color: #8c63bb;
+  box-shadow: 0 0 0 1px #8c63bb;
+}
+#articlesList .article[data-ai-state="unrated"] .article-management {
+  background: #f7f0ff;
+  border-top-color: #e5d5f4;
+}
 /* 共通の機種・日付フッターを操作欄の直上に揃える。 */
 #articlesList .article-management {
   order: 4;
@@ -170,6 +178,7 @@
 }
 @media (max-width: 600px) {
   #articlesList .article-management { padding-inline: 10px; }
+  #articlesList .article[data-ai-state="unrated"] .article-top { flex-wrap: wrap; }
 }
 @media (max-width: 359px) {
   #articlesList .article-management { padding-inline: 8px; }
@@ -391,6 +400,8 @@ function renderPagination() {
       for (const article of filtered) {
         const item = document.createElement("div");
         item.className = "article";
+        const unrated = article.processing_status !== "completed";
+        if (unrated) item.dataset.aiState = "unrated";
 
         const card = document.createElement("div");
 card.innerHTML = GameNewsCard.render(article, {
@@ -432,9 +443,9 @@ item.appendChild(cardElement || card);
         top.appendChild(badge);
 
         const meta = document.createElement("div");
-meta.className = "meta";
+meta.className = unrated ? "meta ai-unrated-badge" : "meta";
 
-meta.textContent = article.processing_status !== "completed"
+meta.textContent = unrated
   ? "AI未評価"
   : `AI評価：${article.importance ?? 0}点`;
 
