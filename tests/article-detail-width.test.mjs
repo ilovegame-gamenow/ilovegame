@@ -17,3 +17,8 @@ test('editor article starts with the preview and keeps a single return link belo
   assert.match(read('article.html'),/← 一覧に戻る/);
   assert.match(html,/GameArticle\.render\([\s\S]*?id="editorBackLink"/);
 });
+
+test('operations management uses the shared editorial width without a narrower override',()=>{
+  assert.match(read('editor-settings.html'),/<main class="settings-main editor-heading-layout">/);
+  assert.doesNotMatch(read('editor-settings.css'),/main\.settings-main\s*\{[^}]*max-width\s*:/);
+});

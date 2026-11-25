@@ -1,5 +1,4 @@
 /* Compact settings layout; shared site typography remains in article/header.css. */
-body[data-page="editor"] > main.settings-main { max-width:1100px; }
 .settings-main { --settings-line:#ebdfd3; --settings-muted:#71675e; --settings-accent:#a95012; --settings-pad:18px; }
 .settings-main .editor-page-heading { margin-bottom:14px; }
 #settingsMessage { margin:8px 0; color:var(--settings-muted); font-size:14px; }
