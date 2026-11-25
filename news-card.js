@@ -20,6 +20,12 @@
     return `<div class="news-card-footer">${GamePlatforms.renderCategories(article)}${renderDate(article)}</div>`;
   }
 
+  function renderVideoPreview(article) {
+    const id=article.video_preview_id;
+    if(article.thumbnail_url || typeof id!=='string' || !/^[A-Za-z0-9_-]{11}$/.test(id))return '';
+    return `<a class="news-video-preview" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(article.title)} 公式動画をYouTubeで再生"><img class="thumb" data-news-thumbnail src="https://i.ytimg.com/vi/${id}/mqdefault.jpg" alt="${escapeHtml(article.title)} 公式動画プレビュー" loading="lazy"><span class="news-video-label">▶ YouTube 公式動画</span></a>`;
+  }
+
   function render(article, options = {}) {
     const a = article || {};
     const platforms = Array.isArray(a.platforms) ? a.platforms : [];
@@ -35,20 +41,21 @@
       : `href="/article.html?id=${encodeURIComponent(a.id)}"`;
 
     const meta = options.compact ? "" : renderDate(a);
+    const videoPreview=renderVideoPreview(a);
     const content = `
-      ${imageUrl
+      ${videoPreview || (imageUrl
         ? `<img class="thumb" data-news-thumbnail src="${escapeHtml(imageUrl)}" alt="${escapeHtml(a.title)}" loading="lazy">`
-        : `<div class="thumb-placeholder">I LOVE GAME♪</div>`}
+        : `<div class="thumb-placeholder">I LOVE GAME♪</div>`)}
       ${options.compact ? "" : meta}
-      <h3>${escapeHtml(a.title || "")}</h3>
+      <h3>${videoPreview && options.clickable!==false ? `<a class="news-video-article-link" ${destination}>${escapeHtml(a.title || "")}</a>` : escapeHtml(a.title || "")}</h3>
       ${options.compact ? '' : `<p>${escapeHtml(a.summary || "")}</p>`}
       ${options.compact ? renderFooter(a) : badges}
     `;
 
-    return options.clickable === false
+    return options.clickable === false || videoPreview
       ? `<article class="card${options.compact ? ' card--compact' : ''}">${content}</article>`
       : `<a class="card news-card-link${options.compact ? ' card--compact' : ''}" ${destination}>${content}</a>`;
   }
 
-  window.GameNewsCard = { render, renderFooter };
+  window.GameNewsCard = { render, renderFooter, renderVideoPreview };
 })();

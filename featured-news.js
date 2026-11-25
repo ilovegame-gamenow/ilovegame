@@ -32,12 +32,14 @@ window.GameFeatured = (() => {
     title.hidden = container.hidden = pickup.length === 0;
     container.innerHTML = pickup.map(article => {
       const image = GameImage.getUrl(article.thumbnail_url, article.source_name);
-      const tag = clickable ? 'a' : 'article';
-      const destination = clickable ? ` href="/article.html?id=${encodeURIComponent(article.id)}"` : '';
+      const preview=GameNewsCard.renderVideoPreview(article);
+      const articleHref=`/article.html?id=${encodeURIComponent(article.id)}`;
+      const tag = clickable && !preview ? 'a' : 'article';
+      const destination = tag==='a' ? ` href="${articleHref}"` : '';
       return `<${tag} class="card news-card-link"${destination}>
         <div class="time">PICK UP</div>
-        ${image ? `<img class="thumb" data-news-thumbnail src="${esc(image)}" alt="">` : '<div class="thumb-placeholder">I LOVE GAME♪</div>'}
-        <h3>${esc(article.title)}</h3><p class="meta">${esc(article.ilovegame_point || article.summary)}</p>
+        ${preview || (image ? `<img class="thumb" data-news-thumbnail src="${esc(image)}" alt="">` : '<div class="thumb-placeholder">I LOVE GAME♪</div>')}
+        <h3>${preview&&clickable?`<a class="news-video-article-link" href="${articleHref}">${esc(article.title)}</a>`:esc(article.title)}</h3><p class="meta">${esc(article.ilovegame_point || article.summary)}</p>
         ${GameNewsCard.renderFooter(article)}
       </${tag}>`;
     }).join('');
