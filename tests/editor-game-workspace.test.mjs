@@ -21,3 +21,8 @@ test('active workspace and visible panel stay in sync on clicks and history navi
  s.document.events['game-management-open']({detail:{title:'テスト'}});check(false);
 });
 test('article-linking mode does not switch workspace',()=>{const s=workspace('#find','?article_id=1');assert.equal(s.tabs.hidden,true);assert.equal(s.managed.hidden,undefined);});
+test('top-level catalog menus use one responsive heading and panel rule',()=>{
+ const css=readFileSync(new URL('../editor-games.css',import.meta.url),'utf8');
+ assert.match(css,/\.catalog-workspace details\.catalog-panel>summary\s*\{[^}]*font-size:var\(--editor-subheading-font\);[^}]*min-height:44px/);
+ assert.doesNotMatch(css,/#managedGamesDetails>summary\s*\{[^}]*font-size/);
+});

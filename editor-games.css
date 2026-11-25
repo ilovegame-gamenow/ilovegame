@@ -35,8 +35,12 @@
 /* Catalog workspace only: keep other editor screens unchanged. */
 .catalog-workspace .catalog-shortcuts {display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:20px 0;}
 .catalog-workspace summary {cursor:pointer;font-weight:700;color:#8b461b;line-height:1.8;}
-.catalog-workspace .catalog-create>summary {font-size:21px;}
-.catalog-workspace .catalog-create[open]>summary {margin-bottom:16px;}
+/* Top-level menus follow the same hierarchy and compact spacing as operations settings. */
+.catalog-workspace > .catalog-panel,.catalog-workspace #managedPanel > .catalog-panel {padding:18px;margin:14px 0;border-radius:14px;}
+.catalog-workspace details.catalog-panel>summary {font-size:var(--editor-subheading-font);font-weight:800;line-height:1.5;min-height:44px;padding:8px 0;box-sizing:border-box;}
+.catalog-workspace details.catalog-panel[open]>summary {margin-bottom:12px;}
+.catalog-workspace details.catalog-panel>summary:focus-visible {outline:3px solid #b85b17;outline-offset:3px;}
+.catalog-workspace .catalog-note,.catalog-workspace .catalog-intro {font-size:13px;}
 .catalog-workspace .catalog-optional {margin:22px 0;padding:16px;background:#fffaf4;border-radius:12px;}
 .catalog-workspace .catalog-list details {margin-top:16px;font-size:14px;}
 .catalog-workspace .catalog-list [data-game-action="link"] {background:#c6530c;color:#fff;}
@@ -44,13 +48,17 @@
 
 .following-actions{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}.following-actions [aria-pressed="true"]{background:#fff0bd;border-color:#d59a19;color:#725000}.following-status{font-size:13px;color:#786452}.finder-results{display:grid;gap:16px;margin-top:18px}.finder-result{padding:18px;border:1px solid #eadbcb;border-radius:12px;background:#fff}.finder-result h3{margin:0 0 10px}.finder-result a{display:inline-block;margin:4px 14px 10px 0}.finder-result button{display:block;margin-top:10px}#followingFilter{padding:10px;margin:10px 0;max-width:100%}
 .catalog-workspace-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:16px 0;padding:5px;border:1px solid #ead9ca;border-radius:999px;background:#f3e9dd}
-.catalog-main .catalog-workspace-tabs>button{min-width:0;min-height:44px;padding:8px 10px;border:1px solid transparent;background:transparent;color:#795039;font-size:var(--button-font);white-space:nowrap;cursor:pointer}
+.catalog-main .catalog-workspace-tabs>button{min-width:0;min-height:44px;padding:8px 10px;border:1px solid transparent;background:transparent;color:#795039;font-size:clamp(14px,1.4vw,16px);white-space:nowrap;cursor:pointer}
 .catalog-main .catalog-workspace-tabs>button[aria-pressed="true"]{background:var(--selected-button-bg);border-color:var(--selected-button-bg);color:var(--selected-button-fg)}
 .catalog-main .catalog-workspace-tabs>button[aria-pressed="false"]:hover{background:#fffaf4}
-.catalog-workspace #managedPanel>.catalog-intro{margin:8px 0 16px;font-size:13px}
+.catalog-workspace #managedPanel>.catalog-intro{margin:8px 0 16px}
 .catalog-workspace-tabs[hidden],#finderPanel[hidden],#managedPanel[hidden],#createPanel[hidden],#openGameCreate[hidden]{display:none}
 
 .finder-source{display:inline-block;margin-bottom:10px;padding:4px 9px;border-radius:6px;background:#f6eddf;color:#795039;font-size:12px}.finder-description{white-space:pre-line;overflow-wrap:anywhere;line-height:1.7}.finder-fallback{padding:16px;border:1px solid #eadbcb;border-radius:12px}.finder-fallback>summary{cursor:pointer}.finder-fallback[open]>summary{margin-bottom:14px}.finder-group-heading{margin:8px 0 0}
 .finder-image{width:184px;max-width:100%;height:86px;object-fit:cover;border-radius:8px;margin:0 0 12px;display:block}
 
-#managedGamesDetails>summary{font-size:21px;min-height:44px;padding:6px 0;box-sizing:border-box}#managedGameCount{font-size:13px;font-weight:500;color:#74675d;white-space:nowrap}#managedGamesDetails[open]>summary{margin-bottom:12px}#managedGamesDetails>summary:focus-visible{outline:3px solid #b85b17;outline-offset:3px}
+#managedGameCount{font-size:13px;font-weight:500;color:#74675d;white-space:nowrap}
+@media(max-width:600px){
+  .catalog-workspace > .catalog-panel,.catalog-workspace #managedPanel > .catalog-panel {padding:12px;}
+  .catalog-main .catalog-workspace-tabs>button {white-space:normal;}
+}
