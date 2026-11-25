@@ -15,7 +15,7 @@ window.GameFeatured = (() => {
     box.hidden = !breaking;
     box.replaceChildren();
     if (breaking) {
-      const image = GameImage.getUrl(breaking.thumbnail_url, breaking.source_name);
+      const image = GameImage.getUrl(breaking.thumbnail_url, breaking.source_name, breaking.id);
       box.innerHTML = `${image ? `<img id="breaking-image" data-news-thumbnail src="${esc(image)}" alt="">` : ''}
         <h1>${esc(breaking.title)}</h1>
         ${GameNewsCard.renderFooter(breaking)}`;
@@ -31,7 +31,7 @@ window.GameFeatured = (() => {
     const title = document.getElementById('pickup-heading');
     title.hidden = container.hidden = pickup.length === 0;
     container.innerHTML = pickup.map(article => {
-      const image = GameImage.getUrl(article.thumbnail_url, article.source_name);
+      const image = GameImage.getUrl(article.thumbnail_url, article.source_name, article.id);
       const tag = clickable ? 'a' : 'article';
       const destination = clickable ? ` href="/article.html?id=${encodeURIComponent(article.id)}"` : '';
       return `<${tag} class="card news-card-link"${destination}>

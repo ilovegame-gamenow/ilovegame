@@ -2,14 +2,18 @@
  * ニュース記事の画像情報を、表示可能なURLに変換する。
  * 任天堂の画像キーと、各社の完全な画像URLに対応。
  */
+// Original editorial illustrations, used only while a licensed still is unavailable.
+const editorialIllustrations = Object.freeze({
+  579: "/assets/editorial-thumbnails/579-racing-illustration.webp"
+});
 const GameImage = {
-  getUrl(thumbnailUrl, sourceName = "") {
+  getUrl(thumbnailUrl, sourceName = "", articleId = null) {
     if (!thumbnailUrl || typeof thumbnailUrl !== "string") {
-      return "";
+      return Object.hasOwn(editorialIllustrations,articleId)?editorialIllustrations[articleId]:"";
     }
 
     const value = thumbnailUrl.trim();
-    if (!value) return "";
+    if (!value) return Object.hasOwn(editorialIllustrations,articleId)?editorialIllustrations[articleId]:"";
 
     // 完全な画像URLはそのまま使用する
     if (/^https?:\/\//i.test(value)) {
