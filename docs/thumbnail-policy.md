@@ -48,3 +48,8 @@
 | 581 | taskey / Midnight Toybox | [公式発表・メディア向けプレスキット案内](https://prtimes.jp/main/html/rd/p/000000206.000012747.html) | assets/editorial-thumbnails/581.webp |
 | 582 | Qdan / みんなでダンダンティアー！ | [公式発表・報道素材ダウンロード案内](https://prtimes.jp/main/html/rd/p/000000033.000108704.html) | assets/editorial-thumbnails/582.webp |
 | 583 | Pocketpair Publishing / Normal Fishing | [公式発表・公開報道素材](https://prtimes.jp/main/html/rd/p/000000171.000071410.html) | assets/editorial-thumbnails/583.webp |
+| 590 | カバー / Aiming・ホロじゃん | [公式発表・画像使用時のクレジット案内](https://prtimes.jp/main/html/rd/p/000001291.000030268.html)（画像内の © COVER © Aiming Inc. を保持） | assets/editorial-thumbnails/590.webp |
+
+### 編集部イメージ
+
+記事579は当サイト独自のコスモッチのレースイラスト、記事578・584・585・587・588はニュースのテーマを示す独自の図案。公式画像や実際のゲーム画面ではない。後者は画像内に「編集部イメージ」と明記し、公式ロゴやスクリーンショットを転用しない。利用条件が確認できた公式素材があれば、そちらに差し替え可能。
