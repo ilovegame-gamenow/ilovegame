@@ -69,5 +69,16 @@ window.GameEditorStatus = (() => {
       try{dialog.showModal();cancel.focus();}catch{dialog.remove();document.body.style.overflow=overflow;choosing=false;resolve(null);}
     });
   }
-  return { update, confirmChange };
+  function thumbnailState(article) {
+    if (article.status !== "pending") return null;
+    const states = {
+      chatgpt_thumbnail_wait_1: ["サムネイル取得待ち", "1/3"],
+      chatgpt_thumbnail_wait_2: ["サムネイル取得待ち", "2/3"],
+      chatgpt_thumbnail_processing_1: ["サムネイル取得中", "1/3"],
+      chatgpt_thumbnail_processing_2: ["サムネイル取得中", "2/3"],
+      chatgpt_thumbnail_review: ["サムネイル要確認", "3/3"]
+    };
+    return Object.hasOwn(states, article.processing_status) ? states[article.processing_status].join(" ") : null;
+  }
+  return { update, confirmChange, thumbnailState };
 })();
