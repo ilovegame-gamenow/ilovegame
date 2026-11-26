@@ -396,7 +396,8 @@ function renderPagination() {
       for (const article of filtered) {
         const item = document.createElement("div");
         item.className = "article";
-        const unrated = article.processing_status !== "completed";
+        const thumbnailState = GameEditorStatus.thumbnailState(article);
+        const unrated = article.processing_status !== "completed" && !thumbnailState;
         if (unrated) item.dataset.aiState = "unrated";
 
         const card = document.createElement("div");
@@ -434,7 +435,8 @@ item.appendChild(cardElement || card);
 
         const badge = document.createElement("span");
         badge.className = "badge " + article.status;
-        badge.textContent = labels[article.status] || "不明";
+        badge.textContent = thumbnailState || labels[article.status] || "不明";
+        if (thumbnailState) { badge.style.background = "#fff0d9"; badge.style.color = "#8a4100"; } else if (unrated && article.status === "pending") { badge.textContent = "AI処理待ち"; }
 
         top.appendChild(badge);
 
@@ -455,6 +457,7 @@ edit.textContent = "編集";
         const publish = document.createElement("button");
         publish.className = "publish-btn";
         publish.textContent = "掲載";
+        if (thumbnailState && !article.thumbnail_url) { publish.disabled = true; publish.title = "サムネイルを設定してください"; }
 
         const reject = document.createElement("button");
         reject.className = "reject-btn";
