@@ -86,6 +86,8 @@
         document.title =
           `${article.title} | I LOVE GAME♪ 編集室`;
 
+        const thumbnailState = GameEditorStatus.thumbnailState(article);
+        const unrated = article.processing_status !== "completed" && !thumbnailState;
         app.innerHTML = `<aside id="recoveryNoticeBox" class="editor-recovery-notice" ${restored ? "" : "hidden"}>
           <p id="recoveryNotice" role="status">${esc(restored?.message || "")}</p>
           <a id="recoveryLogin" href="/editor.html" target="_blank" rel="noopener" hidden>別タブでログインする</a>
@@ -94,8 +96,8 @@
     
 <div class="editor-management-header">
   <h2>記事管理</h2>
-  <span class="editor-importance${article.processing_status !== "completed" ? " ai-unrated-badge" : ""}">
-    ${article.processing_status !== "completed" ? "AI未評価" : `AI評価：${article.importance ?? 0}点`}
+  <span class="editor-importance${unrated ? " ai-unrated-badge" : ""}">
+    ${unrated ? "AI未評価" : `AI評価：${article.importance ?? 0}点`}
   </span>
 </div>
 
@@ -105,7 +107,8 @@
     id="articleStatus"
     class="editor-status-badge"
     data-status="${article.status}"
-  >${({ pending: "審査待ち", published: "掲載中", rejected: "非掲載" })[article.status] || "不明"}</span>
+   style="${thumbnailState ? "background:#fff0d9;color:#8a4100" : ""}"
+  >${thumbnailState || ({ pending: unrated ? "AI処理待ち" : "審査待ち", published: "掲載中", rejected: "非掲載" })[article.status] || "不明"}</span>
 </div>
 
 
@@ -338,7 +341,7 @@ document.getElementById("articleViewActions").hidden = false;
         const rejectButton = document.getElementById("rejectButton");
 
         function updateButtons() {
-          publishButton.disabled = article.status === "published";
+          publishButton.disabled = article.status === "published" || Boolean(thumbnailState && !article.thumbnail_url);
           rejectButton.disabled = article.status === "rejected";
         }
 
