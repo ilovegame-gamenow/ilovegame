@@ -56,6 +56,10 @@
 | 590 | カバー / Aiming・ホロじゃん | [公式発表・画像使用時のクレジット案内](https://prtimes.jp/main/html/rd/p/000001291.000030268.html)（画像内の © COVER © Aiming Inc. を保持） | assets/editorial-thumbnails/590.webp |
 | 595 | ジュピター・ピクロスS CLIMAX | [公式発表の本文内別画像](https://prtimes.jp/main/html/rd/p/000000047.000130182.html)（画像内の ©2026 Jupiter・商標表記を保持） | assets/editorial-thumbnails/595.webp |
 
+### Square Enix Press Hub報道素材（2026-11-26）
+
+記事603： [公式November Screenshots（2026-11-25）](https://press.na.square-enix.com/Items/Details/Romancing-SaGa-3-Destinies-United?focusOnFileCollectionId=November-Screenshots-98053) の `RS3R_20261125_PUB_03_Undine.png`（1920×1080）。[Press Site Terms of Use](https://press.na.square-enix.com/Site/TermsAndConditions) の報道関係者向け掲載・複製許諾に基づき、当該ゲームの記事の紹介に限定。公開ダウンロードで取得し、個別の地域・解禁の制限表示なし。権利表記 © SQUARE ENIX を記事に記載し、内容・比率を維持して縮小・形式変換のみ実施。管理パス：`assets/editorial-thumbnails/603.webp`。一般公式サイトの画像の利用許諾とは区別する。
+
 ### 編集部イメージ
 
 記事579の旧代替画像は当サイト独自のコスモッチのレースイラスト、記事578・584・585・587・588はニュースのテーマを示す独自の図案。公式画像や実際のゲーム画面ではない。後者は画像内に「編集部イメージ」と明記し、公式ロゴやスクリーンショットを転用しない。利用条件が確認できた公式素材があれば、そちらに差し替え可能。
