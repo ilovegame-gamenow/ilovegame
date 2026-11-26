@@ -28,6 +28,31 @@
 | Unruled Games（No Asteroids） | [作品公式Press & Creators](https://unruledgames.com/games/no-asteroids) | 公式プレスキットあり。動画・短いクリップの記事利用は明記されるが、静止画の利用条件および直接参照は未確認。 |
 | Games Press（配信サービス） | [素材利用FAQ](https://www.gamespress.com/en-US/FAQ---Use-of-Assets) | 報道向けに権利者から提供された素材の確認先。配信元は権利保証をしていないため各素材の権利者側条件を確認し、包括許諾とは扱わない。 |
 
+
+## 事前調査の追加台帳（2026-11-27 JST）
+
+次の表は発行元別・素材配布経路別の判定であり、企業の全画像の許諾ではない。○は記載条件の範囲内、△は条件・資格・素材ごとの確認が必要、×は当該規約による一般許諾なし、? は未確認。記事掲載・保存の○は当該報道記事に付随する複製/配信に限定する。サムネイルへの適用・広告のあるニュースサイトでの編集利用・改変・外部直接参照・公開Gitリポジトリでの素材単体再配布は別々に判断する。明示されない条件を○にしない。既存の自動公開・画像待機・自サイト保存基準を変更しない。
+
+| 発行元・配布経路 | 報道記事掲載 / 保存 | 一覧サムネイル / 広告併設 | 条件・根拠 |
+| --- | --- | --- | --- |
+| SIE・日本企業サイトの商品画像 | × / × | × / × | [メディア向け商品画像](https://sonyinteractive.com/jp/メディアの皆様向け商品画像/)：業務目的の画像利用は担当窓口に相談。ハードウェアの指定著作権表記・仕様変更注意文は必須。ログインや素材提供は包括許諾ではない。[素材ライブラリー](https://sonyinteractive.com/jp/news/asset-library/) にソフト・ハード等の素材一覧あり、[報道窓口](https://sonyinteractive.com/jp/news/press-inquiries/) が別途設置。個別ライブラリーの条件は未確認。 |
+| PlayStation・日本の一般公式画像 | × / × | × / × | [著作権について](https://www.playstation.com/ja-jp/legal/about-copyrights/)：公式サイト・販促画像のウェブ転載非許諾。シェア機能を使う個別の投稿許諾や自作物条件はニュース画像へ転用しない。 |
+| セガ・企業サイト | × / × | × / × | [サイトポリシー](https://www.sega.co.jp/sitepolicy/) 第2節：私的使用を超える複製等は事前承認が必要。[プレイ映像ガイドライン](https://www.sega.co.jp/en/streaming_guideline/index.html) は2026-10-19更新、個人のゲームプレイ動画等に限定。動画サムネイルの許諾をニュース記事へ拡大しない。PR TIMES等の別途許諾された配布素材を優先。 |
+| バンダイナムコ・HD一般サイト | × / × | × / × | [Terms of Use](https://www.bandainamco.co.jp/en/terms/)：一般ダウンロードは私的非商用限定、権利表示保持。[米国ゲーム部門Press Center](https://www.bandainamcoent.com/press-center) は登録・承認制、素材条件は未確認。IP・共同権利者を個別確認。 |
+| KONAMI・一般サイト | × / × | × / × | [Terms of Use](https://www.konami.com/siteinfo/en/)：無許諾の二次利用を禁止。別途許諾付き報道配布素材を探す。 |
+| コーエーテクモHD・一般サイト | × / × | × / × | [サイト規約](https://www.koeitecmo.co.jp/term/) の著作権節は私的利用・法律で認められる範囲を超える無断利用を制限。企業サイトの条件を報道素材の許諾と混同しない。プレスキットの包括条件未確認。 |
+| WebWire・公開リリース | △ / △ | △ / ? | [出版社向け利用規約](https://www.webwire.com/ServTerms.asp)：正当な報道・出版利用を出典表示付きで認める。添付画像が発行元の報道素材であること、第三者権利・個別制限を確認。非ニュースページの素材や競合配信サービスへの転載は対象外。 |
+| Games Press | △ / △ | △ / △ | [利用規約](https://www.gamespress.com/ja-JP/Site/TermsAndConditions) は条件付き商用利用を認めるが、[素材FAQ](https://www.gamespress.com/en-US/FAQ---Use-of-Assets) と併読し個別の権利者条件を優先。掲載可能性の保証なし。クレジット・ウォーターマーク保持。許可なしの大量自動取得は禁止。 |
+| PR Newswire | ? / ? | ? / ? | [利用規約](https://www.prnewswire.com/terms-of-use/) と[配信ファイル条件](https://portal.prnewswire.com/Popup/facts.aspx)：他ユーザー投稿の再掲載等に事前書面承認条件があるため、配信サービスの存在だけでは画像を採用しない。発行元提供の別途明示許諾を探す。 |
+| KRAFTON Press Room | ? / ? | ? / ? | [規約](https://kr34896fg8656.gamespress.com/Site/TermsAndConditions)：一般利用は個人的非商用、別のAsset Usage Policy参照を要求。18歳以上、権利表記変更不可。別ポリシーの適用範囲確認まで自動採用不可。 |
+| Ripperwing・公式プレスキット | ○ / △ | △ / △ | [発行元のSteam EULA 第5節](https://store.steampowered.com/eula/3673500_eula_1)：作品報道・レビュー等に提供素材を使用可、縮小・切り抜き可（誤認を招く加工不可）。他商品広告や報道外の商用利用不可。対象キットだけ、保存配信条件は確認。 |
+| Bluestone Games・公式プレスキット | ○ / △ | △ / ? | [利用条件](https://www.bluestonegames.com/terms)：明示的にキットとして提供された素材に限り、出典付き編集利用を認める。一般サイト画像は対象外、配給のみの作品の権利者を確認。 |
+| XOANA STUDIOS・公式プレスキット | ○ / △ | △ / ? | [Press Kit](https://xoanastudios.com/press)：ゲームのスクリーンショット・カバーの編集利用を認める。スタジオ名を記載、ロゴ変形等禁止、提携誤認禁止。 |
+| Scarlet Aurora Interactive・Choke Point | ○ / △ | △ / ? | [公式Press Kit](https://chokepointtd.com/press/)：対象ページ掲載素材の作品紹介を許可。Scarlet Aurora Interactiveを記載、ロゴ改変・提携誤認・無許諾広告転用禁止。 |
+| Shy Snake・スクリーンショット | ○ / △ | △ / ? | [公式Press Kit](https://www.shysnake.com/press)：配布スクリーンショットの編集利用を認める。© Shy Snake LLC、ロゴは比例縮小のみ。 |
+
+**使い方：** まず既存のPR TIMES・WebWire・スクウェア・エニックスPress Hub・Microsoft News Center・Klabater等で対象素材を確認し、次に本表で該当する公式キットを特定する。許諾が確認済みの配布経路・対象・用途・期限・権利表記が一致する場合は画像ごとの個別申請を繰り返さない。一般サイトで制限があるメーカーはその一般画像を探し続けず、別途許諾のある公式報道配布へ切り替える。自サイト保存が許されても公開リポジトリへの原素材再配布まで当然に許されるわけではない。広告併設の編集記事と広告クリエイティブは区別し、規約の条件が明確でない場合は未確認扱いとする。直接参照は全追加行で未確認。素材の個別利用条件、権利者、クレジット、解禁・地域・資格を照合し、必要な権利確認を省略しない。
+
 ## 確認の優先順位
 
 - 全メーカー共通：公式発表・公式プレスキットだけで適切な画像が見つからない場合、ファミ通、GAME Watch、4Gamer、AUTOMATON等のゲームニュース媒体を素材の発見元として確認する。出典・クレジット・公式発表リンクから原典の公式素材や正規報道配信（PR TIMES、WebWire等）へ遡り、作品一致・利用条件・必要な権利表記を確認する。媒体独自の撮影・制作・編集画像や記事側の画像URLは無断流用しない。直接参照条件を含む既存の公開用画像基準と自サイト管理条件を維持する。任天堂向けの報道配信探索手順も他メーカーに適用できる。
