@@ -73,6 +73,25 @@
 - 元動画URL、公式発表URL、利用条件の根拠URL、動画内時刻、必要な権利表記、確認日、保存先を記録し、既存の自サイト管理条件に従う。動画自体はサムネイルに埋め込まない。画像として正常配信されたことを確認した場合のみ設定する。
 - 正規取得・許諾確認・実画像確認・保存ができない環境では抜粋を実施せず、既存の取得待ち・審査ルールを維持する。別途許諾済みの適切な作品画像があれば候補にできる。既存の公開基準は変更しない。
 
+### 静止画生成ツール
+
+`scripts/editorial_video_still.py` はローカルの許諾済み動画から静止画候補を生成する。Python 3、ffmpeg、ffprobe（WebPエンコーダー対応）が必要。ネットワークアクセスや動画ダウンロード、DB更新は行わない。
+
+```sh
+python3 scripts/editorial_video_still.py --video /path/to/press.mp4 \
+  --manifest /path/to/rights.json --output-dir /path/to/output \
+  --time 5.2 --time 12.4 --reference /path/to/approved-reference.png
+```
+
+`--reference` と `--time` は省略可能。候補時刻は最大12、デフォルトは動画内の8時点。参照画像の色・構図に近い候補を選ぶ簡易比較であり、作品・人物・ニュースの一致の証明ではない。出力は最大幅1200のWebP、内容ハッシュつきのファイル名、元動画・時刻・権利情報のJSON。既存ファイルは上書きしない。入力動画は250MiB・10分・4096px以内のローカルMP4/MOV/WebM/MKVのみ。
+
+マニフェストは以下の値を持つ。真偽値は公式根拠を確認済みの場合だけ `true` とする。これは申告でありツール自身が許諾を検証するものではない。
+
+- `article_id`、`title`、`source_url`（正規配布元動画）、`announcement_url`、`rights_url`、`credit`、`verified_at`
+- `frame_extraction`、`editorial_publication`、`thumbnail`、`self_hosting`、`third_party_rights`、`conditions_satisfied`、`advertising_compatible`
+
+参照画像も正規に取得・比較利用できる場合のみ指定する。候補生成後に目視・記事との一致・権利表示・利用条件と保存経路を確認する。自動掲載条件は既存ルールのまま。実行環境にツールや正規取得済み動画がなければこの経路は見送り、待機を維持する。
+
 ## 確認の優先順位
 
 - 全メーカー共通：公式発表・公式プレスキットだけで適切な画像が見つからない場合、ファミ通、GAME Watch、4Gamer、AUTOMATON等のゲームニュース媒体を素材の発見元として確認する。出典・クレジット・公式発表リンクから原典の公式素材や正規報道配信（PR TIMES、WebWire等）へ遡り、作品一致・利用条件・必要な権利表記を確認する。媒体独自の撮影・制作・編集画像や記事側の画像URLは無断流用しない。直接参照条件を含む既存の公開用画像基準と自サイト管理条件を維持する。任天堂向けの報道配信探索手順も他メーカーに適用できる。
