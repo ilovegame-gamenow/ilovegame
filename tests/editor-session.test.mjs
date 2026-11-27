@@ -33,9 +33,9 @@ async function sessionTest(run, minutes=10) {
   if(res.headers['set-cookie'])applyCookie(res.headers['set-cookie']);
   return res;
  };
- const classes=new Set(),elements=new Map(),header={inert:false};
+ const classes=new Set(),elements=new Map(),header={inert:false,tagName:'HEADER'},root={inert:false,tagName:'MAIN'},alreadyInert={inert:true,tagName:'ASIDE'},layoutChecks=[];
  const makeElement=()=>({hidden:false,textContent:'',children:new Map(),contains:()=>false,addEventListener(){},querySelector(tag){if(!this.children.has(tag))this.children.set(tag,makeElement());return this.children.get(tag);}});
- const document={hidden:false,activeElement:null,documentElement:{classList:{add:name=>classes.add(name),remove:name=>classes.delete(name),contains:name=>classes.has(name)}},head:{append(el){elements.set('cover-style',el);}},querySelector(selector){return selector==='body > header'?header:null;},body:{append(el){elements.set(el.id,el);}},createElement:makeElement,addEventListener(type,fn){if(!events.has(type))events.set(type,[]);events.get(type).push(fn);}};
+ const document={hidden:false,activeElement:null,documentElement:{classList:{add:name=>classes.add(name),remove:name=>classes.delete(name),contains:name=>classes.has(name)},getBoundingClientRect(){layoutChecks.push({covered:classes.has('editor-session-covered'),overlayHidden:elements.get('editor-session-cover')?.hidden});return {}; }},head:{append(el){elements.set('cover-style',el);}},querySelector(selector){return selector==='body > header'?header:null;},body:{children:[header,root,alreadyInert],append(el){elements.set(el.id,el);this.children.push(el);}},createElement:makeElement,addEventListener(type,fn){if(!events.has(type))events.set(type,[]);events.get(type).push(fn);}};
  const context=vm.createContext({document,Date,console:{warn(){}},location:{replace:url=>redirects.push(url)},window:new EventTarget(),Event,
   setTimeout:(fn,delay)=>{const id=++nextId;timers.set(id,{fn,at:now+delay,interval:0});return id;},
   clearTimeout:id=>timers.delete(id),
@@ -69,7 +69,7 @@ async function sessionTest(run, minutes=10) {
   assert.ok(loggedIn.headers['set-cookie'].endsWith(`Max-Age=${minutes*60}`));
   vm.runInContext(clientScript,context);
   const start=async()=>{vm.runInContext('window.GameEditorSession.start()',context);await settle();};
-  await run({start,event,advance,suspend,dispatch,calls,redirects,document,timers,context,header,coverStyle:()=>elements.get('cover-style')?.textContent,covered:()=>classes.has('editor-session-covered'),cover:()=>elements.get('editor-session-cover'),now:()=>now,setFailure:value=>{failure=value;},cookie:()=>cookie});
+  await run({start,event,advance,suspend,dispatch,calls,redirects,document,timers,context,header,root,alreadyInert,layoutChecks,coverStyle:()=>elements.get('cover-style')?.textContent,covered:()=>classes.has('editor-session-covered'),cover:()=>elements.get('editor-session-cover'),now:()=>now,setFailure:value=>{failure=value;},cookie:()=>cookie});
  } finally {Date.now=realNow;globalThis.fetch=originalFetch;for(const [key,value] of Object.entries({EDITOR_SECRET:previousSecret,SUPABASE_URL:previousUrl,SUPABASE_SECRET_KEY:previousKey})){if(value===undefined)delete process.env[key];else process.env[key]=value;}}
 }
 
@@ -212,10 +212,13 @@ test('session cover keeps static branding visible but disables header interactio
   await s.start();assert.equal(s.header.inert,false);
   s.document.hidden=true;await s.event('visibilitychange');
   assert.equal(s.covered(),true);assert.equal(s.header.inert,true);
+  assert.equal(s.root.inert,true);
   const css=s.coverStyle();
-  assert.match(css,/body > :not\(#editor-session-cover\) \* \{ visibility:hidden !important; pointer-events:none !important;/);
+  assert.match(css,/body > :not\(#editor-session-cover\):not\(header\) \{ opacity:0 !important; visibility:hidden !important; pointer-events:none !important;/);
   assert.match(css,/body > header:not\(#editor-session-cover\) > \.header-inner > \.header-brand-group \* \{ visibility:visible !important;/);
   s.document.hidden=false;await s.event('visibilitychange');
   assert.equal(s.covered(),false);assert.equal(s.header.inert,false);
+  assert.equal(s.root.inert,false);assert.equal(s.alreadyInert.inert,true);
+  assert.deepEqual(s.layoutChecks.at(-1),{covered:false,overlayHidden:false});
  });
 });
