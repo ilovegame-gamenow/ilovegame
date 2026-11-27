@@ -48,3 +48,6 @@
 #latest>#message{font-size:var(--section-title-subtitle);line-height:1.5;margin:4px 0 6px;color:#77706a}
 #latest>#message:empty{display:none}
 #latest #paginationTop>.pagination{margin:6px auto 10px}
+.image-rights-badge { display:inline-block; border-radius:12px; padding:3px 8px; font-size:12px; line-height:1.5; font-weight:700; background:#fff0d9; color:#8a4100; }
+.image-rights-badge.confirmed { background:#dff2e6; color:#175c36; }
+.image-rights-badge.blocked { background:#fce2e2; color:#8d2727; }

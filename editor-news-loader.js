@@ -18,9 +18,10 @@ window.GameEditorNewsLoader = (() => {
       if(signal?.aborted)abort();
     });
   }
-  async function load({ page, status, source, thumbnail, signal, onRetry }) {
+  async function load({ page, status, source, thumbnail, rights, signal, onRetry }) {
     const query=new URLSearchParams({page:String(page),status,source});
     if(thumbnail==='missing')query.set('thumbnail','missing');
+    if(['confirmed','pending','blocked'].includes(rights))query.set('rights',rights);
     for(let attempt=0;attempt<attempts;attempt++){
       try {
         const response=await fetch(`/api/editor-news?${query}`,{method:'GET',credentials:'same-origin',cache:'no-store',signal});

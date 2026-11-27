@@ -48,7 +48,7 @@ test('dashboard displays initial articles after a transient failure without page
   append(...nodes){this.children.push(...nodes);} appendChild(node){this.append(node);}
   replaceChildren(...nodes){this.children=[...nodes];} querySelector(){return null;} focus(){}
  }
- const ids=Object.fromEntries(['articlesList','message','retryArticles','pagination','paginationTop','allCount','pendingCount','publishedCount','rejectedCount','sourceFilters','sourceCountNote','statusCountNote','pendingRecovery','missingThumbnail'].map(id=>[id,new Node()]));
+ const ids=Object.fromEntries(['articlesList','message','retryArticles','pagination','paginationTop','allCount','pendingCount','publishedCount','rejectedCount','sourceFilters','sourceCountNote','statusCountNote','pendingRecovery','missingThumbnail','imageRightsFilter'].map(id=>[id,new Node()]));
  const statusButtons=['all','pending','published','rejected'].map(value=>{const node=new Node();node.dataset.filter=value;return node;});
  const document={activeElement:null,getElementById:id=>ids[id],createElement:()=>new Node(),addEventListener(){},querySelectorAll:selector=>selector==='[data-filter]'?statusButtons:ids.sourceFilters.children};
  let calls=0;
@@ -58,6 +58,8 @@ test('dashboard displays initial articles after a transient failure without page
  const context=vm.createContext({document,window:{addEventListener:(name,fn)=>{pageEvents[name]=fn;},location:{search:'',href:'https://site.invalid/editor-dashboard.html'},history:{replaceState(){}}},location:{search:'',pathname:'/editor-dashboard.html',href:'https://site.invalid/editor-dashboard.html'},history:{replaceState(){}},GameEditorSession:{start(){},expire(){throw Error('Unexpected login redirect');}},GameEditorRecovery:{renderPending(){}},GameNewsCard:{render:()=>'<article></article>'},GamePagination:{render:()=>new Node()},URL,URLSearchParams,AbortController,DOMException,TypeError,SyntaxError,console,sessionStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)},setTimeout:fn=>setTimeout(fn,0),clearTimeout,fetch:async()=>++calls===1?new Response('{}',{status:503}):new Response(JSON.stringify(initial))});
  vm.runInContext(readFileSync(new URL('../editor-navigation.js',import.meta.url),'utf8'),context);
  context.GameEditorNavigation=context.window.GameEditorNavigation;
+ vm.runInContext(readFileSync(new URL('../editor-status.js',import.meta.url),'utf8'),context);
+ context.GameEditorStatus=context.window.GameEditorStatus;
  context.GameImage={getUrl:value=>value||''};
  vm.runInContext(script,context);context.GameEditorNewsLoader=context.window.GameEditorNewsLoader;
  const html=readFileSync(new URL('../editor-dashboard.html',import.meta.url),'utf8');
