@@ -153,7 +153,7 @@
 #articlesList .article-top {
   margin: 0 0 8px;
   align-items: center;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 6px;
 }
 #articlesList .article-top .meta {
@@ -193,7 +193,7 @@
     
 <div class="editor-page-heading"><h1><svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="3" width="16" height="18" rx="2"/><path d="M5 7H3v12a2 2 0 0 0 2 2m4-14h8m-8 4h8m-8 4h5"/></svg>記事管理</h1><p class="section-subtitle">ニュースの確認・編集・掲載</p></div>
 <section id="pendingRecovery" class="editor-recovery-notice" hidden aria-label="中断した記事編集"></section>
-<section class="editor-filters-panel" aria-label="記事の絞り込み">
+<section class="editor-filters-panel article-filters" aria-label="記事の絞り込み">
   <div class="editor-filter-group">
     <div class="editor-inline-heading"><h2 id="statusFilterHeading" class="filter-heading">掲載状態</h2><p id="statusCountNote" class="filter-note section-subtitle">全情報元の掲載状態別件数</p></div>
 <div class="stats" role="group" aria-labelledby="statusFilterHeading" aria-describedby="statusCountNote">
@@ -215,15 +215,26 @@
   </button>
 </div>
   </div>
-  <div class="editor-filter-group">
+  <div class="article-filter-secondary">
+  <div class="editor-filter-group article-source-group">
     <div class="editor-inline-heading"><h2 id="sourceFilterHeading" class="filter-heading">情報元</h2><p id="sourceCountNote" class="filter-note section-subtitle">情報元別の件数を読み込み中…</p></div>
   <div id="sourceFilters" class="source-filters" role="group" aria-labelledby="sourceFilterHeading" aria-describedby="sourceCountNote">
     <button type="button" class="source-filter active" data-source="all" aria-pressed="true">すべて</button>
   </div>
   </div>
-  <div class="editor-filter-group">
-    <label class="filter-note"><input type="checkbox" id="missingThumbnail"> サムネイルなし</label>
-    <label class="filter-note" for="imageRightsFilter">画像の権利：<select id="imageRightsFilter"><option value="all">すべて</option><option value="confirmed">確認済み</option><option value="pending">確認待ち</option><option value="blocked">利用不可</option></select></label>
+  <div class="editor-filter-group article-rights-group">
+    <div class="editor-inline-heading"><h2 id="rightsFilterHeading" class="filter-heading">画像の権利</h2></div>
+    <div id="imageRightsFilter" class="rights-filters" role="group" aria-labelledby="rightsFilterHeading">
+      <button type="button" data-rights="all" aria-pressed="true">すべて</button>
+      <button type="button" data-rights="confirmed" aria-pressed="false">確認済み</button>
+      <button type="button" data-rights="pending" aria-pressed="false">確認待ち</button>
+      <button type="button" data-rights="blocked" aria-pressed="false">利用不可</button>
+    </div>
+  </div>
+  </div>
+  <div class="article-filter-footer">
+    <label class="thumbnail-toggle"><input type="checkbox" id="missingThumbnail"> サムネイルなし</label>
+    <button type="button" id="resetArticleFilters" class="reset-article-filters">絞り込みを解除</button>
   </div>
 </section>
 <section class="panel" id="latest">
@@ -277,15 +288,16 @@ let pageSize = 20;
 let articleCounts = { pending: 0, published: 0, rejected: 0 };
 let currentSource = urlParams.get("source") || "all";
 let missingThumbnail = urlParams.get("thumbnail") === "missing";
-const rightsFilter = document.getElementById("imageRightsFilter");
 let currentRights = ["confirmed","pending","blocked"].includes(urlParams.get("rights")) ? urlParams.get("rights") : "all";
-rightsFilter.value = currentRights;
-rightsFilter.addEventListener("change", () => { currentRights=rightsFilter.value; changeConditions({}); });
 const thumbnailFilter = document.getElementById("missingThumbnail");
 thumbnailFilter.checked = missingThumbnail;
 thumbnailFilter.addEventListener("change", () => {
   missingThumbnail = thumbnailFilter.checked;
   changeConditions({});
+});
+document.getElementById("resetArticleFilters").addEventListener("click", () => {
+  currentRights="all"; missingThumbnail=false; thumbnailFilter.checked=false;
+  changeConditions({status:"all",source:"all"});
 });
 let sourceOptions = [];
 let directoryVersion = null;
@@ -539,6 +551,11 @@ function updateFilterButtons() {
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
   });
+  document.querySelectorAll("[data-rights]").forEach(button => {
+    const active=button.dataset.rights===currentRights;
+    button.classList.toggle("active",active);
+    button.setAttribute("aria-pressed",String(active));
+  });
 }
 
 function renderSources() {
@@ -634,6 +651,12 @@ function changeConditions({ status = currentFilter, source = currentSource }) {
 }
 
 document.addEventListener("click", event => {
+  const rightsButton = event.target.closest("[data-rights]");
+  if (rightsButton && ["all","confirmed","pending","blocked"].includes(rightsButton.dataset.rights)) {
+    currentRights=rightsButton.dataset.rights;
+    changeConditions({});
+    return;
+  }
   const sourceButton = event.target.closest("[data-source]");
   if (sourceButton) {
     event.preventDefault();
