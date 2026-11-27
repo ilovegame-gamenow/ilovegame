@@ -223,6 +223,7 @@
   </div>
   <div class="editor-filter-group">
     <label class="filter-note"><input type="checkbox" id="missingThumbnail"> サムネイルなし</label>
+    <label class="filter-note" for="imageRightsFilter">画像の権利：<select id="imageRightsFilter"><option value="all">すべて</option><option value="confirmed">確認済み</option><option value="pending">確認待ち</option><option value="blocked">利用不可</option></select></label>
   </div>
 </section>
 <section class="panel" id="latest">
@@ -276,6 +277,10 @@ let pageSize = 20;
 let articleCounts = { pending: 0, published: 0, rejected: 0 };
 let currentSource = urlParams.get("source") || "all";
 let missingThumbnail = urlParams.get("thumbnail") === "missing";
+const rightsFilter = document.getElementById("imageRightsFilter");
+let currentRights = ["confirmed","pending","blocked"].includes(urlParams.get("rights")) ? urlParams.get("rights") : "all";
+rightsFilter.value = currentRights;
+rightsFilter.addEventListener("change", () => { currentRights=rightsFilter.value; changeConditions({}); });
 const thumbnailFilter = document.getElementById("missingThumbnail");
 thumbnailFilter.checked = missingThumbnail;
 thumbnailFilter.addEventListener("change", () => {
@@ -304,7 +309,7 @@ let listRequest = null;
 
       try {
         const data = await GameEditorNewsLoader.load({
-          page:currentPage, status:currentFilter, source:currentSource, thumbnail:missingThumbnail?"missing":undefined, signal:listRequest.signal,
+          page:currentPage, status:currentFilter, source:currentSource, thumbnail:missingThumbnail?"missing":undefined, rights:currentRights, signal:listRequest.signal,
           onRetry:()=>{ if(version===loadVersion) message.textContent="記事を読み込み直しています…"; }
         });
         if (version !== loadVersion) return;
@@ -439,6 +444,11 @@ item.appendChild(cardElement || card);
         if (thumbnailState) { badge.style.background = "#fff0d9"; badge.style.color = "#8a4100"; } else if (unrated && article.status === "pending") { badge.textContent = "AI処理待ち"; }
 
         top.appendChild(badge);
+        const rightsBadge = document.createElement("span");
+        const rightsState = ["confirmed","blocked"].includes(article.image_rights_status) ? article.image_rights_status : "pending";
+        rightsBadge.className = "image-rights-badge " + rightsState;
+        rightsBadge.textContent = "画像：" + ({confirmed:"確認済み",pending:"確認待ち",blocked:"利用不可"})[rightsState];
+        top.appendChild(rightsBadge);
 
         const meta = document.createElement("div");
 meta.className = unrated ? "meta ai-unrated-badge" : "meta";
@@ -612,6 +622,7 @@ function changeConditions({ status = currentFilter, source = currentSource }) {
   url.searchParams.set("page", "1");
   if(missingThumbnail)url.searchParams.set("thumbnail","missing");
   else url.searchParams.delete("thumbnail");
+  if(currentRights!=="all")url.searchParams.set("rights",currentRights);else url.searchParams.delete("rights");
   history.replaceState(null, "", url);
   updateFilterButtons();
   document.querySelectorAll("#sourceFilters [data-source]").forEach(button=>{

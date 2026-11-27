@@ -46,7 +46,10 @@ export default async function handler(req, res) {
     "processing_status",
     "status",
     "platforms",
-    "category"
+    "category",
+    "image_rights_status", "image_rights_note", "image_rights_source_url",
+    "image_rights_original_url", "image_rights_evidence_url", "image_rights_holder",
+    "image_rights_credit", "image_rights_scope", "image_rights_verified_at", "image_rights_expires_at"
   ].join(",");
 
   const params = new URLSearchParams({
@@ -57,7 +60,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `${supabaseUrl}/rest/v1/articles?${params.toString()}`,
+      `${supabaseUrl}/rest/v1/editor_article_image_rights?${params.toString()}`,
       {
         headers: {
           apikey: supabaseKey,

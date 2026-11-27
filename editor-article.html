@@ -114,6 +114,18 @@
 
 <p id="draftNotice">${draft ? "保存済みの下書きを表示しています。公開版へは未反映です。" : article.status==='published'?"公開版の記事を表示しています。":"未公開の記事です。内容を確認・編集してから掲載してください。"}</p>
 <section id="articleGameContext" class="article-game-context" aria-label="作品と発見理由"></section>
+<section class="article-game-context" aria-label="画像の権利確認">
+  <h3>画像の権利確認</h3>
+  <p>判定：${esc(({confirmed:"確認済み",blocked:"利用不可",pending:"確認待ち"})[article.image_rights_status] || "確認待ち")}</p>
+  <p>理由：${esc(article.image_rights_note || "記録なし")}</p>
+  <p>出典：${esc(article.image_rights_source_url || "未確認")}</p>
+  <p>根拠：${esc(article.image_rights_evidence_url || "未確認")}</p>
+  <p>権利者・表記：${esc([article.image_rights_holder, article.image_rights_credit].filter(Boolean).join(" ／ ") || "未確認")}</p>
+  <p>確認日時：${esc(article.image_rights_verified_at || "未確認")}</p>
+  <p>利用期限：${esc(article.image_rights_expires_at || "未設定")}</p>
+  <p>利用範囲：${esc(Object.entries(article.image_rights_scope || {}).map(([key,value])=>`${key}: ${value===true?"可":value===false?"不可":"未確認"}`).join(" ／ ") || "未確認")}</p>
+  <p class="section-subtitle">現在の保存済みサムネイルの確認記録です。公開判定や下書きは変更しません。</p>
+</section>
 <div id="articleViewActions">
   <button type="button" id="editArticleButton">
     記事を編集する
