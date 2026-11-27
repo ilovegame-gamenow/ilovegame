@@ -44,13 +44,15 @@ test('changing filters aborts an old retry before sending another request',async
 test('dashboard displays initial articles after a transient failure without page reload',async()=>{
  class Node {
   constructor(){this.children=[];this.dataset={};this.listeners={};this.classList={toggle(){},add(){}};this.hidden=false;this.textContent='';}
-  setAttribute(){} addEventListener(name,fn){this.listeners[name]=fn;}
+  setAttribute(name,value){this[name]=value;} addEventListener(name,fn){this.listeners[name]=fn;}
   append(...nodes){this.children.push(...nodes);} appendChild(node){this.append(node);}
   replaceChildren(...nodes){this.children=[...nodes];} querySelector(){return null;} focus(){}
  }
- const ids=Object.fromEntries(['articlesList','message','retryArticles','pagination','paginationTop','allCount','pendingCount','publishedCount','rejectedCount','sourceFilters','sourceCountNote','statusCountNote','pendingRecovery','missingThumbnail','imageRightsFilter'].map(id=>[id,new Node()]));
+ const ids=Object.fromEntries(['articlesList','message','retryArticles','pagination','paginationTop','allCount','pendingCount','publishedCount','rejectedCount','sourceFilters','sourceCountNote','statusCountNote','pendingRecovery','missingThumbnail','imageRightsFilter','resetArticleFilters'].map(id=>[id,new Node()]));
  const statusButtons=['all','pending','published','rejected'].map(value=>{const node=new Node();node.dataset.filter=value;return node;});
- const document={activeElement:null,getElementById:id=>ids[id],createElement:()=>new Node(),addEventListener(){},querySelectorAll:selector=>selector==='[data-filter]'?statusButtons:ids.sourceFilters.children};
+ const rightsButtons=['all','confirmed','pending','blocked'].map(value=>{const node=new Node();node.dataset.rights=value;return node;});
+ const clickHandlers=[];
+ const document={activeElement:null,getElementById:id=>ids[id],createElement:()=>new Node(),addEventListener(name,fn){if(name==='click')clickHandlers.push(fn);},querySelectorAll:selector=>selector==='[data-filter]'?statusButtons:selector==='[data-rights]'?rightsButtons:ids.sourceFilters.children};
  let calls=0;
  const pageEvents={};
  const storage=new Map();
@@ -78,4 +80,8 @@ test('dashboard displays initial articles after a transient failure without page
  assert.equal(ids.articlesList.children[1].dataset.aiState,'unrated');
  assert.equal(descendants(ids.articlesList).filter(node=>node.className==='meta ai-unrated-badge').length,1);
  assert.equal(descendants(ids.articlesList).find(node=>node.className==='meta ai-unrated-badge').textContent,'AI未評価');
+ clickHandlers[0]({target:{closest:selector=>selector==='[data-rights]'?rightsButtons[3]:null}});
+ assert.equal(rightsButtons[3]['aria-pressed'],'true');assert.equal(rightsButtons[0]['aria-pressed'],'false');
+ ids.resetArticleFilters.listeners.click();
+ assert.equal(rightsButtons[0]['aria-pressed'],'true');assert.equal(rightsButtons[3]['aria-pressed'],'false');
 });
