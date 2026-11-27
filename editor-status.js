@@ -72,13 +72,18 @@ window.GameEditorStatus = (() => {
   function thumbnailState(article) {
     if (article.status !== "pending") return null;
     const states = {
-      chatgpt_thumbnail_wait_1: ["サムネイル取得待ち", "1/3"],
-      chatgpt_thumbnail_wait_2: ["サムネイル取得待ち", "2/3"],
-      chatgpt_thumbnail_processing_1: ["サムネイル取得中", "1/3"],
-      chatgpt_thumbnail_processing_2: ["サムネイル取得中", "2/3"],
-      chatgpt_thumbnail_review: ["サムネイル要確認", "3/3"]
+      chatgpt_thumbnail_wait_1: "画像取得待ち",
+      chatgpt_thumbnail_wait_2: "画像取得待ち",
+      chatgpt_thumbnail_processing_1: "画像取得中",
+      chatgpt_thumbnail_processing_2: "画像取得中",
+      chatgpt_thumbnail_review: "画像要確認"
     };
-    return Object.hasOwn(states, article.processing_status) ? states[article.processing_status].join(" ") : null;
+    return Object.hasOwn(states, article.processing_status) ? states[article.processing_status] : null;
   }
-  return { update, confirmChange, thumbnailState };
+  function imageState(article) {
+    if (!String(article.thumbnail_url || '').trim()) return { status:'pending', label:thumbnailState(article) || '画像未設定' };
+    const status = ['confirmed','blocked'].includes(article.image_rights_status) ? article.image_rights_status : 'pending';
+    return {status,label:({confirmed:'画像権利確認済み',pending:'画像権利確認待ち',blocked:'画像利用不可'})[status]};
+  }
+  return { update, confirmChange, thumbnailState, imageState };
 })();
