@@ -72,6 +72,8 @@ window.GameEditorStatus = (() => {
   function thumbnailState(article) {
     if (article.status !== "pending") return null;
     const states = {
+      chatgpt_thumbnail_wait: "画像取得待ち",
+      chatgpt_thumbnail_processing: "画像取得中",
       chatgpt_thumbnail_wait_1: "画像取得待ち",
       chatgpt_thumbnail_wait_2: "画像取得待ち",
       chatgpt_thumbnail_processing_1: "画像取得中",
