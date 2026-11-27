@@ -15,13 +15,16 @@ window.GameEditorSession = (() => {
   let recoveryBlocked = false;
   let checkGeneration = 0;
   let cover = null;
+  const concealedRoots = new Map();
 
   // Hide the previous editor view before Safari can restore its snapshot.
   function showCover(message = "ログイン状態を確認しています…", retry = false, recovery = false) {
     covered = true;
     if (!cover) {
       const style = document.createElement('style');
-      style.textContent = `html.editor-session-covered body > :not(#editor-session-cover), html.editor-session-covered body > :not(#editor-session-cover) * { visibility:hidden !important; pointer-events:none !important; }
+      style.textContent = `html.editor-session-covered body > :not(#editor-session-cover):not(header) { opacity:0 !important; visibility:hidden !important; pointer-events:none !important; }
+      html.editor-session-covered body > :not(#editor-session-cover):not(header) * { pointer-events:none !important; }
+      html.editor-session-covered body > header:not(#editor-session-cover) * { visibility:hidden !important; pointer-events:none !important; }
       /* Preserve only the static brand; all editorial data and controls stay concealed and inert. */
       html.editor-session-covered body > header:not(#editor-session-cover) { visibility:visible !important; position:relative; z-index:2147483647; }
       html.editor-session-covered body > header:not(#editor-session-cover) > .header-inner > .header-brand-group, html.editor-session-covered body > header:not(#editor-session-cover) > .header-inner > .header-brand-group * { visibility:visible !important; }
@@ -35,6 +38,11 @@ window.GameEditorSession = (() => {
       document.body.append(cover);
     }
     document.documentElement.classList.add('editor-session-covered');
+    for (const root of document.body.children || []) {
+      if (root === cover || root.tagName === 'HEADER' || concealedRoots.has(root)) continue;
+      concealedRoots.set(root, root.inert);
+      root.inert = true;
+    }
     const header = document.querySelector('body > header');
     if (header) header.inert = true;
     cover.querySelector('p').textContent = message;
@@ -45,8 +53,13 @@ window.GameEditorSession = (() => {
   }
 
   function hideCover() {
-    if (cover) cover.hidden = true;
+    // Restore the page while the opaque cover is still in place, then flush layout
+    // before removing it. Avoid recursively changing visibility on every article card.
     document.documentElement.classList.remove('editor-session-covered');
+    document.documentElement.getBoundingClientRect?.();
+    if (cover) cover.hidden = true;
+    for (const [root, wasInert] of concealedRoots) root.inert = wasInert;
+    concealedRoots.clear();
     const header = document.querySelector('body > header');
     if (header) header.inert = false;
     covered = false;
