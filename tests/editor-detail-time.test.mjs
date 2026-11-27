@@ -12,7 +12,7 @@ test('editor details return the same original timestamp fields as article lists'
   globalThis.fetch=async(input,options={})=>{
     assert.equal(options.method,undefined);
     const url=new URL(input);
-    if(url.pathname.endsWith('/articles')){
+    if(url.pathname.endsWith('/editor_article_image_rights')){
       const fields=url.searchParams.get('select').split(',');
       for(const field of ['site_published_at','created_at','published_at','processing_status'])assert.ok(fields.includes(field));
       return Response.json([article]);

@@ -5,6 +5,7 @@ import { getArticleById } from '../lib/article-repository.js';
 import { getArticleDraft, saveArticleDraft, applyArticleDraft, discardArticleDraft, recoverArticleDraft } from '../lib/article-draft-repository.js';
 import { readDraftContent } from '../lib/article-draft-content.js';
 import { hasCompleteArticleContent } from '../lib/article-publication.js';
+import { parseImageRights, saveImageRights } from '../lib/editor-image-rights.js';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -18,15 +19,22 @@ export default async function handler(req, res) {
     return handleMediaArticleRegistration(req,res);
   }
   const { id, action = 'save' } = req.body || {};
-  if (!Number.isSafeInteger(id) || id <= 0 || !['save', 'apply', 'regenerate', 'discard', 'recover'].includes(action)) {
+  if (!Number.isSafeInteger(id) || id <= 0 || !['save', 'apply', 'regenerate', 'discard', 'recover', 'image_rights'].includes(action)) {
     return res.status(400).json({ error: 'Invalid request' });
   }
+  if (action === 'image_rights' && !requireEditorOrigin(req,res)) return;
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SECRET_KEY;
   if (!url || !key) return res.status(503).json({ error: 'Database unavailable' });
   try {
     const article = await getArticleById(url, key, id);
     if (!article) return res.status(404).json({ error: 'Article not found' });
+    if (action === 'image_rights') {
+      const record = parseImageRights(req.body);
+      if (!record) return res.status(400).json({error:'確認内容・根拠・利用範囲を見直してください'});
+      if (!await saveImageRights(url,key,id,record,article)) return res.status(409).json({error:'画像が変更されました。ページを再読み込みしてください'});
+      return res.status(200).json({ok:true});
+    }
     if (action === 'regenerate') {
       if (!process.env.OPENAI_API_KEY) return res.status(503).json({ error: 'Service unavailable' });
       // 生成結果は入力欄へ返すだけ。下書き保存も公開反映も行わない。

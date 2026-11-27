@@ -1,0 +1,12 @@
+.rights-form{display:grid;gap:14px;margin-top:14px}
+.rights-fields,.rights-scopes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}
+.rights-form label{display:grid;gap:5px;font-size:.92rem;font-weight:600;min-width:0}
+.rights-form :is(input,select,textarea){width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ded3c5;border-radius:8px;background:white;color:#333;font:inherit;min-height:40px}
+.rights-form fieldset{border:1px solid #ded3c5;border-radius:10px;padding:12px;min-width:0}
+.rights-form legend{font-size:.92rem;font-weight:600}
+.rights-form [data-rights-image]{margin:0;font-size:.85rem;color:#786d60;overflow-wrap:anywhere}
+[data-rights-badge]{font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:999px;background:#fff0d9;color:#8a4100}
+[data-rights-badge][data-state=confirmed]{background:#dcf2e8;color:#17634a}
+[data-rights-badge][data-state=blocked]{background:#fbe0df;color:#9c2929}
+#articleImageRights summary{cursor:pointer;color:#a95012;font-weight:700}
+.rights-form [data-rights-result]{font-size:.9rem;min-height:1.5em;align-self:center}
