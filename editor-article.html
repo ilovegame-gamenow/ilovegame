@@ -107,8 +107,7 @@
     id="articleStatus"
     class="editor-status-badge"
     data-status="${article.status}"
-   style="${thumbnailState ? "background:#fff0d9;color:#8a4100" : ""}"
-  >${thumbnailState || ({ pending: unrated ? "AI処理待ち" : "審査待ち", published: "掲載中", rejected: "非掲載" })[article.status] || "不明"}</span>
+  >${({ pending: unrated ? "AI処理待ち" : "審査待ち", published: "掲載中", rejected: "非掲載" })[article.status] || "不明"}</span>
 </div>
 
 
@@ -116,7 +115,7 @@
 <section id="articleGameContext" class="article-game-context" aria-label="作品と発見理由"></section>
 <section class="article-game-context" aria-label="画像の権利確認">
   <h3>画像の権利確認</h3>
-  <p>判定：${esc(({confirmed:"確認済み",blocked:"利用不可",pending:"確認待ち"})[article.image_rights_status] || "確認待ち")}</p>
+  <p>画像状態：${esc(GameEditorStatus.imageState(article).label)}</p>
   <p>理由：${esc(article.image_rights_note || "記録なし")}</p>
   <p>出典：${esc(article.image_rights_source_url || "未確認")}</p>
   <p>根拠：${esc(article.image_rights_evidence_url || "未確認")}</p>

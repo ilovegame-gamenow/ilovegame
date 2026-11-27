@@ -452,14 +452,13 @@ item.appendChild(cardElement || card);
 
         const badge = document.createElement("span");
         badge.className = "badge " + article.status;
-        badge.textContent = thumbnailState || labels[article.status] || "不明";
-        if (thumbnailState) { badge.style.background = "#fff0d9"; badge.style.color = "#8a4100"; } else if (unrated && article.status === "pending") { badge.textContent = "AI処理待ち"; }
+        badge.textContent = unrated && article.status === "pending" ? "AI処理待ち" : labels[article.status] || "不明";
 
         top.appendChild(badge);
         const rightsBadge = document.createElement("span");
-        const rightsState = ["confirmed","blocked"].includes(article.image_rights_status) ? article.image_rights_status : "pending";
-        rightsBadge.className = "image-rights-badge " + rightsState;
-        rightsBadge.textContent = "画像：" + ({confirmed:"確認済み",pending:"確認待ち",blocked:"利用不可"})[rightsState];
+        const imageState = GameEditorStatus.imageState(article);
+        rightsBadge.className = "image-rights-badge " + imageState.status;
+        rightsBadge.textContent = imageState.label;
         top.appendChild(rightsBadge);
 
         const meta = document.createElement("div");

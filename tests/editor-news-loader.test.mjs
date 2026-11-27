@@ -62,6 +62,12 @@ test('dashboard displays initial articles after a transient failure without page
  context.GameEditorNavigation=context.window.GameEditorNavigation;
  vm.runInContext(readFileSync(new URL('../editor-status.js',import.meta.url),'utf8'),context);
  context.GameEditorStatus=context.window.GameEditorStatus;
+ const states=context.GameEditorStatus;
+ assert.equal(states.imageState({status:'pending',processing_status:'chatgpt_thumbnail_wait_1'}).label,'画像取得待ち');
+ assert.equal(states.imageState({status:'pending',processing_status:'chatgpt_thumbnail_wait_2'}).label,'画像取得待ち');
+ assert.equal(states.imageState({status:'pending',processing_status:'chatgpt_thumbnail_review',thumbnail_url:'https://example.invalid/image.jpg'}).label,'画像権利確認待ち');
+ assert.equal(states.imageState({status:'pending',processing_status:'chatgpt_thumbnail_review',thumbnail_url:'https://example.invalid/image.jpg',image_rights_status:'confirmed'}).label,'画像権利確認済み');
+ assert.equal(states.imageState({status:'pending',thumbnail_url:'https://example.invalid/image.jpg',image_rights_status:'blocked'}).label,'画像利用不可');
  context.GameImage={getUrl:value=>value||''};
  vm.runInContext(script,context);context.GameEditorNewsLoader=context.window.GameEditorNewsLoader;
  const html=readFileSync(new URL('../editor-dashboard.html',import.meta.url),'utf8');
